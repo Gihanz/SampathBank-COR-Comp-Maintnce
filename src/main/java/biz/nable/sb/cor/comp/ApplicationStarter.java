@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /*
 **
  */
-@ComponentScan("biz.nable.sb.cor")
+@ComponentScan(basePackages = { "biz.nable.sb.cor", "biz.nable.sb.cor.common" })
 @SpringBootApplication
-@EntityScan("biz.nable.sb.cor")
-@EnableJpaRepositories("biz.nable.sb.cor")
+@EntityScan(basePackages = { "biz.nable.sb.cor", "biz.nable.sb.cor.common.db.entity" })
+@EnableJpaRepositories(basePackages = { "biz.nable.sb.cor", "biz.nable.sb.cor.common.db.repository" })
 @EnableJpaAuditing
 @EnableTransactionManagement
 @EnableAutoConfiguration
