@@ -146,7 +146,7 @@ public class LinkCompanyService {
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setRequestType(REQUEST_TYPE.name());
 		bean.setHashTags(LINK_COMPANY_HASH_TAG.concat(companyId));
-		List<TempDto> tempList = linkCompanyTempComponent.getTempRecord(bean).getTempList();
+		List<TempDto> tempList = linkCompanyTempComponent.getAuthPendingRecord(bean).getTempList();
 		List<CustomerIdResponseBean> customerIdsResponse = new ArrayList<>();
 		for (TempDto tempDto : tempList) {
 			LinkCompanyRequest customerId = commonConverter.mapToPojo(tempDto.getRequestPayload(),

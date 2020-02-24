@@ -35,6 +35,9 @@ public class CompanyAccountMst extends Auditable {
 	private String accountNo;
 	@Column(length = 80)
 	private String accountName;
+	@Column(length = 80)
+	private String nickName;
+	private String accountType;
 	private Double accBalance;
 	@Column(length = 3)
 	private String jointSerial;
@@ -59,6 +62,8 @@ public class CompanyAccountMst extends Auditable {
 	private String acctCurr;
 	@Column(length = 3)
 	private String acctSolId;
+	@Column(length = 3)
+	private String currency;
 
 	private Date acctOpenDate;
 }

@@ -1,5 +1,9 @@
 package biz.nable.sb.cor.comp.bean;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -18,16 +22,14 @@ public class CompanyBean {
 	@NotEmpty(message = "companyName should not be empty")
 	@NotNull(message = "companyName should not be null")
 	private String companyName;
-	private String address1;
-	private String address2;
-	private String city;
-	private String country;
 	private String contactNo;
 	private String faxNo;
 	private String emailAddr;
 	private String contactPerson;
 	@JsonIgnore
 	private String createBy;
+	@JsonIgnore
+	private Date createDate;
 	@JsonIgnore
 	private String lastModifiedBy;
 	@JsonIgnore
@@ -47,6 +49,7 @@ public class CompanyBean {
 	private String wsIp;
 	private String districtCode;
 	private String requestId;
-	private Long authorizationLevels;
+	@JsonIgnore
 	private String userGroup;
+	private List<Long> companyFeatures = new ArrayList<>();
 }

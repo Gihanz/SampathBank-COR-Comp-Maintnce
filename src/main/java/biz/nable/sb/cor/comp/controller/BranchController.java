@@ -158,7 +158,7 @@ public class BranchController {
 
 	@ApiOperation(value = "Get Auth pending Branch List", nickname = "Get Auth pending Branch List", notes = "Get Auth pending Branch List.", httpMethod = "GET")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching Auth pending Branch list successful", response = CommonGetListResponse.class, responseContainer = "Res conta"),
+			@ApiResponse(code = 200, message = "Fetching Auth pending Branch list successful", response = CommonGetListResponse.class),
 			@ApiResponse(code = 400, message = "Get Auth pending Branchlist fail", response = CommonResponse.class),
 			@ApiResponse(code = 500, message = "Internal server error", response = CommonResponse.class) })
 	@GetMapping("/v1/branch/pending")

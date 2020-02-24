@@ -1,6 +1,8 @@
 package biz.nable.sb.cor.comp.request;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -13,11 +15,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class UpdateCompanyRequest implements CommonTempBean {
-//	private String address1;
-//	private String address2;
-//	private String city;
-//	private String country;
 
+	private String companyId;
 	private String contactNo;
 	private String emailAddr;
 	private String epfCode;
@@ -40,8 +39,5 @@ public class UpdateCompanyRequest implements CommonTempBean {
 	@JsonIgnore
 	protected Date lastUpdatedDate;
 
-//	private String faxNo;
-//	private String commTemplateId;
-//	private McAuthEnum mcAuthFlg;
-//	private String requestId;
+	private List<Long> companyFeatures = new ArrayList<>();
 }

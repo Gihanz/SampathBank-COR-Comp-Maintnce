@@ -2,6 +2,7 @@ package biz.nable.sb.cor.comp.service.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,17 +18,15 @@ import org.springframework.stereotype.Service;
 import biz.nable.sb.cor.common.bean.CommonRequestBean;
 import biz.nable.sb.cor.common.bean.CommonResponseBean;
 import biz.nable.sb.cor.common.bean.CommonSearchBean;
-import biz.nable.sb.cor.common.bean.CommonTempBean;
 import biz.nable.sb.cor.common.bean.FindTempByRefBean;
 import biz.nable.sb.cor.common.bean.TempDto;
 import biz.nable.sb.cor.common.exception.RecordNotFoundException;
 import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
-import biz.nable.sb.cor.common.response.GetTempResponse;
 import biz.nable.sb.cor.common.service.impl.CommonConverter;
 import biz.nable.sb.cor.common.utility.ActionTypeEnum;
 import biz.nable.sb.cor.common.utility.StatusEnum;
-import biz.nable.sb.cor.comp.bean.CompanyResponseBean;
+import biz.nable.sb.cor.comp.bean.CompanyListResponseBean;
 import biz.nable.sb.cor.comp.bean.CompanySummeryBean;
 import biz.nable.sb.cor.comp.bean.CompanyTempBean;
 import biz.nable.sb.cor.comp.bean.FindCompanyBean;
@@ -45,6 +44,7 @@ import biz.nable.sb.cor.comp.response.CompanyListResponse;
 import biz.nable.sb.cor.comp.response.CompanyResponse;
 import biz.nable.sb.cor.comp.response.CompanySummeryListResponse;
 import biz.nable.sb.cor.comp.response.GetCompanyByIdResponse;
+import biz.nable.sb.cor.comp.response.GetTempCompanyResponse;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 import biz.nable.sb.cor.comp.utility.RequestTypeEnum;
@@ -89,6 +89,9 @@ public class CompanyService {
 					LocaleContextHolder.getLocale()));
 		} else {
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
+			createCompanyRequest.setCreateDate(new Date());
+			createCompanyRequest.setCreateBy(userId);
+			createCompanyRequest.setUserGroup(userGroup);
 			commonRequestBean.setCommonTempBean(createCompanyRequest);
 			String hashTags = "";
 			String referenceNo = createCompanyRequest.getCompanyId();
@@ -149,27 +152,63 @@ public class CompanyService {
 		logger.info("Start getCompanyList method");
 		List<CompanyMst> listCompanyMsts = companyCustomRepository.findCompanyList(findCompanyBean);
 
-		List<CompanyResponse> companyResponses = new ArrayList<>();
+		logger.info("Start get Company temp List");
+		CommonSearchBean bean = new CommonSearchBean();
+		bean.setRequestType(REQUEST_TYPE.name());
+		bean.setUserGroup(userGroup);
+		List<CompanyTempBean> commonTempBeans = getCompanyTemp(bean);
+
+		List<CompanyListResponseBean> companyListResponseBeans = buildCompanyListResponse(listCompanyMsts,
+				commonTempBeans);
+
+		logger.info("End getCompanyList method execution with {} records", companyListResponseBeans.size());
+		companyListResponse.setReturnCode(HttpStatus.OK.value());
+		companyListResponse.setReturnMessage(
+				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
+		companyListResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+		companyListResponse.setCompanyResponseList(companyListResponseBeans);
+
+		logger.info("================== End Get Company List =================");
+		return companyListResponse;
+	}
+
+	private List<CompanyListResponseBean> buildCompanyListResponse(List<CompanyMst> listCompanyMsts,
+			List<CompanyTempBean> commonTempBeans) {
+		List<CompanyListResponseBean> companyListResponseBeans = new ArrayList<>();
+
+		logger.info("<====== Start mapping companyMst to companyResponse and companyTempResponses =======>");
 		for (CompanyMst companyMst : listCompanyMsts) {
+			CompanyListResponseBean companyListResponseBean = new CompanyListResponseBean();
 			CompanyResponse companyResponse = new CompanyResponse();
 			try {
 				BeanUtils.copyProperties(companyResponse, companyMst);
-				companyResponses.add(companyResponse);
+				companyListResponseBean.setCompanyResponse(companyResponse);
+				if (!RecordStatusEnum.ACTIVE.equals(companyMst.getRecordStatus())) {
+					CompanyTempBean tempCompanyResponse = commonTempBeans.stream()
+							.filter(company -> company.getCompanyId().equals(companyResponse.getCompanyId())).findAny()
+							.orElse(null);
+					companyListResponseBean.setTempCompanyResponse(tempCompanyResponse);
+				}
+				companyListResponseBeans.add(companyListResponseBean);
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SystemException(
 						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
 						ErrorCode.DATA_COPY_ERROR);
 			}
 		}
-		logger.info("End getCompanyList method execution with {} records", companyResponses.size());
-		companyListResponse.setReturnCode(HttpStatus.OK.value());
-		companyListResponse.setReturnMessage(
-				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
-		companyListResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-		companyListResponse.setCompanyResponse(companyResponses);
 
-		logger.info("================== End Get Company List =================");
-		return companyListResponse;
+		logger.info("<====== End mapping companyMst to companyResponse and companyTempResponses =======>");
+		logger.info("<====== Start mapping new create request to companyTempResponses =======>");
+		for (CompanyTempBean companyTempBean : commonTempBeans) {
+			if (ActionTypeEnum.CREATE.equals(companyTempBean.getActionType())) {
+				CompanyListResponseBean companyListResponseBean = new CompanyListResponseBean();
+				companyListResponseBean.setTempCompanyResponse(companyTempBean);
+				companyListResponseBeans.add(companyListResponseBean);
+			}
+		}
+		logger.info("<====== Start mapping new create request to companyTempResponses =======>");
+
+		return companyListResponseBeans;
 	}
 
 	public CommonResponse getCompanySummeryList(StatusEnum status, String userId, String userGroup) {
@@ -221,7 +260,7 @@ public class CompanyService {
 		logger.info("================== Start Get Company By Id =================");
 		Optional<CompanyMst> companyMstO = companyMstRepository.findByCompanyId(companyId);
 		GetCompanyByIdResponse getCompanyByIdResponse = new GetCompanyByIdResponse();
-		CompanyResponseBean companyBean = new CompanyResponseBean();
+		CompanyResponse companyBean = new CompanyResponse();
 		if (companyMstO.isPresent()) {
 			try {
 				BeanUtils.copyProperties(companyBean, companyMstO.get());
@@ -303,8 +342,7 @@ public class CompanyService {
 	}
 
 	public CommonResponse getTempRecord(FindCompanyRequest searchBy, String userId, String userGroup) {
-		GetTempResponse commonResponse = new GetTempResponse();
-		List<CommonTempBean> commonTempBeans = new ArrayList<>();
+		GetTempCompanyResponse commonResponse = new GetTempCompanyResponse();
 		logger.info("================== Start Get Temp data =================");
 
 		CommonSearchBean bean = new CommonSearchBean();
@@ -312,14 +350,8 @@ public class CompanyService {
 		bean.setRequestType(REQUEST_TYPE.name());
 		bean.setHashTags(searchBy.getHashTags());
 		bean.setUserGroup(userGroup);
-		bean.setUserId(userId);
-		List<TempDto> tempList = companyTempComponent.getTempRecord(bean).getTempList();
-		for (TempDto tempDto : tempList) {
-			CompanyTempBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(),
-					CompanyTempBean.class);
-			companyTempBean.setTempId(tempDto.getId());
-			commonTempBeans.add(companyTempBean);
-		}
+		// bean.setUserId(userId);
+		List<CompanyTempBean> commonTempBeans = getCompanyTemp(bean);
 		commonResponse.setCommonTempBeans(commonTempBeans);
 		commonResponse.setReturnCode(HttpStatus.OK.value());
 		commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
@@ -327,6 +359,21 @@ public class CompanyService {
 				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
 		logger.info("================== End get temp data =================");
 		return commonResponse;
+	}
+
+	private List<CompanyTempBean> getCompanyTemp(CommonSearchBean bean) {
+		List<TempDto> tempList = companyTempComponent.getTempRecord(bean).getTempList();
+		List<CompanyTempBean> commonTempBeans = new ArrayList<>();
+		for (TempDto tempDto : tempList) {
+			CompanyTempBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(),
+					CompanyTempBean.class);
+			companyTempBean.setTempId(tempDto.getId());
+			companyTempBean.setRequestedBy(tempDto.getCreatedBy());
+			companyTempBean.setRequestedDate(tempDto.getCreatedDate());
+			companyTempBean.setActionType(tempDto.getActionType());
+			commonTempBeans.add(companyTempBean);
+		}
+		return commonTempBeans;
 	}
 
 	public CommonResponse getApprovalPendingRecord(FindCompanyRequest searchBy, String userId, String userGroup) {
@@ -342,9 +389,10 @@ public class CompanyService {
 					ErrorCode.DATA_COPY_ERROR);
 		}
 		bean.setUserGroup(userGroup);
+		bean.setUserId(userId);
 		bean.setRequestType(REQUEST_TYPE.name());
 
-		List<TempDto> tempList = companyTempComponent.getTempRecord(bean).getTempList();
+		List<TempDto> tempList = companyTempComponent.getAuthPendingRecord(bean).getTempList();
 
 		commonResponse.setTempDtos(tempList);
 		commonResponse.setReturnCode(HttpStatus.OK.value());

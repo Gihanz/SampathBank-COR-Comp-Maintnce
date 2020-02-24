@@ -3,6 +3,7 @@ package biz.nable.sb.cor.comp.component;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import biz.nable.sb.cor.common.annotation.AuthPending;
 import biz.nable.sb.cor.common.annotation.FindTempRecord;
 import biz.nable.sb.cor.common.annotation.TempRecord;
 import biz.nable.sb.cor.common.bean.CommonRequestBean;
@@ -22,6 +23,11 @@ public class LinkCompanyTempComponent {
 
 	@FindTempRecord
 	public CommonSearchBean getTempRecord(CommonSearchBean commonSearchBean) {
+		return commonSearchBean;
+	}
+
+	@AuthPending
+	public CommonSearchBean getAuthPendingRecord(CommonSearchBean commonSearchBean) {
 		return commonSearchBean;
 	}
 

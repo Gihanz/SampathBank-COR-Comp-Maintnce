@@ -1,5 +1,6 @@
 package biz.nable.sb.cor.comp.db.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -35,15 +36,6 @@ public class CompanyMst extends Auditable {
 	private Long parentCompanyId;
 	@Column(length = 80)
 	private String companyName;
-	@Column(length = 100)
-	private String address1;
-	@Column(length = 100)
-	private String address2;
-	@Column(length = 40)
-	private String city;
-	@Column(length = 50)
-	private String country;
-	@Column(length = 20)
 	private String contactNo;
 	@Column(length = 12)
 	private String faxNo;
@@ -75,10 +67,15 @@ public class CompanyMst extends Auditable {
 	private String requestId;
 	@Column(length = 3)
 	private String districtCode;
-	private Long authorizationLevels;
 	private StatusEnum status = StatusEnum.ACTIVE;
 	private RecordStatusEnum recordStatus = RecordStatusEnum.CREATE_PENDING;
 
 	@OneToMany(mappedBy = "company")
 	List<BranchMst> branchMsts;
+
+	@OneToMany(mappedBy = "company")
+	List<CompanyUser> companyUsers;
+
+	@OneToMany(mappedBy = "company")
+	List<CompanyFeatures> companyFeatures = new ArrayList<>();
 }

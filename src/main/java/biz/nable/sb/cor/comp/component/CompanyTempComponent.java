@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import biz.nable.sb.cor.common.annotation.Approve;
+import biz.nable.sb.cor.common.annotation.AuthPending;
 import biz.nable.sb.cor.common.annotation.FindTempRecord;
 import biz.nable.sb.cor.common.annotation.FindTempRecordByRef;
 import biz.nable.sb.cor.common.annotation.TempRecord;
@@ -42,6 +43,11 @@ public class CompanyTempComponent {
 
 	@FindTempRecord
 	public CommonSearchBean getTempRecord(CommonSearchBean commonSearchBean) {
+		return commonSearchBean;
+	}
+
+	@AuthPending
+	public CommonSearchBean getAuthPendingRecord(CommonSearchBean commonSearchBean) {
 		return commonSearchBean;
 	}
 

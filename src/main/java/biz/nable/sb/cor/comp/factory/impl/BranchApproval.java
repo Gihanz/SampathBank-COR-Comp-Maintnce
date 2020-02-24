@@ -166,8 +166,8 @@ public class BranchApproval implements CommonApprovalTemplate {
 
 			if (Boolean.TRUE.equals(isExist)) {
 				logger.info("Company already linked");
-				throw new SystemException(messageSource.getMessage(ErrorCode.Branch_RECORD_ALREADY_EXISTS, null,
-						LocaleContextHolder.getLocale()), ErrorCode.Branch_RECORD_ALREADY_EXISTS);
+				throw new SystemException(messageSource.getMessage(ErrorCode.BRANCH_RECORD_ALREADY_EXISTS, null,
+						LocaleContextHolder.getLocale()), ErrorCode.BRANCH_RECORD_ALREADY_EXISTS);
 			}
 			logger.info("Start Inserting a link");
 			BranchMst branchMst = new BranchMst();

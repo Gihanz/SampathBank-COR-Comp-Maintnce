@@ -15,13 +15,15 @@ public class ErrorCode {
 	public static final String NO_COMPANY_RECORD_FOUND = "B4042";
 	public static final String NO_LINK_COMPANY_RECORD_FOUND = "B4043";
 	public static final String NO_BRANCH_RECORD_FOUND = "B4043";
+	public static final String NO_USER_RECORD_FOUND = "B4044";
 
 	public static final String OPARATION_SUCCESS = "B200";
 	public static final String RETRIVE_COMPANY_SUCCESS = "B201";
 
 	public static final String COMPANY_RECORD_ALREADY_EXISTS = "B4091";
 	public static final String LINK_COMPANY_RECORD_ALREADY_EXISTS = "B4092";
-	public static final String Branch_RECORD_ALREADY_EXISTS = "B4093";
+	public static final String BRANCH_RECORD_ALREADY_EXISTS = "B4093";
+	public static final String USER_RECORD_ALREADY_EXISTS = "B4094";
 
 	public static final String CUSTOMER_ID_ALREADY_LINK = "BCMT10";
 

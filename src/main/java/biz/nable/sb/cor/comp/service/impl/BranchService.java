@@ -89,11 +89,11 @@ public class BranchService {
 					.anyMatch(x -> x.getBranchId().equals(createBranchRequest.getBranchId()));
 
 			if (Boolean.TRUE.equals(isExist)) {
-				logger.info(messageSource.getMessage(ErrorCode.Branch_RECORD_ALREADY_EXISTS, null,
+				logger.info(messageSource.getMessage(ErrorCode.BRANCH_RECORD_ALREADY_EXISTS, null,
 						LocaleContextHolder.getLocale()));
-				commonResponse.setErrorCode(ErrorCode.Branch_RECORD_ALREADY_EXISTS);
+				commonResponse.setErrorCode(ErrorCode.BRANCH_RECORD_ALREADY_EXISTS);
 				commonResponse.setReturnCode(HttpStatus.CONFLICT.value());
-				commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.Branch_RECORD_ALREADY_EXISTS, null,
+				commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.BRANCH_RECORD_ALREADY_EXISTS, null,
 						LocaleContextHolder.getLocale()));
 			} else {
 				CommonRequestBean commonRequestBean = new CommonRequestBean();
@@ -116,69 +116,13 @@ public class BranchService {
 		}
 		return commonResponse;
 	}
-//
-//	public CommonResponse getCustomerIds(String companyId, String userId, String userGroup, String requestId) {
-//		logger.info("================== Start Get Company By Id =================");
-//		Optional<CompanyMst> companyMstO = companyMstRepository.findByCompanyId(companyId);
-//
-//		List<CustomerIdResponseBean> customerIds = getTempList(companyId);
-//		GetCustomerIdsResponse customerIdsResponse = new GetCustomerIdsResponse();
-//		customerIdsResponse.getListOfLinkedCompanies().addAll(customerIds);
-//		if (companyMstO.isPresent()) {
-//			List<CompanyCummData> linkCompanies = branchMstRepository.findByParentCompanyId(companyId);
-//
-//			for (CompanyCummData companyCummData : linkCompanies) {
-//				Optional<CompanyMst> customerO = companyMstRepository.findByCompanyId(companyCummData.getCustomerId());
-//				if (customerO.isPresent()) {
-//					CustomerIdResponseBean customerId = new CustomerIdResponseBean();
-//					customerId.setCompanyId(customerO.get().getCompanyId());
-//					customerId.setCompanyName(customerO.get().getCompanyName());
-//					customerId.setStatus(StatusEnum.ACTIVE.name());
-//					customerIdsResponse.getListOfLinkedCompanies().add(customerId);
-//				}
-//			}
-//
-//		}
-//		customerIdsResponse.setReturnCode(HttpStatus.OK.value());
-//		customerIdsResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-//		customerIdsResponse.setReturnMessage(
-//				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
-//		logger.info("================== End Get Company By Id =================");
-//		return customerIdsResponse;
-//	}
-//
-//	private List<CustomerIdResponseBean> getTempList(String companyId) {
-//		logger.info("Start get temp Link Companys for {}", companyId);
-//
-//		CommonSearchBean bean = new CommonSearchBean();
-//		bean.setRequestType(REQUEST_TYPE.name());
-//		bean.setHashTags(LINK_COMPANY_HASH_TAG.concat(companyId));
-//		List<TempDto> tempList = linkCompanyTempComponent.getTempRecord(bean).getTempList();
-//		List<CustomerIdResponseBean> customerIdsResponse = new ArrayList<>();
-//		for (TempDto tempDto : tempList) {
-//			LinkCompanyRequest customerId = commonConverter.mapToPojo(tempDto.getRequestPayload(),
-//					LinkCompanyRequest.class);
-//			Optional<CompanyMst> customerO = companyMstRepository.findByCompanyId(customerId.getCustomerId());
-//			if (customerO.isPresent()) {
-//				CustomerIdResponseBean customerIdResopnse = new CustomerIdResponseBean();
-//				customerIdResopnse.setCompanyId(customerO.get().getCompanyId());
-//				customerIdResopnse.setCompanyName(customerO.get().getCompanyName());
-//				customerIdResopnse.setStatus(StatusEnum.PENDING.name());
-//				customerIdsResponse.add(customerIdResopnse);
-//			}
-//
-//		}
-//		logger.info("End get temp Link Companys ");
-//
-//		return customerIdsResponse;
-//	}
 
 	public CommonResponse getPendingAuthBranches(String userId, String userGroup, String requestId) {
 		logger.info("================== Start getPendingAuthBranches =================");
 
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setRequestType(REQUEST_TYPE.name());
-		List<TempDto> tempList = branchTempComponent.getTempRecord(bean).getTempList();
+		List<TempDto> tempList = branchTempComponent.getAuthPendingRecord(bean).getTempList();
 		CommonGetListResponse<AuthPendingBranchBean> commonGetListResponse = new CommonGetListResponse<>();
 		List<AuthPendingBranchBean> authPendingBranchBeans = new ArrayList<>();
 		for (TempDto tempDto : tempList) {

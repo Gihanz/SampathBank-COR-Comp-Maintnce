@@ -2,6 +2,7 @@ package biz.nable.sb.cor.comp.factory.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -23,15 +24,21 @@ import biz.nable.sb.cor.common.service.impl.CommonConverter;
 import biz.nable.sb.cor.common.template.CommonApprovalTemplate;
 import biz.nable.sb.cor.common.utility.ActionTypeEnum;
 import biz.nable.sb.cor.common.utility.ApprovalStatus;
+import biz.nable.sb.cor.comp.bean.SyncAllAccountRequest;
 import biz.nable.sb.cor.comp.component.CompanyTempComponent;
 import biz.nable.sb.cor.comp.db.entity.CompanyDelete;
+import biz.nable.sb.cor.comp.db.entity.CompanyFeatures;
 import biz.nable.sb.cor.comp.db.entity.CompanyMst;
 import biz.nable.sb.cor.comp.db.entity.CompanyMstHis;
+import biz.nable.sb.cor.comp.db.entity.Features;
 import biz.nable.sb.cor.comp.db.repository.CompanyDeleteRepository;
+import biz.nable.sb.cor.comp.db.repository.CompanyFeaturesRepository;
 import biz.nable.sb.cor.comp.db.repository.CompanyMstHstRepository;
 import biz.nable.sb.cor.comp.db.repository.CompanyMstRepository;
+import biz.nable.sb.cor.comp.db.repository.FeaturesRepository;
 import biz.nable.sb.cor.comp.request.CreateCompanyRequest;
 import biz.nable.sb.cor.comp.request.UpdateCompanyRequest;
+import biz.nable.sb.cor.comp.service.impl.SyncAccounts;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 
@@ -46,9 +53,16 @@ public class CompanyApproval implements CommonApprovalTemplate {
 	@Autowired
 	private CompanyMstHstRepository companyMstHstRepository;
 	@Autowired
+	private FeaturesRepository featuresRepository;
+	@Autowired
+	private CompanyFeaturesRepository companyFeaturesRepository;
+	@Autowired
 	private CommonConverter commonConverter;
 	@Autowired
 	private MessageSource messageSource;
+
+	@Autowired
+	SyncAccounts syncAccounts;
 
 	@Autowired
 	CompanyTempComponent companyTempComponent;
@@ -63,6 +77,11 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		if (ApprovalStatus.VERIFIED.name().equalsIgnoreCase(approvalBean.getApprovalStatus())) {
 			if (ActionTypeEnum.CREATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
 				addToCompanyMst(approvalBean, commonTemp);
+
+				logger.info("Start Sync accounts");
+				SyncAllAccountRequest request = new SyncAllAccountRequest();
+				request.setCustId(commonTemp.getReferenceNo());
+				// syncAccounts.syncAllAccounts(request);
 			} else if (ActionTypeEnum.UPDATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
 				updateCompanyMst(approvalBean, commonTemp);
 			} else if (ActionTypeEnum.DELETE.name().equalsIgnoreCase(approvalBean.getActionType())) {
@@ -139,6 +158,7 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		companyMst = companyO.get();
 		try {
 			BeanUtils.copyProperties(companyMst, updateCompanyRequest);
+			addFeatureList(companyMst, updateCompanyRequest.getCompanyFeatures());
 		} catch (Exception e) {
 			logger.error("updateCompanyRequest to companyMst data mapping error {}", e);
 			throw new SystemException(
@@ -179,6 +199,9 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		companyMst
 				.setCompanyId(null == companyMst.getCompanyId() ? tempDto.getReferenceNo() : companyMst.getCompanyId());
 		companyMst.setRecordStatus(RecordStatusEnum.ACTIVE);
+		if (null != companyMst.getId()) {
+			companyFeaturesRepository.deleteFeaturesByCompany(companyMst);
+		}
 		companyMst = companyMstRepository.save(companyMst);
 		try {
 			BeanUtils.copyProperties(companyMstHis, companyMst);
@@ -202,10 +225,6 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		}
 		companyMst.setCompanyId(companyRequest.getCompanyId());
 		companyMst.setCompanyName(companyRequest.getCompanyName());
-		companyMst.setAddress1(companyRequest.getAddress1());
-		companyMst.setAddress2(companyRequest.getAddress2());
-		companyMst.setCity(companyRequest.getCity());
-		companyMst.setCountry(companyRequest.getCountry());
 		companyMst.setContactNo(companyRequest.getContactNo());
 		companyMst.setFaxNo(companyRequest.getFaxNo());
 		companyMst.setEmailAddr(companyRequest.getEmailAddr());
@@ -222,16 +241,32 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		companyMst.setBulkPaymentLimit(companyRequest.getBulkPaymentLimit());
 		companyMst.setWsIp(companyRequest.getWsIp());
 		companyMst.setRequestId(companyRequest.getRequestId());
+		companyMst.setCreatedDate(companyRequest.getCreateDate());
+		companyMst.setCreatedBy(companyRequest.getCreateBy());
 		companyMst.setUserGroup(companyRequest.getUserGroup());
-		companyMst.setAuthorizationLevels(companyRequest.getAuthorizationLevels());
 		companyMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
 		companyMst.setLastVerifiedDate(new Date());
+
+		if (null != companyRequest.getCompanyFeatures() && !companyRequest.getCompanyFeatures().isEmpty()) {
+			addFeatureList(companyMst, companyRequest.getCompanyFeatures());
+		}
+
 		if (null == companyMst.getId()) {
 			companyMst.setCanvassedBranch(companyRequest.getCanvassedBranch());
 			companyMst.setCanvassedUser(companyRequest.getCanvassedUser());
 		}
-
 		return companyMst;
 	}
 
+	private void addFeatureList(CompanyMst companyMst, List<Long> requestedFeatures) {
+		List<Features> features = (List<Features>) featuresRepository.findAll();
+		for (Features feature : features) {
+			if (requestedFeatures.stream().anyMatch(x -> x.equals(feature.getId()))) {
+				CompanyFeatures companyFeatures = new CompanyFeatures();
+				companyFeatures.setCompany(companyMst);
+				companyFeatures.setFeature(feature);
+				companyMst.getCompanyFeatures().add(companyFeatures);
+			}
+		}
+	}
 }

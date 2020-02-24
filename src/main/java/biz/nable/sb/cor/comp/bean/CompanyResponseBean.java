@@ -46,5 +46,6 @@ public class CompanyResponseBean {
 	private String requestId;
 	private Long authorizationId;
 	private List<Long> listOfLinkedCustIDs = new ArrayList<>();
+	private List<Long> companyFeatures = new ArrayList<>();
 	private StatusEnum status;
 }

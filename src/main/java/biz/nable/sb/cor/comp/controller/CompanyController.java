@@ -96,8 +96,8 @@ public class CompanyController {
 					logger.info(commonResponse.getReturnMessage());
 				} catch (SystemException e) {
 					logger.info("SystemException occured while creating Company for {}.", e.getMessage());
-					commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-							"Error occured while creating Company. " + e.getMessage(), e.getErrorCode());
+					commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage(),
+							e.getErrorCode());
 				} catch (Exception e) {
 					logger.error("Error occured while creating Company for {}.", e);
 					commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -389,7 +389,7 @@ public class CompanyController {
 		logger.info("Start get temp data (serchBy: {})", search);
 		CommonResponse commonResponse = new CommonResponse();
 		try {
-			commonResponse = companyService.getTempRecord(searchBy, userId, userGroup);
+			commonResponse = companyService.getApprovalPendingRecord(searchBy, userId, userGroup);
 			logger.info("Successfuly fetched ");
 		} catch (SystemException e) {
 			logger.info("Error occured while geting Temp record {}.", e.getMessage());
