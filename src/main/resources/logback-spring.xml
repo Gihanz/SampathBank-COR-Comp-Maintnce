@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE xml>
 <configuration debug="true">
-	 <appender name = "STDOUT" class = "ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-         <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p] %m%n</pattern>
-      </encoder>
-   </appender>
-   
-   <appender name = "FILE" class = "ch.qos.logback.core.FileAppender">
-<!--       <File>/opt/IBM/WebSphere/AppServer/profiles/ESB_DEV/logs/core/approvals/application.log</File> -->
-      <file>/opt/PROJECT/NBL/log/SBOCMXLOG/company.log</file>
-      <encoder>
-         <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p] %m%n</pattern>
-      </encoder>
-   </appender>
-   
-   <root level = "INFO">
-      <appender-ref ref = "FILE"/>
-      <appender-ref ref = "STDOUT"/> 
-   </root>
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p]
+				%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<springProfile name="local">
+			<file>/opt/PROJECT/NBL/log/SBOCMXLOG/company.log</file>
+			<encoder>
+				<pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p]
+					%m%n</pattern>
+			</encoder>
+		</springProfile>
+		<springProfile name="prod">
+			<File>/opt/IBM/WebSphere/AppServer/profiles/ESB_DEV/logs/core/approvals/application.log</File>
+			<encoder>
+				<pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p]
+					%m%n</pattern>
+			</encoder>
+		</springProfile>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="STDOUT" />
+	</root>
 </configuration>

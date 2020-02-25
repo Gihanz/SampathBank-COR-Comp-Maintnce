@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import biz.nable.sb.cor.common.bean.CommonTempBean;
@@ -17,10 +19,12 @@ import lombok.ToString;
 public class UpdateCompanyRequest implements CommonTempBean {
 
 	private String companyId;
+	private String companyName;
 	private String contactNo;
 	private String emailAddr;
 	private String epfCode;
 	private String etfCode;
+	private String faxNo;
 	private String epfAreaCode;
 	private String districtCode;
 	private String treasureCustRef;
@@ -38,6 +42,6 @@ public class UpdateCompanyRequest implements CommonTempBean {
 	protected String lastUpdatedBy;
 	@JsonIgnore
 	protected Date lastUpdatedDate;
-
+	@NotEmpty(message = "companyFeatures cannot be empty")
 	private List<Long> companyFeatures = new ArrayList<>();
 }

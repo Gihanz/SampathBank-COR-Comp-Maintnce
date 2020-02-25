@@ -28,6 +28,7 @@ import biz.nable.sb.cor.common.utility.StatusEnum;
 import biz.nable.sb.cor.comp.bean.AuthPendingBranchBean;
 import biz.nable.sb.cor.comp.bean.BranchBean;
 import biz.nable.sb.cor.comp.bean.BranchDetailBean;
+import biz.nable.sb.cor.comp.bean.BranchResponseBean;
 import biz.nable.sb.cor.comp.component.BranchTempComponent;
 import biz.nable.sb.cor.comp.db.entity.BranchDelete;
 import biz.nable.sb.cor.comp.db.entity.BranchMst;
@@ -39,6 +40,7 @@ import biz.nable.sb.cor.comp.exception.RecordNotFoundException;
 import biz.nable.sb.cor.comp.request.CreateBranchRequest;
 import biz.nable.sb.cor.comp.request.DeleteBranchRequest;
 import biz.nable.sb.cor.comp.request.UpdateBranchRequest;
+import biz.nable.sb.cor.comp.response.BranchResponse;
 import biz.nable.sb.cor.comp.response.CommonGetListResponse;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
@@ -167,18 +169,18 @@ public class BranchService {
 		Optional<BranchMst> optional = branchMstRepository.findByBranchIdAndCompany(deleteBranchRequest.getBranchId(),
 				optional1.get().getId());
 		if (optional.isPresent()) {
-			CreateBranchRequest linkCompanyBean = new CreateBranchRequest();
+			CreateBranchRequest branchRequest = new CreateBranchRequest();
 			try {
-				BeanUtils.copyProperties(linkCompanyBean, optional.get());
+				BeanUtils.copyProperties(branchRequest, optional.get());
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SystemException(
 						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
 						ErrorCode.DATA_COPY_ERROR);
 			}
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
-			commonRequestBean.setCommonTempBean(linkCompanyBean);
-			String hashTags = BRANCH_HASH_TAG.concat(linkCompanyBean.getCompanyId());
-			String referenceNo = linkCompanyBean.getBranchId();
+			commonRequestBean.setCommonTempBean(branchRequest);
+			String hashTags = BRANCH_HASH_TAG.concat(branchRequest.getCompanyId());
+			String referenceNo = branchRequest.getBranchId();
 			commonRequestBean.setHashTags(hashTags);
 			commonRequestBean.setReferenceNo(referenceNo);
 			commonRequestBean.setRequestType(REQUEST_TYPE.name());
@@ -250,50 +252,13 @@ public class BranchService {
 					ErrorCode.NO_COMPANY_RECORD_FOUND);
 		} else {
 			CompanyMst companyMst = optional.get();
-			for (BranchMst branch : companyMst.getBranchMsts()) {
-				logger.info("Get records form master table");
-				if (status == branch.getStatus()) {
-					BranchDetailBean branchDetailBean = new BranchDetailBean();
-					branchDetailBean.setBranchId(branch.getBranchId());
-					branchDetailBean.setBranchName(branch.getBranchName());
-					branchDetailBean.setCompanyId(companyMst.getCompanyId());
-					branchDetailBean.setCompanyName(companyMst.getCompanyName());
-					branchDetailBean.setStatus(branch.getStatus());
-					branchDetailBeans.getPayLoad().add(branchDetailBean);
-				}
-			}
-			if (StatusEnum.DELETED == status) {
-				logger.info("Get records form Delete table");
-				List<BranchDelete> branchDeletes = branchDeleteRepository.findByCompanyId(companyMst.getId());
-				for (BranchDelete branchDelete : branchDeletes) {
-					BranchDetailBean branchDetailBean = new BranchDetailBean();
-					branchDetailBean.setBranchId(branchDelete.getBranchId());
-					branchDetailBean.setBranchName(branchDelete.getBranchName());
-					branchDetailBean.setCompanyId(companyMst.getCompanyId());
-					branchDetailBean.setCompanyName(companyMst.getCompanyName());
-					branchDetailBean.setStatus(StatusEnum.DELETED);
-					branchDetailBeans.getPayLoad().add(branchDetailBean);
-				}
-			}
-			if (StatusEnum.PENDING == status || StatusEnum.INACTIVE == status) {
-				logger.info("Get records form Temp table");
-				CommonSearchBean bean = new CommonSearchBean();
-				bean.setHashTags(BRANCH_HASH_TAG.concat(companyId));
-				bean.setRequestType(REQUEST_TYPE.name());
-				bean.setActionType(ActionTypeEnum.CREATE);
-				List<TempDto> tempList = branchTempComponent.getTempRecord(bean).getTempList();
-				for (TempDto tempDto : tempList) {
-					BranchDetailBean branchDetailBean = new BranchDetailBean();
-					BranchBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(),
-							BranchBean.class);
-					branchDetailBean.setCompanyId(companyMst.getCompanyId());
-					branchDetailBean.setCompanyName(companyMst.getCompanyName());
-					branchDetailBean.setBranchId(companyTempBean.getBranchId());
-					branchDetailBean.setBranchName(companyTempBean.getBranchName());
-					branchDetailBean.setStatus(StatusEnum.INACTIVE);
-					branchDetailBeans.getPayLoad().add(branchDetailBean);
-				}
-			}
+
+			addActiveBranchList(companyMst, branchDetailBeans, status);
+
+			addDeletedBranchList(companyMst, branchDetailBeans, status);
+
+			addPendingBranchList(companyMst, branchDetailBeans, status, ActionTypeEnum.CREATE);
+
 		}
 
 		branchDetailBeans.setReturnCode(HttpStatus.OK.value());
@@ -305,4 +270,119 @@ public class BranchService {
 		return branchDetailBeans;
 	}
 
+	public CommonResponse getAllBranches(String userId, String userGroup, String requestId) {
+		CommonGetListResponse<BranchResponse> branchDetailBeans = new CommonGetListResponse<>();
+		logger.info("================== Start Find  branch =================");
+		List<BranchMst> listBranchMsts = (List<BranchMst>) branchMstRepository.findAll();
+		List<BranchBean> commonTempBeans = getCompanyTemp();
+		if (listBranchMsts.isEmpty()) {
+			throw new RecordNotFoundException(
+					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
+					ErrorCode.NO_COMPANY_RECORD_FOUND);
+		} else {
+			branchDetailBeans.setPayLoad(buildBranchListResponse(listBranchMsts, commonTempBeans));
+		}
+
+		branchDetailBeans.setReturnCode(HttpStatus.OK.value());
+		branchDetailBeans.setReturnMessage(
+				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
+		branchDetailBeans.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+
+		logger.info("================== End Find  branch =================");
+		return branchDetailBeans;
+	}
+
+	private void addActiveBranchList(CompanyMst companyMst, CommonGetListResponse<BranchDetailBean> branchDetailBeans,
+			StatusEnum status) {
+		for (BranchMst branch : companyMst.getBranchMsts()) {
+			logger.info("Get records form master table");
+			if (status == branch.getStatus()) {
+				BranchDetailBean branchDetailBean = new BranchDetailBean();
+				branchDetailBean.setBranchId(branch.getBranchId());
+				branchDetailBean.setBranchName(branch.getBranchName());
+				branchDetailBean.setCompanyId(companyMst.getCompanyId());
+				branchDetailBean.setCompanyName(companyMst.getCompanyName());
+				branchDetailBean.setStatus(branch.getStatus());
+				branchDetailBeans.getPayLoad().add(branchDetailBean);
+			}
+		}
+	}
+
+	private List<BranchBean> getCompanyTemp() {
+		CommonSearchBean bean = new CommonSearchBean();
+		bean.setRequestType(REQUEST_TYPE.name());
+		List<TempDto> tempList = branchTempComponent.getTempRecord(bean).getTempList();
+		List<BranchBean> commonTempBeans = new ArrayList<>();
+		for (TempDto tempDto : tempList) {
+			BranchBean branchBean = commonConverter.mapToPojo(tempDto.getRequestPayload(), BranchBean.class);
+			commonTempBeans.add(branchBean);
+		}
+		return commonTempBeans;
+	}
+
+	private void addPendingBranchList(CompanyMst companyMst, CommonGetListResponse<BranchDetailBean> branchDetailBeans,
+			StatusEnum status, ActionTypeEnum actionTypeEnum) {
+		if (StatusEnum.PENDING == status || StatusEnum.INACTIVE == status) {
+			logger.info("Get records form Temp table");
+			CommonSearchBean bean = new CommonSearchBean();
+			bean.setHashTags(BRANCH_HASH_TAG.concat(companyMst.getCompanyId()));
+			bean.setRequestType(REQUEST_TYPE.name());
+			bean.setActionType(actionTypeEnum);
+			List<TempDto> tempList = branchTempComponent.getTempRecord(bean).getTempList();
+			for (TempDto tempDto : tempList) {
+				BranchDetailBean branchDetailBean = new BranchDetailBean();
+				BranchBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(), BranchBean.class);
+				branchDetailBean.setCompanyId(companyMst.getCompanyId());
+				branchDetailBean.setCompanyName(companyMst.getCompanyName());
+				branchDetailBean.setBranchId(companyTempBean.getBranchId());
+				branchDetailBean.setBranchName(companyTempBean.getBranchName());
+				branchDetailBean.setStatus(StatusEnum.INACTIVE);
+				branchDetailBeans.getPayLoad().add(branchDetailBean);
+			}
+		}
+
+	}
+
+	private void addDeletedBranchList(CompanyMst companyMst, CommonGetListResponse<BranchDetailBean> branchDetailBeans,
+			StatusEnum status) {
+		if (StatusEnum.DELETED == status) {
+			logger.info("Get records form Delete table");
+			List<BranchDelete> branchDeletes = branchDeleteRepository.findByCompanyId(companyMst.getId());
+			for (BranchDelete branchDelete : branchDeletes) {
+				BranchDetailBean branchDetailBean = new BranchDetailBean();
+				branchDetailBean.setBranchId(branchDelete.getBranchId());
+				branchDetailBean.setBranchName(branchDelete.getBranchName());
+				branchDetailBean.setCompanyId(companyMst.getCompanyId());
+				branchDetailBean.setCompanyName(companyMst.getCompanyName());
+				branchDetailBean.setStatus(StatusEnum.DELETED);
+				branchDetailBeans.getPayLoad().add(branchDetailBean);
+			}
+		}
+	}
+
+	private List<BranchResponse> buildBranchListResponse(List<BranchMst> listBranchMsts,
+			List<BranchBean> commonTempBeans) {
+		List<BranchResponse> branchResponses = new ArrayList<>();
+
+		logger.info("<====== Start mapping companyMst to companyResponse and companyTempResponses =======>");
+		for (BranchMst branchMst : listBranchMsts) {
+			BranchResponse branchResponse = new BranchResponse();
+			BranchResponseBean branchResponseBean = new BranchResponseBean();
+			branchResponseBean.setBranchName(branchMst.getBranchName());
+			branchResponse.setCompanyID(branchMst.getCompany().getCompanyId());
+			branchResponse.setBranchCode(branchMst.getBranchId());
+			branchResponse.setCurrent(branchResponseBean);
+			if (RecordStatusEnum.UPDATE_PENDING.equals(branchMst.getRecordStatus())) {
+				BranchBean branchBean = commonTempBeans.stream()
+						.filter(branch -> branch.getBranchId().equals(branchMst.getBranchId())).findAny().orElse(null);
+				if (null != branchBean) {
+					BranchResponseBean modified = new BranchResponseBean();
+					modified.setBranchName(branchBean.getBranchName());
+					branchResponse.setModified(modified);
+				}
+			}
+			branchResponses.add(branchResponse);
+		}
+		return branchResponses;
+	}
 }

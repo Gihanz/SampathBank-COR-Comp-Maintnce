@@ -1,5 +1,6 @@
 package biz.nable.sb.cor.comp.db.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,11 +25,9 @@ public class CompanyFeatures {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COMPANY_FET_SEQ")
 	@SequenceGenerator(name = "COMPANY_FET_SEQ", sequenceName = "SB_COR_COMPANY_FEA", allocationSize = 1)
 	private Long id;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "company_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+	@JoinColumn(name = "company", nullable = false)
 	private CompanyMst company;
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "feature_id", nullable = false)
-	private Features feature;
+	private Long feature;
+	private String featureDescription;
 }

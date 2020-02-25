@@ -97,8 +97,8 @@ public class FeaturesService {
 		} else {
 			for (CompanyFeatures companyFeature : optional.get().getCompanyFeatures()) {
 				FeatureBean featureBean = new FeatureBean();
-				featureBean.setDescription(companyFeature.getFeature().getDescription());
-				featureBean.setId(companyFeature.getFeature().getId());
+				featureBean.setDescription(companyFeature.getFeatureDescription());
+				featureBean.setId(companyFeature.getFeature());
 				featureResponse.getFeatureBeans().add(featureBean);
 			}
 			featureResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);

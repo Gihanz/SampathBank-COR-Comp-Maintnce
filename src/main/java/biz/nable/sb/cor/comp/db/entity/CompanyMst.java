@@ -3,6 +3,7 @@ package biz.nable.sb.cor.comp.db.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -76,6 +77,6 @@ public class CompanyMst extends Auditable {
 	@OneToMany(mappedBy = "company")
 	List<CompanyUser> companyUsers;
 
-	@OneToMany(mappedBy = "company")
+	@OneToMany(mappedBy = "company", cascade = CascadeType.REFRESH)
 	List<CompanyFeatures> companyFeatures = new ArrayList<>();
 }

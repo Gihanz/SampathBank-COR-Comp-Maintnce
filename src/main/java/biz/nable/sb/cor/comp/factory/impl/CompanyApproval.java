@@ -1,6 +1,7 @@
 package biz.nable.sb.cor.comp.factory.impl;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -202,7 +203,10 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		if (null != companyMst.getId()) {
 			companyFeaturesRepository.deleteFeaturesByCompany(companyMst);
 		}
-		companyMst = companyMstRepository.save(companyMst);
+		for (CompanyFeatures features : companyMst.getCompanyFeatures()) {
+			companyFeaturesRepository.save(features);
+		}
+
 		try {
 			BeanUtils.copyProperties(companyMstHis, companyMst);
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -260,13 +264,16 @@ public class CompanyApproval implements CommonApprovalTemplate {
 
 	private void addFeatureList(CompanyMst companyMst, List<Long> requestedFeatures) {
 		List<Features> features = (List<Features>) featuresRepository.findAll();
+		List<CompanyFeatures> companyFeatures = new ArrayList<>();
 		for (Features feature : features) {
 			if (requestedFeatures.stream().anyMatch(x -> x.equals(feature.getId()))) {
-				CompanyFeatures companyFeatures = new CompanyFeatures();
-				companyFeatures.setCompany(companyMst);
-				companyFeatures.setFeature(feature);
-				companyMst.getCompanyFeatures().add(companyFeatures);
+				CompanyFeatures companyFeature = new CompanyFeatures();
+				companyFeature.setCompany(companyMst);
+				companyFeature.setFeature(feature.getId());
+				companyFeature.setFeatureDescription(feature.getDescription());
+				companyFeatures.add(companyFeature);
 			}
 		}
+		companyMst.setCompanyFeatures(companyFeatures);
 	}
 }

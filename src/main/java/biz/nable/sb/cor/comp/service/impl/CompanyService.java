@@ -126,6 +126,8 @@ public class CompanyService {
 					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
 		} else {
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
+			updateCompanyRequest.setCompanyName(optional.get().getCompanyName());
+			updateCompanyRequest.setCompanyId(optional.get().getCompanyId());
 			commonRequestBean.setCommonTempBean(updateCompanyRequest);
 			String hashTags = "";
 			String referenceNo = companyId;

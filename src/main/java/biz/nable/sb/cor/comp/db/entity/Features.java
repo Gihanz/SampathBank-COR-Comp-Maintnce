@@ -1,16 +1,12 @@
 package biz.nable.sb.cor.comp.db.entity;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import biz.nable.sb.cor.common.db.audit.Auditable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,7 +16,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "SB_COR_FEATURES")
-public class Features extends Auditable {
+public class Features {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FEATURE_SEQ")
@@ -28,6 +24,4 @@ public class Features extends Auditable {
 	private Long id;
 	private String description;
 
-	@OneToMany(mappedBy = "feature")
-	List<CompanyFeatures> companyFeatures;
 }

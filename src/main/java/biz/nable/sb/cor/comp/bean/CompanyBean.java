@@ -51,5 +51,6 @@ public class CompanyBean {
 	private String requestId;
 	@JsonIgnore
 	private String userGroup;
+	@NotEmpty(message = "companyFeatures cannot be empty")
 	private List<Long> companyFeatures = new ArrayList<>();
 }
