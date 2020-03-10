@@ -127,7 +127,7 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		try {
 			BeanUtils.copyProperties(companyDelete, companyMst);
 			companyDelete.setLastVerifiedBy(approvalBean.getVerifiedBy());
-
+			companyDelete.setLastVerifiedDate(new Date());
 			companyDelete.setLastUpdatedBy(tempDto.getLastUpdatedBy());
 			companyDelete.setLastUpdatedDate(tempDto.getLastUpdatedDate());
 			BeanUtils.copyProperties(companyMstHis, companyDelete);
@@ -191,7 +191,8 @@ public class CompanyApproval implements CommonApprovalTemplate {
 
 		CompanyMstHis companyMstHis = new CompanyMstHis();
 		companyMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
-
+		companyMst.setLastVerifiedDate(new Date());
+		companyMst.setAuthorizationId(Long.parseLong(approvalBean.getApprovalId()));
 		companyMst.setLastUpdatedBy(tempDto.getLastUpdatedBy());
 		companyMst.setLastUpdatedDate(tempDto.getLastUpdatedDate());
 		companyMst.setCreatedBy(null == companyMst.getCreatedBy() ? tempDto.getCreatedBy() : companyMst.getCreatedBy());
@@ -200,6 +201,7 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		companyMst
 				.setCompanyId(null == companyMst.getCompanyId() ? tempDto.getReferenceNo() : companyMst.getCompanyId());
 		companyMst.setRecordStatus(RecordStatusEnum.ACTIVE);
+
 		if (null != companyMst.getId()) {
 			companyFeaturesRepository.deleteFeaturesByCompany(companyMst);
 		}
@@ -230,7 +232,6 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		companyMst.setCompanyId(companyRequest.getCompanyId());
 		companyMst.setCompanyName(companyRequest.getCompanyName());
 		companyMst.setContactNo(companyRequest.getContactNo());
-		companyMst.setFaxNo(companyRequest.getFaxNo());
 		companyMst.setEmailAddr(companyRequest.getEmailAddr());
 		companyMst.setContactPerson(companyRequest.getContactPerson());
 		companyMst.setEpfCode(companyRequest.getEpfCode());

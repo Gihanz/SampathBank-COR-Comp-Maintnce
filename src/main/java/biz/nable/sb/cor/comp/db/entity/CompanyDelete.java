@@ -40,8 +40,6 @@ public class CompanyDelete extends Auditable {
 	private String country;
 	@Column(length = 20)
 	private String contactNo;
-	@Column(length = 12)
-	private String faxNo;
 	@Column(length = 80)
 	private String emailAddr;
 	@Column(length = 50)

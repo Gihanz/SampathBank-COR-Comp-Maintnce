@@ -20,5 +20,6 @@ public class FindCompanyBean {
 	private String createdUserGroup;
 	private String lastUpdatedUserGroup;
 	private String companyName;
+	private String companyId;
 	private StatusEnum status;
 }

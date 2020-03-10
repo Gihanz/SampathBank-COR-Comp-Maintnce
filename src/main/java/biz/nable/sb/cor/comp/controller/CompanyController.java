@@ -36,6 +36,7 @@ import biz.nable.sb.cor.comp.request.CreateCompanyRequest;
 import biz.nable.sb.cor.comp.request.FindCompanyRequest;
 import biz.nable.sb.cor.comp.request.UpdateCompanyRequest;
 import biz.nable.sb.cor.comp.response.CompanyListResponse;
+import biz.nable.sb.cor.comp.response.CompanySummeryListResponse;
 import biz.nable.sb.cor.comp.response.GetCompanyByIdResponse;
 import biz.nable.sb.cor.comp.service.impl.CompanyService;
 import biz.nable.sb.cor.comp.validator.Validator;
@@ -204,7 +205,7 @@ public class CompanyController {
 				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
-				logger.info("RecordNotFoundException occured while getCompanyById for {}.", e.getMessage());
+				logger.info("RecordNotFoundException occured while getCompanyList for {}.", e.getMessage());
 				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Unknown Error occured while getCompanyList for {}.", e);
@@ -223,7 +224,7 @@ public class CompanyController {
 
 	@ApiOperation(value = "Get Company Summery List API", nickname = "Get Company Summery List API", notes = "Get Company Summery List API", httpMethod = "GET")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successfully Fetched", response = CompanyListResponse.class),
+			@ApiResponse(code = 200, message = "Successfully Fetched", response = CompanySummeryListResponse.class),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })
@@ -257,7 +258,7 @@ public class CompanyController {
 				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
-				logger.info("RecordNotFoundException occured while getCompanyById for {}.", e.getMessage());
+				logger.info("RecordNotFoundException occured while getCompanySfor {}.", e.getMessage());
 				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Unknown Error occured while getCompanyList for {}.", e);
@@ -408,5 +409,58 @@ public class CompanyController {
 		MDC.clear();
 		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
 	}
+
+//
+//	@ApiOperation(value = "Company Suspend/Reactivate request", nickname = "Company  Suspend/Reactivate ", notes = "Update compay Request.", httpMethod = "PUT")
+//	@ApiResponses(value = {
+//			@ApiResponse(code = 200, message = "Company updated successfully", response = CommonResponse.class),
+//			@ApiResponse(code = 404, message = "Resource not found"),
+//			@ApiResponse(code = 400, message = "Input parameters are not valid"),
+//			@ApiResponse(code = 500, message = "Internal server error") })
+//	@PutMapping(value = "/v1/company/{companyId}")
+//	public ResponseEntity<CommonResponse> updateCompany(@RequestBody UpdateCompanyRequest updateCompanyRequest,
+//			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
+//			@RequestHeader(name = "userId", required = true) String userId,
+//			@RequestHeader(name = "userGroup", required = false) String userGroup,
+//			@PathVariable("companyId") String companyId) {
+//		MDC.put(REQUEST_ID_HEADER, requestId);
+//		long startTime = System.currentTimeMillis();
+//
+//		logger.info("Start exicute method updateCompany");
+//		CommonResponse commonResponse;
+//		if (StringUtils.isEmpty(userId)) {
+//			logger.error(invalidUserLoggingMsg, userId);
+//			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+//					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
+//							LocaleContextHolder.getLocale()),
+//					ErrorCode.INVALID_USER_ID);
+//		} else {
+//			try {
+//				logger.debug("Update Company (CompId: {}).", companyId);
+//				if (StringUtils.isEmpty(userGroup)) {
+//					userGroup = COMMON_USER_GROUP;
+//				}
+//				commonResponse = companyService.updateTempCompany(updateCompanyRequest, companyId, userId, userGroup,
+//						requestId);
+//				logger.info(commonResponse.getReturnMessage());
+//			} catch (SystemException e) {
+//				logger.info("Error occured while updating Company for {}.", e.getMessage());
+//				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+//						e.getErrorCode());
+//			} catch (RecordNotFoundException e) {
+//				logger.info("RecordNotFoundException occured while updating Company for {}.", e.getMessage());
+//				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+//			} catch (Exception e) {
+//				logger.error("Unknown Error occured while updating Company for {}.", e);
+//				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+//						ErrorCode.UNKNOWN_ERROR);
+//			}
+//
+//		}
+//		long endTime = System.currentTimeMillis();
+//		logger.info("updateCompany rate: avg_resp={}", (endTime - startTime));
+//		MDC.clear();
+//		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
+//	}
 
 }

@@ -1,6 +1,5 @@
 package biz.nable.sb.cor.comp.db.entity;
 
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,7 +32,6 @@ public class CompanyMstHis extends Auditable {
 	private String city;
 	private String country;
 	private String contactNo;
-	private String faxNo;
 	private String emailAddr;
 	private String contactPerson;
 	private String createBy;

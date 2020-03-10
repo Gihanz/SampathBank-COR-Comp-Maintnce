@@ -18,7 +18,7 @@
 			</encoder>
 		</springProfile>
 		<springProfile name="prod">
-			<File>/opt/IBM/WebSphere/AppServer/profiles/ESB_DEV/logs/core/approvals/application.log</File>
+			<File>/opt/IBM/WebSphere/AppServer/profiles/ESB_DEV/logs/core/comp/application.log</File>
 			<encoder>
 				<pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p]
 					%m%n</pattern>

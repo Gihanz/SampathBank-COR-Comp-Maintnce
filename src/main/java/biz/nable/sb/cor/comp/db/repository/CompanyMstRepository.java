@@ -20,4 +20,6 @@ public interface CompanyMstRepository extends CrudRepository<CompanyMst, Long>, 
 
 	Optional<CompanyMst> findByCompanyIdAndRecordStatus(String companyId, RecordStatusEnum active);
 
+	List<CompanyMst> findByCompanyIdIn(List<String> companyIdList);
+
 }

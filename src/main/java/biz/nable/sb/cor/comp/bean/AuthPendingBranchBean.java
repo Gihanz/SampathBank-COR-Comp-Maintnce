@@ -12,10 +12,10 @@ import lombok.ToString;
 public class AuthPendingBranchBean {
 	private String companyId;
 	private String companyName;
-	private String BranchId;
-	private String BranchName;
 	private ActionTypeEnum actionType;
 	private StatusEnum status;
 	private Long authorizationId;
 	private String signature;
+	private BranchResponseBean currentBranch;
+	private BranchResponseBean modifiedBranch;
 }

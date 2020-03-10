@@ -1,5 +1,7 @@
 package biz.nable.sb.cor.comp.db.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,13 +24,16 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "SB_COR_COMPANY_FEATURES")
-public class CompanyFeatures {
+public class CompanyFeatures implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COMPANY_FET_SEQ")
 	@SequenceGenerator(name = "COMPANY_FET_SEQ", sequenceName = "SB_COR_COMPANY_FEA", allocationSize = 1)
 	private Long id;
 	@ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "company", nullable = false)
+	@JsonBackReference
 	private CompanyMst company;
 	private Long feature;
 	private String featureDescription;

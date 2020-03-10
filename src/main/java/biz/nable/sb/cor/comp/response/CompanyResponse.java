@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CompanyResponse extends CompanyBean {
-	private List<Long> listOfLinkedCustIDs = new ArrayList<>();
+	private List<Long> listOfLinkedCustIds = new ArrayList<>();
 	private String companyId;
 	private StatusEnum status;
 }

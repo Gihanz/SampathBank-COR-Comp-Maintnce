@@ -121,29 +121,38 @@ public class BranchService {
 
 	public CommonResponse getPendingAuthBranches(String userId, String userGroup, String requestId) {
 		logger.info("================== Start getPendingAuthBranches =================");
-
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setRequestType(REQUEST_TYPE.name());
 		List<TempDto> tempList = branchTempComponent.getAuthPendingRecord(bean).getTempList();
 		CommonGetListResponse<AuthPendingBranchBean> commonGetListResponse = new CommonGetListResponse<>();
 		List<AuthPendingBranchBean> authPendingBranchBeans = new ArrayList<>();
 		for (TempDto tempDto : tempList) {
-			CreateBranchRequest customerId = commonConverter.mapToPojo(tempDto.getRequestPayload(),
+			CreateBranchRequest branchRequest = commonConverter.mapToPojo(tempDto.getRequestPayload(),
 					CreateBranchRequest.class);
-			Optional<CompanyMst> companyO = companyMstRepository.findByCompanyId(customerId.getCompanyId());
+			Optional<CompanyMst> companyO = companyMstRepository.findByCompanyId(branchRequest.getCompanyId());
 			if (companyO.isPresent()) {
 				AuthPendingBranchBean branchBean = new AuthPendingBranchBean();
 				branchBean.setCompanyId(companyO.get().getCompanyId());
 				branchBean.setCompanyName(companyO.get().getCompanyName());
-				branchBean.setBranchId(customerId.getBranchId());
-				branchBean.setBranchName(customerId.getBranchName());
+				BranchResponseBean branchResponse = new BranchResponseBean();
+				branchResponse.setBranchName(branchRequest.getBranchName());
+				branchBean.setModifiedBranch(branchResponse);
+				if (ActionTypeEnum.UPDATE.equals(tempDto.getActionType())) {
+					Optional<BranchMst> optional = branchMstRepository
+							.findByBranchIdAndCompany(tempDto.getReferenceNo(), companyO.get().getId());
+					if (optional.isPresent()) {
+						BranchResponseBean currentBranchResponse = new BranchResponseBean();
+						branchResponse.setBranchName(optional.get().getBranchName());
+						branchBean.setCurrentBranch(currentBranchResponse);
+					}
+				}
+
 				branchBean.setAuthorizationId(Long.parseLong(tempDto.getApprovalId()));
 				branchBean.setSignature(tempDto.getSignature());
 				branchBean.setActionType(tempDto.getActionType());
 				branchBean.setStatus(StatusEnum.PENDING);
 				authPendingBranchBeans.add(branchBean);
 			}
-
 		}
 		commonGetListResponse.setPayLoad(authPendingBranchBeans);
 		commonGetListResponse.setReturnCode(HttpStatus.OK.value());

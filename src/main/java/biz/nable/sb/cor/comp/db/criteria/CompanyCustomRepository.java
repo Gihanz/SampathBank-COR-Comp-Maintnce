@@ -65,6 +65,7 @@ public class CompanyCustomRepository {
 				createdUserGroupCriteriaBuilder(predicates, criteriaBuilder, root, findCompanyBean);
 				lastUpdatedUserGroupCriteriaBuilder(predicates, criteriaBuilder, root, findCompanyBean);
 				statusCriteriaBuilder(predicates, criteriaBuilder, root, findCompanyBean);
+				companyIdCriteriaBuilder(predicates, criteriaBuilder, root, findCompanyBean);
 
 				return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
 			}
@@ -166,6 +167,14 @@ public class CompanyCustomRepository {
 			Root<CompanyMst> root, FindCompanyBean findCompanyBean) {
 		if (null != findCompanyBean.getStatus()) {
 			predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("status"), findCompanyBean.getStatus())));
+		}
+	}
+
+	private void companyIdCriteriaBuilder(List<Predicate> predicates, CriteriaBuilder criteriaBuilder,
+			Root<CompanyMst> root, FindCompanyBean findCompanyBean) {
+		if (null != findCompanyBean.getCompanyId()) {
+			predicates.add(
+					criteriaBuilder.and(criteriaBuilder.equal(root.get("companyId"), findCompanyBean.getCompanyId())));
 		}
 	}
 }

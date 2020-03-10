@@ -1,5 +1,6 @@
 package biz.nable.sb.cor.comp.db.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
 import biz.nable.sb.cor.common.utility.StatusEnum;
@@ -26,7 +29,10 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "SB_COR_COMPANY_MST")
-public class CompanyMst extends Auditable {
+public class CompanyMst extends Auditable implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COMPANY_MST_SEQ")
 	@SequenceGenerator(name = "COMPANY_MST_SEQ", sequenceName = "SB_COR_COMPANY_MST_SEQ", allocationSize = 1)
@@ -38,8 +44,6 @@ public class CompanyMst extends Auditable {
 	@Column(length = 80)
 	private String companyName;
 	private String contactNo;
-	@Column(length = 12)
-	private String faxNo;
 	@Column(length = 80)
 	private String emailAddr;
 	@Column(length = 50)
@@ -72,11 +76,16 @@ public class CompanyMst extends Auditable {
 	private RecordStatusEnum recordStatus = RecordStatusEnum.CREATE_PENDING;
 
 	@OneToMany(mappedBy = "company")
-	List<BranchMst> branchMsts;
+	@JsonManagedReference
+	private List<BranchMst> branchMsts;
 
 	@OneToMany(mappedBy = "company")
-	List<CompanyUser> companyUsers;
+	@JsonManagedReference
+	private List<CompanyUser> companyUsers;
 
-	@OneToMany(mappedBy = "company", cascade = CascadeType.REFRESH)
-	List<CompanyFeatures> companyFeatures = new ArrayList<>();
+	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<CompanyFeatures> companyFeatures = new ArrayList<>();
+
+	private Long authorizationId;
 }

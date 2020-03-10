@@ -23,7 +23,6 @@ public class CompanyBean {
 	@NotNull(message = "companyName should not be null")
 	private String companyName;
 	private String contactNo;
-	private String faxNo;
 	private String emailAddr;
 	private String contactPerson;
 	@JsonIgnore

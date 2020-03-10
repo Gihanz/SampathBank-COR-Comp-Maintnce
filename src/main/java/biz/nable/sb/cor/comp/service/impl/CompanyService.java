@@ -44,7 +44,6 @@ import biz.nable.sb.cor.comp.response.CompanyListResponse;
 import biz.nable.sb.cor.comp.response.CompanyResponse;
 import biz.nable.sb.cor.comp.response.CompanySummeryListResponse;
 import biz.nable.sb.cor.comp.response.GetCompanyByIdResponse;
-import biz.nable.sb.cor.comp.response.GetTempCompanyResponse;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 import biz.nable.sb.cor.comp.utility.RequestTypeEnum;
@@ -153,64 +152,27 @@ public class CompanyService {
 		CompanyListResponse companyListResponse = new CompanyListResponse();
 		logger.info("Start getCompanyList method");
 		List<CompanyMst> listCompanyMsts = companyCustomRepository.findCompanyList(findCompanyBean);
+		List<CompanyResponse> companyResponseList = new ArrayList<>();
 
-		logger.info("Start get Company temp List");
-		CommonSearchBean bean = new CommonSearchBean();
-		bean.setRequestType(REQUEST_TYPE.name());
-		bean.setUserGroup(userGroup);
-		List<CompanyTempBean> commonTempBeans = getCompanyTemp(bean);
+		for (CompanyMst companyMst : listCompanyMsts) {
+			CompanyResponse companyResponse = new CompanyResponse();
+			try {
+				BeanUtils.copyProperties(companyResponse, companyMst);
+				companyResponseList.add(companyResponse);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				logger.error("Data copping error occred Company Id: {}", companyMst.getCompanyId());
+			}
+		}
 
-		List<CompanyListResponseBean> companyListResponseBeans = buildCompanyListResponse(listCompanyMsts,
-				commonTempBeans);
-
-		logger.info("End getCompanyList method execution with {} records", companyListResponseBeans.size());
+		logger.info("End getCompanyList method execution with {} records", companyResponseList.size());
 		companyListResponse.setReturnCode(HttpStatus.OK.value());
 		companyListResponse.setReturnMessage(
 				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
 		companyListResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-		companyListResponse.setCompanyResponseList(companyListResponseBeans);
+		companyListResponse.setCompanyResponseList(companyResponseList);
 
 		logger.info("================== End Get Company List =================");
 		return companyListResponse;
-	}
-
-	private List<CompanyListResponseBean> buildCompanyListResponse(List<CompanyMst> listCompanyMsts,
-			List<CompanyTempBean> commonTempBeans) {
-		List<CompanyListResponseBean> companyListResponseBeans = new ArrayList<>();
-
-		logger.info("<====== Start mapping companyMst to companyResponse and companyTempResponses =======>");
-		for (CompanyMst companyMst : listCompanyMsts) {
-			CompanyListResponseBean companyListResponseBean = new CompanyListResponseBean();
-			CompanyResponse companyResponse = new CompanyResponse();
-			try {
-				BeanUtils.copyProperties(companyResponse, companyMst);
-				companyListResponseBean.setCompanyResponse(companyResponse);
-				if (!RecordStatusEnum.ACTIVE.equals(companyMst.getRecordStatus())) {
-					CompanyTempBean tempCompanyResponse = commonTempBeans.stream()
-							.filter(company -> company.getCompanyId().equals(companyResponse.getCompanyId())).findAny()
-							.orElse(null);
-					companyListResponseBean.setTempCompanyResponse(tempCompanyResponse);
-				}
-				companyListResponseBeans.add(companyListResponseBean);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new SystemException(
-						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
-						ErrorCode.DATA_COPY_ERROR);
-			}
-		}
-
-		logger.info("<====== End mapping companyMst to companyResponse and companyTempResponses =======>");
-		logger.info("<====== Start mapping new create request to companyTempResponses =======>");
-		for (CompanyTempBean companyTempBean : commonTempBeans) {
-			if (ActionTypeEnum.CREATE.equals(companyTempBean.getActionType())) {
-				CompanyListResponseBean companyListResponseBean = new CompanyListResponseBean();
-				companyListResponseBean.setTempCompanyResponse(companyTempBean);
-				companyListResponseBeans.add(companyListResponseBean);
-			}
-		}
-		logger.info("<====== Start mapping new create request to companyTempResponses =======>");
-
-		return companyListResponseBeans;
 	}
 
 	public CommonResponse getCompanySummeryList(StatusEnum status, String userId, String userGroup) {
@@ -343,41 +305,6 @@ public class CompanyService {
 
 	}
 
-	public CommonResponse getTempRecord(FindCompanyRequest searchBy, String userId, String userGroup) {
-		GetTempCompanyResponse commonResponse = new GetTempCompanyResponse();
-		logger.info("================== Start Get Temp data =================");
-
-		CommonSearchBean bean = new CommonSearchBean();
-		bean.setReferenceNo(null != searchBy.getReferenceNo() ? searchBy.getReferenceNo() : null);
-		bean.setRequestType(REQUEST_TYPE.name());
-		bean.setHashTags(searchBy.getHashTags());
-		bean.setUserGroup(userGroup);
-		// bean.setUserId(userId);
-		List<CompanyTempBean> commonTempBeans = getCompanyTemp(bean);
-		commonResponse.setCommonTempBeans(commonTempBeans);
-		commonResponse.setReturnCode(HttpStatus.OK.value());
-		commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-		commonResponse.setReturnMessage(
-				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
-		logger.info("================== End get temp data =================");
-		return commonResponse;
-	}
-
-	private List<CompanyTempBean> getCompanyTemp(CommonSearchBean bean) {
-		List<TempDto> tempList = companyTempComponent.getTempRecord(bean).getTempList();
-		List<CompanyTempBean> commonTempBeans = new ArrayList<>();
-		for (TempDto tempDto : tempList) {
-			CompanyTempBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(),
-					CompanyTempBean.class);
-			companyTempBean.setTempId(tempDto.getId());
-			companyTempBean.setRequestedBy(tempDto.getCreatedBy());
-			companyTempBean.setRequestedDate(tempDto.getCreatedDate());
-			companyTempBean.setActionType(tempDto.getActionType());
-			commonTempBeans.add(companyTempBean);
-		}
-		return commonTempBeans;
-	}
-
 	public CommonResponse getApprovalPendingRecord(FindCompanyRequest searchBy, String userId, String userGroup) {
 		ApprovalPendingResponse commonResponse = new ApprovalPendingResponse();
 		logger.info("================== Start Get Temp data =================");
@@ -395,14 +322,61 @@ public class CompanyService {
 		bean.setRequestType(REQUEST_TYPE.name());
 
 		List<TempDto> tempList = companyTempComponent.getAuthPendingRecord(bean).getTempList();
+		List<String> companyIdList = new ArrayList<>();
+		List<CompanyListResponseBean> companyListResponseBeans = new ArrayList<>();
+		for (TempDto tempDto : tempList) {
+			CompanyListResponseBean companyListResponseBean = new CompanyListResponseBean();
+			try {
+				BeanUtils.copyProperties(companyListResponseBean, tempDto);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				logger.error("Erre occred while copping tempDto to companyListResponseBean");
+			}
+			CompanyTempBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(),
+					CompanyTempBean.class);
+			companyListResponseBean.setTempCompanyResponse(companyTempBean);
+			if (!ActionTypeEnum.CREATE.equals(tempDto.getActionType())) {
+				companyIdList.add(tempDto.getReferenceNo());
+			}
+			companyListResponseBeans.add(companyListResponseBean);
+		}
 
-		commonResponse.setTempDtos(tempList);
+		if (!companyIdList.isEmpty()) {
+			List<CompanyMst> companyMsts = companyMstRepository.findByCompanyIdIn(companyIdList);
+			logger.info("Start get Company temp List");
+
+			buildAuthCompanyListResponse(companyMsts, companyListResponseBeans);
+		}
+
+		commonResponse.setTempDtos(companyListResponseBeans);
 		commonResponse.setReturnCode(HttpStatus.OK.value());
 		commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
 		commonResponse.setReturnMessage(
 				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
 		logger.info("================== End get temp data =================");
 		return commonResponse;
+	}
+
+	private void buildAuthCompanyListResponse(List<CompanyMst> listCompanyMsts,
+			List<CompanyListResponseBean> companyListResponseBeans) {
+
+		logger.info("<====== Start mapping companyMst to companyResponse and companyTempResponses =======>");
+		for (CompanyMst companyMst : listCompanyMsts) {
+			CompanyResponse companyResponse = new CompanyResponse();
+			try {
+				BeanUtils.copyProperties(companyResponse, companyMst);
+				CompanyListResponseBean tempCompanyResponse = companyListResponseBeans.stream()
+						.filter(companyListResponseBean -> companyListResponseBean.getReferenceNo()
+								.equals(companyResponse.getCompanyId()))
+						.findAny().orElse(null);
+				if (null != tempCompanyResponse) {
+					tempCompanyResponse.setCompanyResponse(companyResponse);
+				}
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				throw new SystemException(
+						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
+						ErrorCode.DATA_COPY_ERROR);
+			}
+		}
 	}
 
 }
