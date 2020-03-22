@@ -1,5 +1,5 @@
 package biz.nable.sb.cor.comp.utility;
 
-public enum McAuthEnum {
+public enum YnFlagEnum {
 	Y, N;
 }

@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.common.utility.ErrorCode;
-import biz.nable.sb.cor.comp.response.CommonGetListResponse;
 import biz.nable.sb.cor.comp.response.FeatureResponse;
 import biz.nable.sb.cor.comp.service.impl.FeaturesService;
 import io.swagger.annotations.ApiOperation;
@@ -36,8 +35,7 @@ public class FeaturesController {
 	ObjectMapper objectMapper;
 
 	@ApiOperation(value = "Get All Features", nickname = "Get All Featuress", notes = "Get All Features", httpMethod = "GET")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching All Features successful", response = CommonGetListResponse.class, responseContainer = "Res conta"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Fetching All Features successful"),
 			@ApiResponse(code = 400, message = "Get All Features fail", response = CommonResponse.class),
 			@ApiResponse(code = 500, message = "Internal server error", response = CommonResponse.class) })
 	@GetMapping("/v1/features")
@@ -73,8 +71,7 @@ public class FeaturesController {
 	}
 
 	@ApiOperation(value = "Get Company Features", nickname = "Get Company Features", notes = "Get Company Features", httpMethod = "GET")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching Company Features successful", response = CommonGetListResponse.class, responseContainer = "Res conta"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Fetching Company Features successful"),
 			@ApiResponse(code = 400, message = "Get Company Features fail", response = CommonResponse.class),
 			@ApiResponse(code = 500, message = "Internal server error", response = CommonResponse.class) })
 	@GetMapping("/v1/features/company/{companyId}")

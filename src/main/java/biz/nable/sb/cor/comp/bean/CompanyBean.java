@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import biz.nable.sb.cor.comp.utility.McAuthEnum;
+import biz.nable.sb.cor.comp.utility.YnFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,7 +37,7 @@ public class CompanyBean {
 	private String etfCode;
 	private String epfAreaCode;
 	private String commTemplateId;
-	private McAuthEnum mcAuthFlg;
+	private YnFlagEnum mcAuthFlg;
 	private String canvassedBranch;
 	private Long canvassedUser;
 	private String treasureCustRef;
@@ -50,6 +50,8 @@ public class CompanyBean {
 	private String requestId;
 	@JsonIgnore
 	private String userGroup;
+	private Long corporatePaymentsLimit;
+	private String deviceLocation;
 	@NotEmpty(message = "companyFeatures cannot be empty")
 	private List<Long> companyFeatures = new ArrayList<>();
 }

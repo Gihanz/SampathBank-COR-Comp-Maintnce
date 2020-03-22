@@ -28,6 +28,7 @@ import biz.nable.sb.cor.common.exception.RecordNotFoundException;
 import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.common.utility.ErrorCode;
+import biz.nable.sb.cor.comp.bean.AuthPendingLinkCompanyBean;
 import biz.nable.sb.cor.comp.request.LinkCompanyDeleteRequest;
 import biz.nable.sb.cor.comp.request.LinkCompanyRequest;
 import biz.nable.sb.cor.comp.response.CommonGetListResponse;
@@ -109,7 +110,7 @@ public class LinkCompanyController {
 			@ApiResponse(code = 400, message = "Get link company list fail"),
 			@ApiResponse(code = 500, message = "Internal server error") })
 	@GetMapping("/v1/customer/{companyId}")
-	public ResponseEntity<CommonResponse> getCustomerids(
+	public ResponseEntity<GetCustomerIdsResponse> getCustomerids(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup,
@@ -118,10 +119,10 @@ public class LinkCompanyController {
 		long startTime = System.currentTimeMillis();
 
 		logger.info("Start exicute method getCustomerids");
-		CommonResponse commonResponse;
+		GetCustomerIdsResponse commonResponse;
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+			commonResponse = new GetCustomerIdsResponse(HttpStatus.BAD_REQUEST.value(),
 					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
@@ -135,14 +136,15 @@ public class LinkCompanyController {
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.error("Error occured while getCustomerids for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+				commonResponse = new GetCustomerIdsResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
 				logger.info("RecordNotFoundException occured while getCustomerids for {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+				commonResponse = new GetCustomerIdsResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(),
+						e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Error occured while getCustomerids for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+				commonResponse = new GetCustomerIdsResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
 			}
 
@@ -154,12 +156,11 @@ public class LinkCompanyController {
 	}
 
 	@ApiOperation(value = "Get Auth pending Link Company List", nickname = "Get Auth pending Link Company List", notes = "Get Auth pending Link Company List.", httpMethod = "GET")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching Auth pending link company list successful", response = CommonGetListResponse.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Fetching Auth pending link company list successful"),
 			@ApiResponse(code = 400, message = "Get Auth pending link company list fail"),
 			@ApiResponse(code = 500, message = "Internal server error") })
 	@GetMapping("/v1/customer/pending")
-	public ResponseEntity<CommonResponse> getPendingAuthCustomerids(
+	public ResponseEntity<AuthPendingLinkCompanyBean> getPendingAuthCustomerids(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup) {
@@ -167,10 +168,10 @@ public class LinkCompanyController {
 		long startTime = System.currentTimeMillis();
 
 		logger.info("Start exicute method getPendingAuthCustomerids");
-		CommonResponse commonResponse;
+		AuthPendingLinkCompanyBean commonResponse;
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+			commonResponse = new AuthPendingLinkCompanyBean(HttpStatus.BAD_REQUEST.value(),
 					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
@@ -184,15 +185,16 @@ public class LinkCompanyController {
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.error("Error occured while getPendingAuthCustomerids for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+				commonResponse = new AuthPendingLinkCompanyBean(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
 				logger.info("RecordNotFoundException occured while getPendingAuthCustomerids for {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+				commonResponse = new AuthPendingLinkCompanyBean(HttpStatus.NOT_FOUND.value(), e.getMessage(),
+						e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Error occured while getPendingAuthCustomerids for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
-						ErrorCode.UNKNOWN_ERROR);
+				commonResponse = new AuthPendingLinkCompanyBean(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+						e.getMessage(), ErrorCode.UNKNOWN_ERROR);
 			}
 
 		}

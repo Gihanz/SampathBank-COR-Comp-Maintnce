@@ -24,7 +24,6 @@ public class UpdateCompanyRequest implements CommonTempBean {
 	private String emailAddr;
 	private String epfCode;
 	private String etfCode;
-	private String faxNo;
 	private String epfAreaCode;
 	private String districtCode;
 	private String treasureCustRef;
@@ -34,7 +33,6 @@ public class UpdateCompanyRequest implements CommonTempBean {
 	private String contactPerson;
 	private String canvassedBranch;
 	private Long canvassedUser;
-	private Long authorizationLevels;
 	private Double bulkPaymentLimit;
 	private String wsIp;
 

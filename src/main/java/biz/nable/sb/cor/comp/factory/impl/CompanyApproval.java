@@ -191,6 +191,7 @@ public class CompanyApproval implements CommonApprovalTemplate {
 
 		CompanyMstHis companyMstHis = new CompanyMstHis();
 		companyMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
+		companyMst.setUserGroup(tempDto.getUserGroup());
 		companyMst.setLastVerifiedDate(new Date());
 		companyMst.setAuthorizationId(Long.parseLong(approvalBean.getApprovalId()));
 		companyMst.setLastUpdatedBy(tempDto.getLastUpdatedBy());
@@ -205,9 +206,7 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		if (null != companyMst.getId()) {
 			companyFeaturesRepository.deleteFeaturesByCompany(companyMst);
 		}
-		for (CompanyFeatures features : companyMst.getCompanyFeatures()) {
-			companyFeaturesRepository.save(features);
-		}
+		companyMstRepository.save(companyMst);
 
 		try {
 			BeanUtils.copyProperties(companyMstHis, companyMst);
@@ -251,6 +250,8 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		companyMst.setUserGroup(companyRequest.getUserGroup());
 		companyMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
 		companyMst.setLastVerifiedDate(new Date());
+		companyMst.setCorporatePaymentsLimit(companyRequest.getCorporatePaymentsLimit());
+		companyMst.setDeviceLocation(companyRequest.getDeviceLocation());
 
 		if (null != companyRequest.getCompanyFeatures() && !companyRequest.getCompanyFeatures().isEmpty()) {
 			addFeatureList(companyMst, companyRequest.getCompanyFeatures());

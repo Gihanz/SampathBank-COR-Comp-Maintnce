@@ -98,8 +98,8 @@ public class BranchApproval implements CommonApprovalTemplate {
 					ErrorCode.NO_COMPANY_RECORD_FOUND);
 		}
 		if (!ActionTypeEnum.CREATE.name().equals(approvalBean.getActionType())) {
-			Optional<BranchMst> optional = branchMstRepository.findByBranchIdAndCompany(approvalBean.getReferenceId(),
-					companyO.get().getId());
+			Optional<BranchMst> optional = branchMstRepository
+					.findByBranchIdAndCompany(approvalBean.getReferenceId().split("#")[0], companyO.get());
 			if (!optional.isPresent()) {
 				throw new SystemException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);
@@ -119,8 +119,8 @@ public class BranchApproval implements CommonApprovalTemplate {
 		if (companyO.isPresent()) {
 			logger.info("Start Deleting existing Branch");
 
-			Optional<BranchMst> optional = branchMstRepository.findByBranchIdAndCompany(approvalBean.getReferenceId(),
-					companyO.get().getId());
+			Optional<BranchMst> optional = branchMstRepository
+					.findByBranchIdAndCompany(approvalBean.getReferenceId().split("#")[0], companyO.get());
 			if (!optional.isPresent()) {
 				throw new SystemException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);

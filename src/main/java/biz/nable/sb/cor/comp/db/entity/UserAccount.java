@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -19,16 +18,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+@Entity
 @Getter
 @Setter
 @ToString
-@Entity
-@Table(name = "SB_COR_USER_FEATURES")
-public class UserFeatures extends Auditable implements Serializable {
+public class UserAccount extends Auditable implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_FET_SEQ")
@@ -40,8 +35,7 @@ public class UserFeatures extends Auditable implements Serializable {
 	private CompanyUser companyUser;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "companyFeatures", nullable = false)
+	@JoinColumn(name = "companyAccount", nullable = false)
 	@JsonBackReference
-	private CompanyFeatures companyFeatures;
-
+	private CompanyAccountMst companyAccount;
 }

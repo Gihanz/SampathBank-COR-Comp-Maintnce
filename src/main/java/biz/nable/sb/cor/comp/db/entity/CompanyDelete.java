@@ -9,7 +9,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
-import biz.nable.sb.cor.comp.utility.McAuthEnum;
+import biz.nable.sb.cor.comp.utility.YnFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -52,7 +52,7 @@ public class CompanyDelete extends Auditable {
 	private String epfAreaCode;
 	@Column(length = 15)
 	private String commTemplateId;
-	private McAuthEnum mcAuthFlg;
+	private YnFlagEnum mcAuthFlg;
 	@Column(length = 3)
 	private String canvassedBranch;
 	private Long canvassedUser;

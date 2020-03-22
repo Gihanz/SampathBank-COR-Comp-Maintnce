@@ -22,9 +22,11 @@ import biz.nable.sb.cor.common.exception.RecordNotFoundException;
 import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.common.service.impl.CommonConverter;
+import biz.nable.sb.cor.common.utility.ActionTypeEnum;
 import biz.nable.sb.cor.common.utility.StatusEnum;
 import biz.nable.sb.cor.comp.bean.AuthPendingLinkCompanyBean;
 import biz.nable.sb.cor.comp.bean.CustomerIdResponseBean;
+import biz.nable.sb.cor.comp.bean.LinkCompanyResponseBean;
 import biz.nable.sb.cor.comp.component.LinkCompanyTempComponent;
 import biz.nable.sb.cor.comp.db.entity.CompanyCummData;
 import biz.nable.sb.cor.comp.db.entity.CompanyMst;
@@ -32,7 +34,6 @@ import biz.nable.sb.cor.comp.db.repository.CompanyMstRepository;
 import biz.nable.sb.cor.comp.db.repository.LinkCompanyRepository;
 import biz.nable.sb.cor.comp.request.LinkCompanyDeleteRequest;
 import biz.nable.sb.cor.comp.request.LinkCompanyRequest;
-import biz.nable.sb.cor.comp.response.CommonGetListResponse;
 import biz.nable.sb.cor.comp.response.GetCustomerIdsResponse;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
@@ -68,30 +69,32 @@ public class LinkCompanyService {
 		logger.info("Link company {} to {}", linkCompanyRequest.getCustomerId(),
 				linkCompanyRequest.getParentCompanyId());
 		CommonResponse commonResponse = new CommonResponse();
-		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(linkCompanyRequest.getParentCompanyId());
-		Optional<CompanyMst> optional2 = companyMstRepository.findByCompanyId(linkCompanyRequest.getCustomerId());
-		if (!optional.isPresent() || !optional2.isPresent()) {
+		Optional<CompanyCummData> optional = linkCompanyRepository.findByParentCompanyIdAndCustomerId(
+				linkCompanyRequest.getParentCompanyId(), linkCompanyRequest.getCustomerId());
+		Optional<CompanyMst> optional2 = companyMstRepository.findByCompanyId(linkCompanyRequest.getParentCompanyId());
+		if (optional.isPresent()) {
 
-			logger.info(messageSource.getMessage(ErrorCode.COMPANY_RECORD_ALREADY_EXISTS, null,
+			logger.info(messageSource.getMessage(ErrorCode.CUSTOMER_ID_ALREADY_LINK, null,
 					LocaleContextHolder.getLocale()));
-			commonResponse.setErrorCode(ErrorCode.COMPANY_RECORD_ALREADY_EXISTS);
+			commonResponse.setErrorCode(ErrorCode.CUSTOMER_ID_ALREADY_LINK);
 			commonResponse.setReturnCode(HttpStatus.CONFLICT.value());
-			commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.COMPANY_RECORD_ALREADY_EXISTS, null,
+			commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.CUSTOMER_ID_ALREADY_LINK, null,
 					LocaleContextHolder.getLocale()));
 		} else {
-			if (null != optional2.get().getParentCompanyId() && optional2.get().getParentCompanyId() > 0) {
-				logger.info(messageSource.getMessage(ErrorCode.CUSTOMER_ID_ALREADY_LINK, null,
+			if (!optional2.isPresent()) {
+				logger.info(messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()));
-				commonResponse.setErrorCode(ErrorCode.CUSTOMER_ID_ALREADY_LINK);
+				commonResponse.setErrorCode(ErrorCode.NO_COMPANY_RECORD_FOUND);
 				commonResponse.setReturnCode(HttpStatus.CONFLICT.value());
-				commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.CUSTOMER_ID_ALREADY_LINK, null,
+				commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()));
 
 			} else {
 				CommonRequestBean commonRequestBean = new CommonRequestBean();
 				commonRequestBean.setCommonTempBean(linkCompanyRequest);
 				String hashTags = LINK_COMPANY_HASH_TAG.concat(String.valueOf(linkCompanyRequest.getParentCompanyId()));
-				String referenceNo = String.valueOf(linkCompanyRequest.getCustomerId());
+				String referenceNo = String.valueOf(linkCompanyRequest.getCustomerId()).concat("#")
+						.concat(linkCompanyRequest.getParentCompanyId());
 				commonRequestBean.setHashTags(hashTags);
 				commonRequestBean.setReferenceNo(referenceNo);
 				commonRequestBean.setRequestType(REQUEST_TYPE.name());
@@ -110,11 +113,11 @@ public class LinkCompanyService {
 		return commonResponse;
 	}
 
-	public CommonResponse getCustomerIds(String companyId, String userId, String userGroup, String requestId) {
+	public GetCustomerIdsResponse getCustomerIds(String companyId, String userId, String userGroup, String requestId) {
 		logger.info("================== Start Get Company By Id =================");
 		Optional<CompanyMst> companyMstO = companyMstRepository.findByCompanyId(companyId);
 
-		List<CustomerIdResponseBean> customerIds = getTempList(companyId);
+		List<CustomerIdResponseBean> customerIds = getTempList(companyId, userId, userGroup);
 		GetCustomerIdsResponse customerIdsResponse = new GetCustomerIdsResponse();
 		customerIdsResponse.getListOfLinkedCompanies().addAll(customerIds);
 		if (companyMstO.isPresent()) {
@@ -122,13 +125,16 @@ public class LinkCompanyService {
 
 			for (CompanyCummData companyCummData : linkCompanies) {
 				Optional<CompanyMst> customerO = companyMstRepository.findByCompanyId(companyCummData.getCustomerId());
+				CustomerIdResponseBean customerId = new CustomerIdResponseBean();
 				if (customerO.isPresent()) {
-					CustomerIdResponseBean customerId = new CustomerIdResponseBean();
 					customerId.setCompanyId(customerO.get().getCompanyId());
 					customerId.setCompanyName(customerO.get().getCompanyName());
-					customerId.setStatus(StatusEnum.ACTIVE.name());
-					customerIdsResponse.getListOfLinkedCompanies().add(customerId);
+					customerId.setStatus(companyCummData.getStatus().name());
+				} else {
+					customerId.setCompanyId(companyCummData.getCustomerId());
+					customerId.setStatus(companyCummData.getStatus().name());
 				}
+				customerIdsResponse.getListOfLinkedCompanies().add(customerId);
 			}
 
 		}
@@ -140,12 +146,14 @@ public class LinkCompanyService {
 		return customerIdsResponse;
 	}
 
-	private List<CustomerIdResponseBean> getTempList(String companyId) {
+	private List<CustomerIdResponseBean> getTempList(String companyId, String userId, String userGroup) {
 		logger.info("Start get temp Link Companys for {}", companyId);
 
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setRequestType(REQUEST_TYPE.name());
 		bean.setHashTags(LINK_COMPANY_HASH_TAG.concat(companyId));
+		bean.setUserGroup(userGroup);
+		bean.setUserId(userId);
 		List<TempDto> tempList = linkCompanyTempComponent.getAuthPendingRecord(bean).getTempList();
 		List<CustomerIdResponseBean> customerIdsResponse = new ArrayList<>();
 		for (TempDto tempDto : tempList) {
@@ -166,40 +174,42 @@ public class LinkCompanyService {
 		return customerIdsResponse;
 	}
 
-	public CommonResponse getPendingAuthCustomerIds(String userId, String userGroup, String requestId) {
+	public AuthPendingLinkCompanyBean getPendingAuthCustomerIds(String userId, String userGroup, String requestId) {
 		logger.info("================== Start Get Company By Id =================");
 
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setRequestType(REQUEST_TYPE.name());
 		List<TempDto> tempList = linkCompanyTempComponent.getTempRecord(bean).getTempList();
-		CommonGetListResponse<AuthPendingLinkCompanyBean> commonGetListResponse = new CommonGetListResponse<AuthPendingLinkCompanyBean>();
-		List<AuthPendingLinkCompanyBean> authPendingLinkCompanyBeans = new ArrayList<>();
+		AuthPendingLinkCompanyBean authPendingLinkCompanyBean = new AuthPendingLinkCompanyBean();
 		for (TempDto tempDto : tempList) {
 			LinkCompanyRequest customerId = commonConverter.mapToPojo(tempDto.getRequestPayload(),
 					LinkCompanyRequest.class);
 			Optional<CompanyMst> companyO = companyMstRepository.findByCompanyId(customerId.getParentCompanyId());
-			Optional<CompanyMst> customerO = companyMstRepository.findByCompanyId(customerId.getCustomerId());
-			if (customerO.isPresent() && companyO.isPresent()) {
-				AuthPendingLinkCompanyBean linkCompanyBean = new AuthPendingLinkCompanyBean();
+			if (companyO.isPresent()) {
+				LinkCompanyResponseBean linkCompanyBean = new LinkCompanyResponseBean();
 				linkCompanyBean.setCompanyId(companyO.get().getCompanyId());
 				linkCompanyBean.setCompanyName(companyO.get().getCompanyName());
-				linkCompanyBean.setLinkedCompanyID(customerO.get().getCompanyId());
+				linkCompanyBean.setLinkedCompanyID(customerId.getCustomerId());
 				linkCompanyBean.setAuthorizationId(Long.parseLong(tempDto.getApprovalId()));
 				linkCompanyBean.setSignature(tempDto.getSignature());
 				linkCompanyBean.setActionType(tempDto.getActionType());
 				linkCompanyBean.setStatus(StatusEnum.PENDING);
-				authPendingLinkCompanyBeans.add(linkCompanyBean);
+				if (ActionTypeEnum.CREATE.equals(tempDto.getActionType())) {
+					authPendingLinkCompanyBean.getNewCustomers().add(linkCompanyBean);
+				} else if (ActionTypeEnum.DELETE.equals(tempDto.getActionType())) {
+					authPendingLinkCompanyBean.getDeletedCustomers().add(linkCompanyBean);
+				}
+
 			}
 
 		}
-		commonGetListResponse.setPayLoad(authPendingLinkCompanyBeans);
-		commonGetListResponse.setReturnCode(HttpStatus.OK.value());
-		commonGetListResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-		commonGetListResponse.setReturnMessage(
+		authPendingLinkCompanyBean.setReturnCode(HttpStatus.OK.value());
+		authPendingLinkCompanyBean.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+		authPendingLinkCompanyBean.setReturnMessage(
 				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
 		logger.info("================== End getPendingAuthCustomerIds =================");
 
-		return commonGetListResponse;
+		return authPendingLinkCompanyBean;
 	}
 
 	public CommonResponse deleteCompany(LinkCompanyDeleteRequest linkCompanyDeleteRequest, String userId,
@@ -220,7 +230,8 @@ public class LinkCompanyService {
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			commonRequestBean.setCommonTempBean(linkCompanyBean);
 			String hashTags = LINK_COMPANY_HASH_TAG.concat(linkCompanyBean.getParentCompanyId());
-			String referenceNo = linkCompanyBean.getCustomerId();
+			String referenceNo = linkCompanyBean.getCustomerId().concat("#")
+					.concat(linkCompanyDeleteRequest.getParentCompanyId());
 			commonRequestBean.setHashTags(hashTags);
 			commonRequestBean.setReferenceNo(referenceNo);
 			commonRequestBean.setRequestType(REQUEST_TYPE.name());

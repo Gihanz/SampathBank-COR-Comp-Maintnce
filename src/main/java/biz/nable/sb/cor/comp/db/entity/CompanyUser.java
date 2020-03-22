@@ -1,6 +1,7 @@
 package biz.nable.sb.cor.comp.db.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,16 +10,28 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import biz.nable.sb.cor.common.db.audit.Auditable;
 import biz.nable.sb.cor.common.utility.StatusEnum;
-import lombok.Data;
+import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
+import biz.nable.sb.cor.comp.utility.UserRoleEnum;
+import biz.nable.sb.cor.comp.utility.YnFlagEnum;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Data
-public class CompanyUser implements Serializable {
+@Getter
+@Setter
+@ToString
+public class CompanyUser extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -29,10 +42,19 @@ public class CompanyUser implements Serializable {
 	@JoinColumn(name = "user", nullable = false)
 	@JsonBackReference
 	private UserMst user;
-	private StatusEnum statusEnum;
+	private StatusEnum status;
+	private RecordStatusEnum recordStatus;
+	private UserRoleEnum role;
+	private YnFlagEnum isPrimeryUser;
+	@Length(max = 1000)
+	private String remark;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "company", nullable = false)
 	@JsonBackReference
 	private CompanyMst company;
+
+	@OneToMany(mappedBy = "companyUser")
+	@JsonManagedReference
+	private List<UserFeatures> userFeatures;
 }

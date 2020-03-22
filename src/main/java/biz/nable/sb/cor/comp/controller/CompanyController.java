@@ -35,6 +35,7 @@ import biz.nable.sb.cor.comp.bean.FindCompanyBean;
 import biz.nable.sb.cor.comp.request.CreateCompanyRequest;
 import biz.nable.sb.cor.comp.request.FindCompanyRequest;
 import biz.nable.sb.cor.comp.request.UpdateCompanyRequest;
+import biz.nable.sb.cor.comp.response.ApprovalPendingResponse;
 import biz.nable.sb.cor.comp.response.CompanyListResponse;
 import biz.nable.sb.cor.comp.response.CompanySummeryListResponse;
 import biz.nable.sb.cor.comp.response.GetCompanyByIdResponse;
@@ -176,7 +177,7 @@ public class CompanyController {
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })
 	@GetMapping(value = "/v1/company")
-	public ResponseEntity<CommonResponse> getCompanyList(
+	public ResponseEntity<CompanyListResponse> getCompanyList(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup, FindCompanyBean findCompanyBean) {
@@ -184,10 +185,10 @@ public class CompanyController {
 		long startTime = System.currentTimeMillis();
 
 		logger.info("Start exicute method getCompanyList");
-		CommonResponse commonResponse;
+		CompanyListResponse commonResponse;
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+			commonResponse = new CompanyListResponse(HttpStatus.BAD_REQUEST.value(),
 					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
@@ -202,14 +203,15 @@ public class CompanyController {
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.info("Error occured while getCompanyList for {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+				commonResponse = new CompanyListResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
 				logger.info("RecordNotFoundException occured while getCompanyList for {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+				commonResponse = new CompanyListResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(),
+						e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Unknown Error occured while getCompanyList for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				commonResponse = new CompanyListResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
 						messageSource.getMessage(ErrorCode.UNKNOWN_ERROR, null, LocaleContextHolder.getLocale())
 								+ e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
@@ -229,7 +231,7 @@ public class CompanyController {
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })
 	@GetMapping(value = "/v1/company/summery")
-	public ResponseEntity<CommonResponse> getCompanySummeryList(
+	public ResponseEntity<CompanySummeryListResponse> getCompanySummeryList(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup,
@@ -238,10 +240,10 @@ public class CompanyController {
 		long startTime = System.currentTimeMillis();
 
 		logger.info("Start exicute method getCompanyList");
-		CommonResponse commonResponse;
+		CompanySummeryListResponse commonResponse;
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+			commonResponse = new CompanySummeryListResponse(HttpStatus.BAD_REQUEST.value(),
 					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
@@ -255,14 +257,15 @@ public class CompanyController {
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.info("Error occured while getCompanyList for {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
-						e.getErrorCode());
+				commonResponse = new CompanySummeryListResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+						e.getMessage(), e.getErrorCode());
 			} catch (RecordNotFoundException e) {
 				logger.info("RecordNotFoundException occured while getCompanySfor {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+				commonResponse = new CompanySummeryListResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(),
+						e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Unknown Error occured while getCompanyList for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				commonResponse = new CompanySummeryListResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
 						messageSource.getMessage(ErrorCode.UNKNOWN_ERROR, null, LocaleContextHolder.getLocale())
 								+ e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
@@ -335,7 +338,7 @@ public class CompanyController {
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })
 	@GetMapping(value = "/v1/company/{companyId}")
-	public ResponseEntity<CommonResponse> getCompanyById(
+	public ResponseEntity<GetCompanyByIdResponse> getCompanyById(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup,
@@ -344,10 +347,10 @@ public class CompanyController {
 		long startTime = System.currentTimeMillis();
 
 		logger.info("Start exicute method getCompanyById");
-		CommonResponse commonResponse;
+		GetCompanyByIdResponse commonResponse;
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+			commonResponse = new GetCompanyByIdResponse(HttpStatus.BAD_REQUEST.value(),
 					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
@@ -361,14 +364,15 @@ public class CompanyController {
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.error("Error occured while getCompanyById for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+				commonResponse = new GetCompanyByIdResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
 				logger.info("RecordNotFoundException occured while getCompanyById for {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+				commonResponse = new GetCompanyByIdResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(),
+						e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Error occured while getCompanyById for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+				commonResponse = new GetCompanyByIdResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
 			}
 
@@ -380,7 +384,7 @@ public class CompanyController {
 	}
 
 	@GetMapping("/v1/company/temp")
-	public ResponseEntity<CommonResponse> getTempRecords(
+	public ResponseEntity<ApprovalPendingResponse> getTempRecords(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup, FindCompanyRequest searchBy) {
@@ -388,20 +392,21 @@ public class CompanyController {
 		long startTime = System.currentTimeMillis();
 		String search = null == searchBy ? "EMPTY" : searchBy.toString();
 		logger.info("Start get temp data (serchBy: {})", search);
-		CommonResponse commonResponse = new CommonResponse();
+		ApprovalPendingResponse commonResponse = new ApprovalPendingResponse();
 		try {
 			commonResponse = companyService.getApprovalPendingRecord(searchBy, userId, userGroup);
 			logger.info("Successfuly fetched ");
 		} catch (SystemException e) {
 			logger.info("Error occured while geting Temp record {}.", e.getMessage());
-			commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+			commonResponse = new ApprovalPendingResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 					e.getErrorCode());
 		} catch (RecordNotFoundException e) {
 			logger.info("RecordNotFoundException occured while geting Temp record, {}.", e.getMessage());
-			commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+			commonResponse = new ApprovalPendingResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(),
+					e.getErrorCode());
 		} catch (Exception e) {
 			logger.error("Unknown Error occured while  geting Temp record.", e);
-			commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+			commonResponse = new ApprovalPendingResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 					ErrorCode.UNKNOWN_ERROR);
 		}
 		long endTime = System.currentTimeMillis();

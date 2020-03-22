@@ -10,12 +10,14 @@ public class ErrorCode {
 	public static final String VALIDATION_ERROR = "B400";
 	public static final String INVALID_USER_ID = "B410";
 	public static final String INVALID_REQUEST_PARAMETER = "B411";
+	public static final String INVALID_FEATURE_ID = "B4002";
 
 	public static final String NO_TEMP_RECORD_FOUND = "B4041";
 	public static final String NO_COMPANY_RECORD_FOUND = "B4042";
 	public static final String NO_LINK_COMPANY_RECORD_FOUND = "B4043";
 	public static final String NO_BRANCH_RECORD_FOUND = "B4043";
 	public static final String NO_USER_RECORD_FOUND = "B4044";
+	public static final String NO_FEATURE_RECORD_FOUND = "B4045";
 
 	public static final String OPARATION_SUCCESS = "B200";
 	public static final String RETRIVE_COMPANY_SUCCESS = "B201";

@@ -8,7 +8,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
-import biz.nable.sb.cor.comp.utility.McAuthEnum;
+import biz.nable.sb.cor.comp.utility.YnFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -40,7 +40,7 @@ public class CompanyMstHis extends Auditable {
 	private String epfCode;
 	private String etfCode;
 	private String commTemplateId;
-	private McAuthEnum mcAuthFlg;
+	private YnFlagEnum mcAuthFlg;
 	private String canvassedBranch;
 	private String canvassedUser;
 	private String treasureCustRef;

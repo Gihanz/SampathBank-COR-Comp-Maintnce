@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class UserFeatureBean {
 	private Long id;
-	private String CorpUserId;
+	private String corpUserId;
 	private String companyFeatureId;
 
 }

@@ -2,24 +2,30 @@ package biz.nable.sb.cor.comp.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
-import biz.nable.sb.cor.common.utility.ErrorCode;
 import biz.nable.sb.cor.comp.bean.SyncAllAccountRequest;
 import biz.nable.sb.cor.comp.component.FinacleConnector;
 import biz.nable.sb.cor.comp.db.entity.CompanyAccountMst;
+import biz.nable.sb.cor.comp.db.entity.CompanyMst;
 import biz.nable.sb.cor.comp.db.repository.AccountsRepository;
+import biz.nable.sb.cor.comp.db.repository.CompanyMstRepository;
 import biz.nable.sb.cor.comp.exception.FinacleCallException;
 import biz.nable.sb.cor.comp.soap.schemas.iib.CustomerInfoRecord;
 import biz.nable.sb.cor.comp.soap.schemas.iib.GetCustomerInfoResponseType;
 import biz.nable.sb.cor.comp.soap.schemas.iib.GetGenInqResponseType;
+import biz.nable.sb.cor.comp.utility.ErrorCode;
 
 @Service
 public class SyncAccounts {
@@ -30,12 +36,24 @@ public class SyncAccounts {
 	AccountsRepository accountRepo;
 
 	@Autowired
+	CompanyMstRepository companyMstRepository;
+
+	@Autowired
 	FinacleConnector finacleConnector;
+
+	@Autowired
+	MessageSource messageSource;
 
 	@Async("asyncAccountSyncExecutor")
 	public void syncAllAccounts(SyncAllAccountRequest request) {
 		logger.info("start Account sync CustId : {}", request.getCustId());
-		List<CompanyAccountMst> entities = accountRepo.findByCompanyId(request.getCustId());
+		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(request.getCustId());
+		if (!optional.isPresent()) {
+			throw new SystemException(
+					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
+					ErrorCode.NO_COMPANY_RECORD_FOUND);
+		}
+		List<CompanyAccountMst> entities = optional.get().getCompanyAccounts();
 		logger.info("Existing DebitAccount count:{} list: {}", entities.size(), entities);
 
 		List<CompanyAccountMst> syncedList = new ArrayList<>();

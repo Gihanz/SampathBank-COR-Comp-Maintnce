@@ -10,13 +10,22 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
+import org.hibernate.validator.constraints.Length;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import lombok.Data;
+import biz.nable.sb.cor.common.db.audit.Auditable;
+import biz.nable.sb.cor.common.utility.StatusEnum;
+import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
-public class UserMst implements Serializable {
+public class UserMst extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -24,8 +33,15 @@ public class UserMst implements Serializable {
 	@SequenceGenerator(name = "USER_MST_SEQ", sequenceName = "SB_COR_USER_MST_SEQ", allocationSize = 1)
 	private Long id;
 	private String userName;
+	private String designation;
+	private Long branch;
+	@Length(max = 1000)
+	private String remark;
+	private StatusEnum status;
+	private RecordStatusEnum recordStatus;
 
 	@OneToMany(mappedBy = "user")
 	@JsonManagedReference
-	List<CompanyUser> companyUsers;
+	private List<CompanyUser> companyUsers;
+
 }

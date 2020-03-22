@@ -32,10 +32,15 @@ import biz.nable.sb.cor.comp.bean.CompanyTempBean;
 import biz.nable.sb.cor.comp.bean.FindCompanyBean;
 import biz.nable.sb.cor.comp.component.CompanyTempComponent;
 import biz.nable.sb.cor.comp.db.criteria.CompanyCustomRepository;
+import biz.nable.sb.cor.comp.db.entity.CompanyCummData;
 import biz.nable.sb.cor.comp.db.entity.CompanyDelete;
+import biz.nable.sb.cor.comp.db.entity.CompanyFeatures;
 import biz.nable.sb.cor.comp.db.entity.CompanyMst;
+import biz.nable.sb.cor.comp.db.entity.Features;
 import biz.nable.sb.cor.comp.db.repository.CompanyDeleteRepository;
 import biz.nable.sb.cor.comp.db.repository.CompanyMstRepository;
+import biz.nable.sb.cor.comp.db.repository.FeaturesRepository;
+import biz.nable.sb.cor.comp.db.repository.LinkCompanyRepository;
 import biz.nable.sb.cor.comp.request.CreateCompanyRequest;
 import biz.nable.sb.cor.comp.request.FindCompanyRequest;
 import biz.nable.sb.cor.comp.request.UpdateCompanyRequest;
@@ -58,7 +63,13 @@ public class CompanyService {
 	CompanyMstRepository companyMstRepository;
 
 	@Autowired
+	FeaturesRepository featuresRepository;
+
+	@Autowired
 	CompanyCustomRepository companyCustomRepository;
+
+	@Autowired
+	LinkCompanyRepository linkCompanyRepository;
 
 	@Autowired
 	CompanyDeleteRepository companyDeleteRepository;
@@ -87,6 +98,15 @@ public class CompanyService {
 			commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.COMPANY_RECORD_ALREADY_EXISTS, null,
 					LocaleContextHolder.getLocale()));
 		} else {
+
+			for (Long feature : createCompanyRequest.getCompanyFeatures()) {
+				Optional<Features> optionalF = featuresRepository.findById(feature);
+				if (!optionalF.isPresent()) {
+					throw new SystemException(messageSource.getMessage(ErrorCode.INVALID_FEATURE_ID, null,
+							LocaleContextHolder.getLocale()), ErrorCode.INVALID_FEATURE_ID);
+				}
+			}
+
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			createCompanyRequest.setCreateDate(new Date());
 			createCompanyRequest.setCreateBy(userId);
@@ -99,12 +119,12 @@ public class CompanyService {
 			commonRequestBean.setRequestType(REQUEST_TYPE.name());
 			commonRequestBean.setUserGroup(userGroup);
 			commonRequestBean.setUserId(userId);
-
 			CommonResponseBean commonResponseBean = companyTempComponent.createTempCompany(commonRequestBean,
 					requestId);
 			commonResponse.setErrorCode(commonResponseBean.getErrorCode());
 			commonResponse.setReturnCode(commonResponseBean.getReturnCode());
 			commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
+
 		}
 		logger.info("================== End Create company =================");
 		return commonResponse;
@@ -112,7 +132,6 @@ public class CompanyService {
 
 	public CommonResponse updateTempCompany(UpdateCompanyRequest updateCompanyRequest, String companyId, String userId,
 			String userGroup, String requestId) {
-
 		logger.info("================== Start Update company =================");
 		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(companyId);
 		CommonResponse commonResponse = new CommonResponse();
@@ -141,6 +160,8 @@ public class CompanyService {
 			companyMstRepository.save(optional.get());
 			commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
 			commonResponse.setReturnCode(HttpStatus.OK.value());
+			commonResponse.setReturnMessage(
+					messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
 		}
 		logger.info("================== End update company =================");
 		return commonResponse;
@@ -151,17 +172,33 @@ public class CompanyService {
 		logger.info("================== Start Get Company List =================");
 		CompanyListResponse companyListResponse = new CompanyListResponse();
 		logger.info("Start getCompanyList method");
+//		findCompanyBean.setCreatedUserGroup(userGroup);
 		List<CompanyMst> listCompanyMsts = companyCustomRepository.findCompanyList(findCompanyBean);
 		List<CompanyResponse> companyResponseList = new ArrayList<>();
 
 		for (CompanyMst companyMst : listCompanyMsts) {
 			CompanyResponse companyResponse = new CompanyResponse();
 			try {
+				companyMst.setBranchMsts(null);
+				companyMst.setCompanyAccounts(null);
+				companyMst.setCompanyUsers(null);
 				BeanUtils.copyProperties(companyResponse, companyMst);
-				companyResponseList.add(companyResponse);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				logger.error("Data copping error occred Company Id: {}", companyMst.getCompanyId());
+			} catch (IllegalAccessException e) {
+				logger.error("Propperty copping error: IllegalAccessException");
+			} catch (InvocationTargetException e) {
+				logger.info("Propperty copping error: InvocationTargetException");
 			}
+			List<Long> list = new ArrayList<>();
+			for (CompanyFeatures features : companyMst.getCompanyFeatures()) {
+				list.add(features.getFeature());
+			}
+			List<CompanyCummData> companyCummDatas = linkCompanyRepository
+					.findByParentCompanyId(companyMst.getCompanyId());
+			for (CompanyCummData companyCummData : companyCummDatas) {
+				companyResponse.getListOfLinkedCustIds().add(companyCummData.getCustomerId());
+			}
+			companyResponse.setCompanyFeatures(list);
+			companyResponseList.add(companyResponse);
 		}
 
 		logger.info("End getCompanyList method execution with {} records", companyResponseList.size());
@@ -175,7 +212,7 @@ public class CompanyService {
 		return companyListResponse;
 	}
 
-	public CommonResponse getCompanySummeryList(StatusEnum status, String userId, String userGroup) {
+	public CompanySummeryListResponse getCompanySummeryList(StatusEnum status, String userId, String userGroup) {
 		logger.info("================== Start Get Company By Id =================");
 		CompanySummeryListResponse summeryListResponse = new CompanySummeryListResponse();
 		if (StatusEnum.ACTIVE == status) {
@@ -220,20 +257,33 @@ public class CompanyService {
 		return summeryListResponse;
 	}
 
-	public CommonResponse getCompanyById(String companyId, String userId, String userGroup, String requestId) {
+	public GetCompanyByIdResponse getCompanyById(String companyId, String userId, String userGroup, String requestId) {
 		logger.info("================== Start Get Company By Id =================");
 		Optional<CompanyMst> companyMstO = companyMstRepository.findByCompanyId(companyId);
 		GetCompanyByIdResponse getCompanyByIdResponse = new GetCompanyByIdResponse();
 		CompanyResponse companyBean = new CompanyResponse();
 		if (companyMstO.isPresent()) {
+			companyMstO.get().setBranchMsts(null);
+			companyMstO.get().setCompanyAccounts(null);
+			companyMstO.get().setCompanyUsers(null);
 			try {
 				BeanUtils.copyProperties(companyBean, companyMstO.get());
-				getCompanyByIdResponse.setCompanyBean(companyBean);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new SystemException(
-						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
-						ErrorCode.DATA_COPY_ERROR);
+				List<Long> list = new ArrayList<>();
+				for (CompanyFeatures features : companyMstO.get().getCompanyFeatures()) {
+					list.add(features.getFeature());
+				}
+				List<CompanyCummData> companyCummDatas = linkCompanyRepository
+						.findByParentCompanyId(companyMstO.get().getCompanyId());
+				for (CompanyCummData companyCummData : companyCummDatas) {
+					companyBean.getListOfLinkedCustIds().add(companyCummData.getCustomerId());
+				}
+				companyBean.setCompanyFeatures(list);
+			} catch (IllegalAccessException e) {
+				logger.error("Propperty copping error: IllegalAccessException");
+			} catch (InvocationTargetException e) {
+				logger.info("Propperty copping error: InvocationTargetException");
 			}
+			getCompanyByIdResponse.setCompanyBean(companyBean);
 		} else {
 			FindTempByRefBean bean = new FindTempByRefBean();
 			bean.setReferenceNo(companyId);
@@ -244,6 +294,7 @@ public class CompanyService {
 						CompanyTempBean.class);
 				try {
 					BeanUtils.copyProperties(companyBean, companyTempBean);
+
 					companyBean.setStatus(StatusEnum.INACTIVE);
 					getCompanyByIdResponse.setCompanyBean(companyBean);
 				} catch (IllegalAccessException | InvocationTargetException e) {
@@ -271,6 +322,11 @@ public class CompanyService {
 			UpdateCompanyRequest companyBean = new UpdateCompanyRequest();
 			try {
 				BeanUtils.copyProperties(companyBean, companyMstO.get());
+				List<Long> features = new ArrayList<>();
+				for (CompanyFeatures companyFeatures : companyMstO.get().getCompanyFeatures()) {
+					features.add(companyFeatures.getFeature());
+				}
+				companyBean.setCompanyFeatures(features);
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SystemException(
 						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
@@ -305,7 +361,8 @@ public class CompanyService {
 
 	}
 
-	public CommonResponse getApprovalPendingRecord(FindCompanyRequest searchBy, String userId, String userGroup) {
+	public ApprovalPendingResponse getApprovalPendingRecord(FindCompanyRequest searchBy, String userId,
+			String userGroup) {
 		ApprovalPendingResponse commonResponse = new ApprovalPendingResponse();
 		logger.info("================== Start Get Temp data =================");
 
@@ -368,6 +425,11 @@ public class CompanyService {
 						.filter(companyListResponseBean -> companyListResponseBean.getReferenceNo()
 								.equals(companyResponse.getCompanyId()))
 						.findAny().orElse(null);
+				List<Long> list = new ArrayList<>();
+				for (CompanyFeatures features : companyMst.getCompanyFeatures()) {
+					list.add(features.getFeature());
+				}
+				companyResponse.setCompanyFeatures(list);
 				if (null != tempCompanyResponse) {
 					tempCompanyResponse.setCompanyResponse(companyResponse);
 				}

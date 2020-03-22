@@ -31,6 +31,8 @@ import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.common.utility.ErrorCode;
 import biz.nable.sb.cor.common.utility.StatusEnum;
+import biz.nable.sb.cor.comp.bean.AuthPendingBranchBean;
+import biz.nable.sb.cor.comp.bean.BranchDetailBean;
 import biz.nable.sb.cor.comp.request.CreateBranchRequest;
 import biz.nable.sb.cor.comp.request.DeleteBranchRequest;
 import biz.nable.sb.cor.comp.request.UpdateBranchRequest;
@@ -106,12 +108,11 @@ public class BranchController {
 	}
 
 	@ApiOperation(value = "Get Branch List By Company ID", nickname = "Get Branch List By Company Id", notes = "Get Branch List By Company ID.", httpMethod = "GET")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching Branchlist successful", response = CommonGetListResponse.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Fetching Branchlist successful"),
 			@ApiResponse(code = 400, message = "Get Branchlist fail"),
 			@ApiResponse(code = 500, message = "Internal server error") })
 	@GetMapping("/v1/branch/{companyId}")
-	public ResponseEntity<CommonResponse> getCustomerids(
+	public ResponseEntity<CommonGetListResponse<BranchDetailBean>> getCustomerids(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup,
@@ -121,10 +122,10 @@ public class BranchController {
 		long startTime = System.currentTimeMillis();
 
 		logger.info("Start exicute method getCustomerids");
-		CommonResponse commonResponse;
+		CommonGetListResponse<BranchDetailBean> commonResponse;
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+			commonResponse = new CommonGetListResponse<>(HttpStatus.BAD_REQUEST.value(),
 					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
@@ -138,14 +139,15 @@ public class BranchController {
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.error("Error occured while getCustomerids for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+				commonResponse = new CommonGetListResponse<>(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
 				logger.info("RecordNotFoundException occured while getCustomerids for {}.", e.getMessage());
-				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+				commonResponse = new CommonGetListResponse<>(HttpStatus.NOT_FOUND.value(), e.getMessage(),
+						e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Error occured while getCustomerids for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+				commonResponse = new CommonGetListResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
 			}
 
@@ -157,12 +159,11 @@ public class BranchController {
 	}
 
 	@ApiOperation(value = "Get Auth pending Branch List", nickname = "Get Auth pending Branch List", notes = "Get Auth pending Branch List.", httpMethod = "GET")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching Auth pending Branch list successful", response = CommonGetListResponse.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Fetching Auth pending Branch list successful"),
 			@ApiResponse(code = 400, message = "Get Auth pending Branchlist fail", response = CommonResponse.class),
 			@ApiResponse(code = 500, message = "Internal server error", response = CommonResponse.class) })
 	@GetMapping("/v1/branch/pending")
-	public ResponseEntity<CommonResponse> getPendingAuthBranches(
+	public ResponseEntity<CommonGetListResponse<AuthPendingBranchBean>> getPendingAuthBranches(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup) {
@@ -170,10 +171,10 @@ public class BranchController {
 		long startTime = System.currentTimeMillis();
 
 		logger.info("Start exicute method getPendingAuthBranches");
-		CommonResponse commonResponse;
+		CommonGetListResponse<AuthPendingBranchBean> commonResponse;
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+			commonResponse = new CommonGetListResponse<>(HttpStatus.BAD_REQUEST.value(),
 					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
@@ -187,11 +188,11 @@ public class BranchController {
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.error("Error occured while getPendingAuthBranches for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+				commonResponse = new CommonGetListResponse<>(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (Exception e) {
 				logger.error("Error occured while getPendingAuthBranches for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+				commonResponse = new CommonGetListResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
 			}
 

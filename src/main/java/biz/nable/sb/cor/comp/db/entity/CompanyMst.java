@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
 import biz.nable.sb.cor.common.utility.StatusEnum;
-import biz.nable.sb.cor.comp.utility.McAuthEnum;
+import biz.nable.sb.cor.comp.utility.YnFlagEnum;
 import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,7 +56,7 @@ public class CompanyMst extends Auditable implements Serializable {
 	private String epfAreaCode;
 	@Column(length = 15)
 	private String commTemplateId;
-	private McAuthEnum mcAuthFlg;
+	private YnFlagEnum mcAuthFlg;
 	@Column(length = 3)
 	private String canvassedBranch;
 	private Long canvassedUser;
@@ -87,5 +87,11 @@ public class CompanyMst extends Auditable implements Serializable {
 	@JsonManagedReference
 	private List<CompanyFeatures> companyFeatures = new ArrayList<>();
 
+	@OneToMany(mappedBy = "companyId", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<CompanyAccountMst> companyAccounts = new ArrayList<>();
+
+	private Long corporatePaymentsLimit;
+	private String deviceLocation;
 	private Long authorizationId;
 }

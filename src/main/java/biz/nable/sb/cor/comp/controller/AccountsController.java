@@ -42,8 +42,7 @@ public class AccountsController {
 	private MessageSource messageSource;
 
 	@ApiOperation(value = "Get AccountsList By ID API", nickname = "Get AccountsList By ID API", notes = "Get AccountsList By ID API", httpMethod = "GET")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successfully Fetched", response = CommonGetListResponse.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully Fetched"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })

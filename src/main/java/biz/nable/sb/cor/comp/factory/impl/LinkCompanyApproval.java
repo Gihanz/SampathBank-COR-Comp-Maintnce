@@ -76,7 +76,8 @@ public class LinkCompanyApproval implements CommonApprovalTemplate {
 
 	private void changeMstStatus(ApprovalBean approvalBean) {
 		if (!ActionTypeEnum.CREATE.name().equals(approvalBean.getActionType())) {
-			Optional<CompanyCummData> optional = linkCompanyRepository.findBycustomerId(approvalBean.getReferenceId());
+			Optional<CompanyCummData> optional = linkCompanyRepository.findByParentCompanyIdAndCustomerId(
+					approvalBean.getReferenceId().split("#")[1], approvalBean.getReferenceId().split("#")[0]);
 			if (!optional.isPresent()) {
 				throw new SystemException(messageSource.getMessage(ErrorCode.NO_LINK_COMPANY_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()), ErrorCode.NO_LINK_COMPANY_RECORD_FOUND);
@@ -89,7 +90,8 @@ public class LinkCompanyApproval implements CommonApprovalTemplate {
 
 	private void deleteLinkCompany(ApprovalBean approvalBean, TempDto tempDto) {
 		logger.info("Start Deleting Link");
-		Optional<CompanyCummData> companyO = linkCompanyRepository.findBycustomerId(approvalBean.getReferenceId());
+		Optional<CompanyCummData> companyO = linkCompanyRepository.findByParentCompanyIdAndCustomerId(
+				approvalBean.getReferenceId().split("#")[1], approvalBean.getReferenceId().split("#")[0]);
 		CompanyCummData companyCummData;
 		CompanyCummDataDelete companyCummDataDelete = new CompanyCummDataDelete();
 		if (companyO.isPresent()) {
@@ -123,7 +125,8 @@ public class LinkCompanyApproval implements CommonApprovalTemplate {
 	private void addToLinkCompanyMst(ApprovalBean approvalBean, TempDto tempDto) {
 		LinkCompanyRequest linkCompanyRequest = commonConverter.mapToPojo(tempDto.getRequestPayload(),
 				LinkCompanyRequest.class);
-		Optional<CompanyCummData> optional = linkCompanyRepository.findBycustomerId(approvalBean.getReferenceId());
+		Optional<CompanyCummData> optional = linkCompanyRepository.findByParentCompanyIdAndCustomerId(
+				approvalBean.getReferenceId().split("#")[1], approvalBean.getReferenceId().split("#")[0]);
 		CompanyCummData companyCummData;
 		if (optional.isPresent()) {
 			logger.info("Company already linked");

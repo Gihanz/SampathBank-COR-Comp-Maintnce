@@ -15,4 +15,6 @@ public interface LinkCompanyRepository extends CrudRepository<CompanyCummData, L
 
 	Optional<CompanyCummData> findBycustomerId(String customerId);
 
+	Optional<CompanyCummData> findByParentCompanyIdAndCustomerId(String parentCompanyId, String customerId);
+
 }

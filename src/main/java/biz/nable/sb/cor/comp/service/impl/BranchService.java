@@ -101,7 +101,8 @@ public class BranchService {
 				CommonRequestBean commonRequestBean = new CommonRequestBean();
 				commonRequestBean.setCommonTempBean(createBranchRequest);
 				String hashTags = BRANCH_HASH_TAG.concat(String.valueOf(createBranchRequest.getCompanyId()));
-				String referenceNo = String.valueOf(createBranchRequest.getBranchId());
+				String referenceNo = String.valueOf(createBranchRequest.getBranchId()).concat("#")
+						.concat(createBranchRequest.getCompanyId());
 				commonRequestBean.setHashTags(hashTags);
 				commonRequestBean.setReferenceNo(referenceNo);
 				commonRequestBean.setRequestType(REQUEST_TYPE.name());
@@ -119,10 +120,14 @@ public class BranchService {
 		return commonResponse;
 	}
 
-	public CommonResponse getPendingAuthBranches(String userId, String userGroup, String requestId) {
+	public CommonGetListResponse<AuthPendingBranchBean> getPendingAuthBranches(String userId, String userGroup,
+			String requestId) {
 		logger.info("================== Start getPendingAuthBranches =================");
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setRequestType(REQUEST_TYPE.name());
+		bean.setUserGroup(userGroup);
+		bean.setUserId(userId);
+
 		List<TempDto> tempList = branchTempComponent.getAuthPendingRecord(bean).getTempList();
 		CommonGetListResponse<AuthPendingBranchBean> commonGetListResponse = new CommonGetListResponse<>();
 		List<AuthPendingBranchBean> authPendingBranchBeans = new ArrayList<>();
@@ -134,15 +139,16 @@ public class BranchService {
 				AuthPendingBranchBean branchBean = new AuthPendingBranchBean();
 				branchBean.setCompanyId(companyO.get().getCompanyId());
 				branchBean.setCompanyName(companyO.get().getCompanyName());
+				branchBean.setBranchId(branchRequest.getBranchId());
 				BranchResponseBean branchResponse = new BranchResponseBean();
 				branchResponse.setBranchName(branchRequest.getBranchName());
 				branchBean.setModifiedBranch(branchResponse);
 				if (ActionTypeEnum.UPDATE.equals(tempDto.getActionType())) {
 					Optional<BranchMst> optional = branchMstRepository
-							.findByBranchIdAndCompany(tempDto.getReferenceNo(), companyO.get().getId());
+							.findByBranchIdAndCompany(tempDto.getReferenceNo().split("#")[0], companyO.get());
 					if (optional.isPresent()) {
 						BranchResponseBean currentBranchResponse = new BranchResponseBean();
-						branchResponse.setBranchName(optional.get().getBranchName());
+						currentBranchResponse.setBranchName(optional.get().getBranchName());
 						branchBean.setCurrentBranch(currentBranchResponse);
 					}
 				}
@@ -176,11 +182,12 @@ public class BranchService {
 					ErrorCode.NO_COMPANY_RECORD_FOUND);
 		}
 		Optional<BranchMst> optional = branchMstRepository.findByBranchIdAndCompany(deleteBranchRequest.getBranchId(),
-				optional1.get().getId());
+				optional1.get());
 		if (optional.isPresent()) {
 			CreateBranchRequest branchRequest = new CreateBranchRequest();
 			try {
 				BeanUtils.copyProperties(branchRequest, optional.get());
+				branchRequest.setCompanyId(optional.get().getCompany().getCompanyId());
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SystemException(
 						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
@@ -188,8 +195,8 @@ public class BranchService {
 			}
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			commonRequestBean.setCommonTempBean(branchRequest);
-			String hashTags = BRANCH_HASH_TAG.concat(branchRequest.getCompanyId());
-			String referenceNo = branchRequest.getBranchId();
+			String hashTags = BRANCH_HASH_TAG.concat(deleteBranchRequest.getCompanyId());
+			String referenceNo = branchRequest.getBranchId().concat("#").concat(branchRequest.getCompanyId());
 			commonRequestBean.setHashTags(hashTags);
 			commonRequestBean.setReferenceNo(referenceNo);
 			commonRequestBean.setRequestType(REQUEST_TYPE.name());
@@ -225,7 +232,7 @@ public class BranchService {
 					ErrorCode.NO_COMPANY_RECORD_FOUND);
 		} else {
 			Optional<BranchMst> optionalB = branchMstRepository
-					.findByBranchIdAndCompany(updateBranchRequest.getBranchId(), optional.get().getId());
+					.findByBranchIdAndCompany(updateBranchRequest.getBranchId(), optional.get());
 			if (!optionalB.isPresent()) {
 				throw new RecordNotFoundException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);
@@ -233,7 +240,8 @@ public class BranchService {
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			commonRequestBean.setCommonTempBean(updateBranchRequest);
 			String hashTags = BRANCH_HASH_TAG.concat(updateBranchRequest.getCompanyId());
-			String referenceNo = updateBranchRequest.getBranchId();
+			String referenceNo = updateBranchRequest.getBranchId().concat("#")
+					.concat(updateBranchRequest.getCompanyId());
 			commonRequestBean.setHashTags(hashTags);
 			commonRequestBean.setReferenceNo(referenceNo);
 
@@ -250,8 +258,8 @@ public class BranchService {
 		return commonResponse;
 	}
 
-	public CommonResponse getBranches(String companyId, StatusEnum status, String userId, String userGroup,
-			String requestId) {
+	public CommonGetListResponse<BranchDetailBean> getBranches(String companyId, StatusEnum status, String userId,
+			String userGroup, String requestId) {
 		CommonGetListResponse<BranchDetailBean> branchDetailBeans = new CommonGetListResponse<>();
 		logger.info("================== Start Find  branch =================");
 		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(companyId);
@@ -279,7 +287,7 @@ public class BranchService {
 		return branchDetailBeans;
 	}
 
-	public CommonResponse getAllBranches(String userId, String userGroup, String requestId) {
+	public CommonGetListResponse<BranchResponse> getAllBranches(String userId, String userGroup, String requestId) {
 		CommonGetListResponse<BranchResponse> branchDetailBeans = new CommonGetListResponse<>();
 		logger.info("================== Start Find  branch =================");
 		List<BranchMst> listBranchMsts = (List<BranchMst>) branchMstRepository.findAll();

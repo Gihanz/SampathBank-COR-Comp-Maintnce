@@ -151,7 +151,7 @@ public class CompanyCustomRepository {
 			Root<CompanyMst> root, FindCompanyBean findCompanyBean) {
 		if (null != findCompanyBean.getCreatedUserGroup() && !findCompanyBean.getCreatedUserGroup().isEmpty()) {
 			predicates.add(criteriaBuilder
-					.and(criteriaBuilder.equal(root.get("createdUserGroup"), findCompanyBean.getCreatedUserGroup())));
+					.and(criteriaBuilder.equal(root.get("userGroup"), findCompanyBean.getCreatedUserGroup())));
 		}
 	}
 

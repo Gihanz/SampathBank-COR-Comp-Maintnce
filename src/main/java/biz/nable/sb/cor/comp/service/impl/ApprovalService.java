@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import biz.nable.sb.cor.common.bean.CommonSearchBean;
-import biz.nable.sb.cor.common.bean.TempDto;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.comp.bean.CompanyListResponseBean;
 import biz.nable.sb.cor.comp.component.CompanyTempComponent;
@@ -36,7 +35,7 @@ public class ApprovalService {
 
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setUserGroup(userGroup);
-		List<TempDto> tempList = companyTempComponent.getTempRecord(bean).getTempList();
+//		List<TempDto> tempList = companyTempComponent.getTempRecord(bean).getTempList();
 		List<CompanyListResponseBean> responseBeans = new ArrayList<>();
 		commonResponse.setTempDtos(responseBeans);
 		commonResponse.setReturnCode(HttpStatus.OK.value());

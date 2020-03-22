@@ -10,6 +10,6 @@ import biz.nable.sb.cor.comp.db.entity.UserFeatures;
 @Repository
 public interface UserFeaturesRepositoty extends CrudRepository<UserFeatures, Long> {
 
-	List<UserFeatures> findByCorpUserId(String corpUserId);
+	List<UserFeatures> findByCompanyUser(String companyUser);
 
 }
