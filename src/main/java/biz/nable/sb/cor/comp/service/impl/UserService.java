@@ -1,5 +1,6 @@
 package biz.nable.sb.cor.comp.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -103,6 +104,12 @@ public class UserService {
 			}
 		}
 		return commonResponse;
+	}
+
+	public List<UserMst> getUseres(String userId, String userGroup, String requestId){
+
+		return userMstRepository.findAll();
+
 	}
 //
 //	public CommonResponse getPendingAuthBranches(String userId, String userGroup, String requestId) {

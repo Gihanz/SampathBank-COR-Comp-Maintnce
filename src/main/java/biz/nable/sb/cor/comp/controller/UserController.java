@@ -5,6 +5,11 @@ package biz.nable.sb.cor.comp.controller;
 
 import javax.validation.Valid;
 
+import biz.nable.sb.cor.common.exception.RecordNotFoundException;
+import biz.nable.sb.cor.comp.db.entity.UserMst;
+import biz.nable.sb.cor.comp.response.CommonGetListResponse;
+import biz.nable.sb.cor.comp.response.UserCommonResponse;
+import biz.nable.sb.cor.comp.utility.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -14,10 +19,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,6 +31,9 @@ import biz.nable.sb.cor.comp.service.impl.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
+import java.util.Collections;
+import java.util.List;
 
 /*
  * @Description	:This controller class is acting as controller 
@@ -96,55 +101,63 @@ public class UserController {
 	}
 //
 //	@ApiOperation(value = "Get User List By Company ID", nickname = "Get User List By Company Id", notes = "Get User List By Company ID.", httpMethod = "GET")
-//	@ApiResponses(value = {
-//			@ApiResponse(code = 200, message = "Fetching Userlist successful", response = CommonGetListResponse.class),
-//			@ApiResponse(code = 400, message = "Get Userlist fail"),
-//			@ApiResponse(code = 500, message = "Internal server error") })
-//	@GetMapping("/v1/user/{companyId}")
-//	public ResponseEntity<CommonResponse> getCustomerids(
-//			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
-//			@RequestHeader(name = "userId", required = true) String userId,
-//			@RequestHeader(name = "userGroup", required = false) String userGroup,
+@ApiOperation(value = "Get User List ", nickname = "Get User List", notes = "Get User List.", httpMethod = "GET")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Fetching Userlist successful", response = CommonGetListResponse.class),
+			@ApiResponse(code = 400, message = "Get Userlist fail"),
+			@ApiResponse(code = 500, message = "Internal server error") })
+//	@GetMapping("/v1/user/{companyId}"
+	@GetMapping("/v1/user")
+	public ResponseEntity<CommonResponse> getCustomerids(
+			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
+			@RequestHeader(name = "userId", required = true) String userId,
+			@RequestHeader(name = "userGroup", required = false) String userGroup
 //			@RequestParam(name = "status", required = true) StatusEnum status,
-//			@PathVariable("companyId") String companyId) {
-//		MDC.put(REQUEST_ID_HEADER, requestId);
-//		long startTime = System.currentTimeMillis();
-//
-//		logger.info("Start exicute method getCustomerids");
-//		CommonResponse commonResponse;
-//		if (StringUtils.isEmpty(userId)) {
-//			logger.error(invalidUserLoggingMsg, userId);
-//			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
-//					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
-//							LocaleContextHolder.getLocale()),
-//					ErrorCode.INVALID_USER_ID);
-//		} else {
-//			try {
+//			@PathVariable("companyId") String companyId
+	) {
+		MDC.put(REQUEST_ID_HEADER, requestId);
+		long startTime = System.currentTimeMillis();
+
+		logger.info("Start execute method getCustomerids");
+		CommonResponse commonResponse = new CommonResponse();
+		UserCommonResponse userCommonResponse = new UserCommonResponse();
+		if (StringUtils.isEmpty(userId)) {
+			logger.error(invalidUserLoggingMsg, userId);
+			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
+							LocaleContextHolder.getLocale()),
+					ErrorCode.INVALID_USER_ID);
+		} else {
+			try {
 //				logger.debug("Fetch Customerids by CompanyId: {}", companyId);
-//				if (StringUtils.isEmpty(userGroup)) {
-//					userGroup = COMMON_USER_GROUP;
-//				}
-//				commonResponse = userService.getUseres(companyId, status, userId, userGroup, requestId);
-//				logger.info(commonResponse.getReturnMessage());
-//			} catch (SystemException e) {
-//				logger.error("Error occured while getCustomerids for {}.", e);
-//				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
-//						e.getErrorCode());
-//			} catch (RecordNotFoundException e) {
-//				logger.info("RecordNotFoundException occured while getCustomerids for {}.", e.getMessage());
-//				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
-//			} catch (Exception e) {
-//				logger.error("Error occured while getCustomerids for {}.", e);
-//				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
-//						ErrorCode.UNKNOWN_ERROR);
-//			}
-//
-//		}
-//		long endTime = System.currentTimeMillis();
-//		logger.info("getCustomerids rate: avg_resp={}", (endTime - startTime));
-//		MDC.clear();
-//		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
-//	}
+				if (StringUtils.isEmpty(userGroup)) {
+					userGroup = COMMON_USER_GROUP;
+				}
+				List<UserMst> allUsers = userService.getUseres(userId, userGroup, requestId);
+				userCommonResponse.setUserResponseList(Collections.singletonList(allUsers));
+				userCommonResponse.setReturnCode(HttpStatus.OK.value());
+				userCommonResponse.setReturnMessage("Successfully retrieved the User");
+				commonResponse.setReturnCode(200);
+				logger.info(commonResponse.getReturnMessage());
+			} catch (SystemException e) {
+				logger.error("Error occured while getCustomerids for {}.", e);
+				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+						e.getErrorCode());
+			} catch (RecordNotFoundException e) {
+				logger.info("RecordNotFoundException occured while getCustomerids for {}.", e.getMessage());
+				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
+			} catch (Exception e) {
+				logger.error("Error occured while getCustomerids for {}.", e);
+				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+						ErrorCode.UNKNOWN_ERROR);
+			}
+
+		}
+		long endTime = System.currentTimeMillis();
+		logger.info("getCustomerids rate: avg_resp={}", (endTime - startTime));
+		MDC.clear();
+		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(userCommonResponse);
+	}
 //
 //	@ApiOperation(value = "Get Auth pending User List", nickname = "Get Auth pending User List", notes = "Get Auth pending User List.", httpMethod = "GET")
 //	@ApiResponses(value = {
