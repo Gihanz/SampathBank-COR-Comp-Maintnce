@@ -203,7 +203,7 @@ public class LinkCompanyController {
 		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
 	}
 
-	@ApiOperation(value = "Delete Customer ID API", nickname = "Delete Customer ID API", notes = "Delete Customer ID API", httpMethod = "DELETE")
+	@ApiOperation(value = "Delete Customer ID API", nickname = "Delete Customer ID API", notes = "Delete Customer ID API", httpMethod = "PUT")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successfully deleted", response = GetCompanyByIdResponse.class),
 			@ApiResponse(code = 404, message = "Resource not found"),
