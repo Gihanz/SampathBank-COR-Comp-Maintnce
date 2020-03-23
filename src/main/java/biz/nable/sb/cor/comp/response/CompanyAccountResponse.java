@@ -15,6 +15,6 @@ public class CompanyAccountResponse {
 	private String closedFlag;
 	private Double balance;
 	private String currency;
-	private Date accOpenDate;
+	private String accOpenDate;
 	private Date lastTransactionDate;
 }

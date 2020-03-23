@@ -82,7 +82,7 @@ public class CompanyApproval implements CommonApprovalTemplate {
 				logger.info("Start Sync accounts");
 				SyncAllAccountRequest request = new SyncAllAccountRequest();
 				request.setCustId(commonTemp.getReferenceNo());
-				// syncAccounts.syncAllAccounts(request);
+				syncAccounts.syncAllAccounts(request);
 			} else if (ActionTypeEnum.UPDATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
 				updateCompanyMst(approvalBean, commonTemp);
 			} else if (ActionTypeEnum.DELETE.name().equalsIgnoreCase(approvalBean.getActionType())) {

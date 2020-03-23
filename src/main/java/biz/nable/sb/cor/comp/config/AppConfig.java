@@ -12,6 +12,7 @@ import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
@@ -21,6 +22,7 @@ import biz.nable.sb.cor.comp.bean.RetrieveFinacleBean;
 import biz.nable.sb.cor.comp.component.SOAPConnector;
 
 @Configuration
+@EnableAsync
 public class AppConfig {
 
 	@Value("${custom.iib.finacle.integration.url}")

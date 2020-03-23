@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -44,43 +45,49 @@ public class SyncAccounts {
 	@Autowired
 	MessageSource messageSource;
 
+	@Value("${account.sync.enable}")
+	private String isSyncEnable;
+
 	@Async("asyncAccountSyncExecutor")
 	public void syncAllAccounts(SyncAllAccountRequest request) {
-		logger.info("start Account sync CustId : {}", request.getCustId());
-		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(request.getCustId());
-		if (!optional.isPresent()) {
-			throw new SystemException(
-					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
-					ErrorCode.NO_COMPANY_RECORD_FOUND);
-		}
-		List<CompanyAccountMst> entities = optional.get().getCompanyAccounts();
-		logger.info("Existing DebitAccount count:{} list: {}", entities.size(), entities);
+		if ("Y".equalsIgnoreCase(isSyncEnable)) {
+			logger.info("start Account sync CustId : {}", request.getCustId());
+			Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(request.getCustId());
+			if (!optional.isPresent()) {
+				throw new SystemException(messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null,
+						LocaleContextHolder.getLocale()), ErrorCode.NO_COMPANY_RECORD_FOUND);
+			}
+			List<CompanyAccountMst> entities = optional.get().getCompanyAccounts();
+			logger.info("Existing DebitAccount count:{} list: {}", entities.size(), entities);
 
-		List<CompanyAccountMst> syncedList = new ArrayList<>();
-		List<CompanyAccountMst> syncErrorList = new ArrayList<>();
-		GetCustomerInfoResponseType customerInfoResponse = finacleConnector.getCustomerInfo(request.getCustId());
-		if (null == customerInfoResponse || !"000".equals(customerInfoResponse.getActionCode())) {
-			String actionCode = null != customerInfoResponse ? customerInfoResponse.getActionCode() : "null";
-			logger.info("Invalid finacle response actionCode: {}", actionCode);
-			throw new FinacleCallException("Invalid finacle response");
-		}
-		logger.info("Finacle Account count:{} list: {}", customerInfoResponse.getCustomerInfoRecord().size(),
-				customerInfoResponse.getCustomerInfoRecord());
-		if (!customerInfoResponse.getCustomerInfoRecord().isEmpty()) {
-			customerInfoResponse.getCustomerInfoRecord().forEach(finacleModle -> {
-				CompanyAccountMst debitAccountEntity = entities.stream()
-						.filter(entitie -> finacleModle.getAcctNo().equals(entitie.getAccountNo())).findAny()
-						.orElse(new CompanyAccountMst());
+			List<CompanyAccountMst> syncedList = new ArrayList<>();
+			List<CompanyAccountMst> syncErrorList = new ArrayList<>();
+			GetCustomerInfoResponseType customerInfoResponse = finacleConnector.getCustomerInfo(request.getCustId());
+			if (null == customerInfoResponse || !"000".equals(customerInfoResponse.getActionCode())) {
+				String actionCode = null != customerInfoResponse ? customerInfoResponse.getActionCode() : "null";
+				logger.info("Invalid finacle response actionCode: {}", actionCode);
+				throw new FinacleCallException("Invalid finacle response");
+			}
+			logger.info("Finacle Account count:{} list: {}", customerInfoResponse.getCustomerInfoRecord().size(),
+					customerInfoResponse.getCustomerInfoRecord());
+			if (!customerInfoResponse.getCustomerInfoRecord().isEmpty()) {
+				customerInfoResponse.getCustomerInfoRecord().forEach(finacleModle -> {
+					CompanyAccountMst debitAccountEntity = entities.stream()
+							.filter(entitie -> finacleModle.getAcctNo().equals(entitie.getAccountNo())).findAny()
+							.orElse(new CompanyAccountMst());
 
-				GetGenInqResponseType genInqResponseType = finacleConnector.getGenInq(finacleModle.getAcctNo());
-				if (null != genInqResponseType && "000".equals(genInqResponseType.getActionCode())) {
-					syncAccont(debitAccountEntity, finacleModle, genInqResponseType);
-					syncedList.add(debitAccountEntity);
-				} else {
-					syncErrorList.add(debitAccountEntity);
-					logger.error("Account sync error AccNo : {}", debitAccountEntity.getAccountNo());
-				}
-			});
+					GetGenInqResponseType genInqResponseType = finacleConnector.getGenInq(finacleModle.getAcctNo());
+					if (null != genInqResponseType && "000".equals(genInqResponseType.getActionCode())) {
+						syncAccont(debitAccountEntity, finacleModle, genInqResponseType);
+						syncedList.add(debitAccountEntity);
+					} else {
+						syncErrorList.add(debitAccountEntity);
+						logger.error("Account sync error AccNo : {}", debitAccountEntity.getAccountNo());
+					}
+				});
+			}
+		} else {
+			logger.info("Account sync call, Sync Disabled");
 		}
 	}
 
@@ -103,6 +110,13 @@ public class SyncAccounts {
 			debitAccountEntity.setNickName(genInqResponseType.getSystemNickname());
 			debitAccountEntity.setJointRecType("");
 		}
+		debitAccountEntity.setAccBalance(genInqResponseType.getAvailableBalance());
+		debitAccountEntity.setJointSerial(finacleModle.getJointSerial());
+		debitAccountEntity.setAccBalance(genInqResponseType.getAvailableBalance());
+		debitAccountEntity.setJointHolderName(genInqResponseType.getJointHolders());
+		debitAccountEntity.setOperMode(genInqResponseType.getModeOfOperation());
+		debitAccountEntity.setAcctOpenDate(genInqResponseType.getAcctOpenDate());
+
 		try {
 			accountRepo.save(debitAccountEntity);
 			logger.info("Account sync success");

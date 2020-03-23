@@ -1,6 +1,5 @@
 package biz.nable.sb.cor.comp.db.entity;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -69,7 +68,7 @@ public class CompanyAccountMst extends Auditable {
 	@Column(length = 3)
 	private String currency;
 
-	private Date acctOpenDate;
+	private String acctOpenDate;
 
 	@OneToMany(mappedBy = "companyUser")
 	@JsonManagedReference

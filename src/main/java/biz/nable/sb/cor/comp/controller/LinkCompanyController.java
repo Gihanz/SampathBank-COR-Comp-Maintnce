@@ -31,7 +31,6 @@ import biz.nable.sb.cor.common.utility.ErrorCode;
 import biz.nable.sb.cor.comp.bean.AuthPendingLinkCompanyBean;
 import biz.nable.sb.cor.comp.request.LinkCompanyDeleteRequest;
 import biz.nable.sb.cor.comp.request.LinkCompanyRequest;
-import biz.nable.sb.cor.comp.response.CommonGetListResponse;
 import biz.nable.sb.cor.comp.response.GetCompanyByIdResponse;
 import biz.nable.sb.cor.comp.response.GetCustomerIdsResponse;
 import biz.nable.sb.cor.comp.service.impl.LinkCompanyService;
