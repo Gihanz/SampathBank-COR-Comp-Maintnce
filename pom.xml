@@ -41,9 +41,16 @@
 	</dependencyManagement>
 	<dependencies>
 
-		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter</artifactId> 
-			<exclusions> <exclusion> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-logging</artifactId> 
-			</exclusion> </exclusions> </dependency> -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<!-- <exclusions> -->
+			<!-- <exclusion> -->
+			<!-- <groupId>org.springframework.boot</groupId> -->
+			<!-- <artifactId>spring-boot-starter-logging</artifactId> -->
+			<!-- </exclusion> -->
+			<!-- </exclusions> -->
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -57,6 +64,11 @@
 					<artifactId>spring-boot-starter-tomcat</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.ibm.db2.jcc</groupId>
@@ -132,13 +144,25 @@
 		<dependency>
 			<groupId>biz.nable.sb.cor.common.utils</groupId>
 			<artifactId>SB_COR_Common-Utils</artifactId>
-			<version>0.0.2-GA</version>
+			<version>0.0.6-GA</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web-services</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -148,26 +172,26 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.13.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<generatePackage>biz.nable.sb.cor.comp.soap.schemas.iib</generatePackage>
-					<generateDirectory>${project.basedir}/src/main/java</generateDirectory>
-					<schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
-					<schemaIncludes>
-						<include>*.wsdl</include>
-					</schemaIncludes>
-				</configuration>
-			</plugin>
+			<!-- <plugin> -->
+			<!-- <groupId>org.jvnet.jaxb2.maven2</groupId> -->
+			<!-- <artifactId>maven-jaxb2-plugin</artifactId> -->
+			<!-- <version>0.13.2</version> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <goals> -->
+			<!-- <goal>generate</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- <configuration> -->
+			<!-- <generatePackage>biz.nable.sb.cor.comp.soap.schemas.iib</generatePackage> -->
+			<!-- <generateDirectory>${project.basedir}/src/main/java</generateDirectory> -->
+			<!-- <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory> -->
+			<!-- <schemaIncludes> -->
+			<!-- <include>*.wsdl</include> -->
+			<!-- </schemaIncludes> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
 		</plugins>
 	</build>
 
