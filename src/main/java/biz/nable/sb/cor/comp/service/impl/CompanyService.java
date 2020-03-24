@@ -98,7 +98,6 @@ public class CompanyService {
 			commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.COMPANY_RECORD_ALREADY_EXISTS, null,
 					LocaleContextHolder.getLocale()));
 		} else {
-
 			for (Long feature : createCompanyRequest.getCompanyFeatures()) {
 				Optional<Features> optionalF = featuresRepository.findById(feature);
 				if (!optionalF.isPresent()) {
