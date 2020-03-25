@@ -17,7 +17,6 @@ import java.util.List;
 public class CompanyUserResponse {
 
     private Long id;
-    private UserMst user;
     private StatusEnum status;
     private RecordStatusEnum recordStatus;
     private UserRoleEnum role;

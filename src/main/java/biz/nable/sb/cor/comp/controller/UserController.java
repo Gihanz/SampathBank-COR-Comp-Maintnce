@@ -167,7 +167,6 @@ public class UserController {
 						companyUserResponse.setId(companyUsers.get(y).getId());
 						companyUserResponse.setStatus(companyUsers.get(y).getStatus());
 						companyUserResponse.setRecordStatus(companyUsers.get(y).getRecordStatus());
-						companyUserResponse.setUser(companyUsers.get(y).getUser());
 						companyUserResponse.setRole(companyUsers.get(y).getRole());
 						companyUserResponse.setIsPrimeryUser(companyUsers.get(y).getIsPrimeryUser());
 						companyUserResponse.setRemark(companyUsers.get(y).getRemark());
