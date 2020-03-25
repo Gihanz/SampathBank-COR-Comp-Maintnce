@@ -99,9 +99,10 @@ public class UserController {
 		MDC.clear();
 		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
 	}
+
 //
 //	@ApiOperation(value = "Get User List By Company ID", nickname = "Get User List By Company Id", notes = "Get User List By Company ID.", httpMethod = "GET")
-@ApiOperation(value = "Get User List ", nickname = "Get User List", notes = "Get User List.", httpMethod = "GET")
+	@ApiOperation(value = "Get User List ", nickname = "Get User List", notes = "Get User List.", httpMethod = "GET")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Fetching Userlist successful", response = CommonGetListResponse.class),
 			@ApiResponse(code = 400, message = "Get Userlist fail"),

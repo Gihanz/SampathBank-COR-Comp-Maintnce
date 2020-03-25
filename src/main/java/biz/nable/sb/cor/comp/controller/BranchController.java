@@ -30,7 +30,6 @@ import biz.nable.sb.cor.common.exception.RecordNotFoundException;
 import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.common.utility.ErrorCode;
-import biz.nable.sb.cor.common.utility.StatusEnum;
 import biz.nable.sb.cor.comp.bean.AuthPendingBranchBean;
 import biz.nable.sb.cor.comp.bean.BranchDetailBean;
 import biz.nable.sb.cor.comp.request.CreateBranchRequest;
@@ -38,6 +37,7 @@ import biz.nable.sb.cor.comp.request.DeleteBranchRequest;
 import biz.nable.sb.cor.comp.request.UpdateBranchRequest;
 import biz.nable.sb.cor.comp.response.CommonGetListResponse;
 import biz.nable.sb.cor.comp.service.impl.BranchService;
+import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -116,7 +116,7 @@ public class BranchController {
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup,
-			@RequestParam(name = "status", required = true) StatusEnum status,
+			@RequestParam(name = "status", required = true) RecordStatusEnum status,
 			@PathVariable("companyId") String companyId) {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
