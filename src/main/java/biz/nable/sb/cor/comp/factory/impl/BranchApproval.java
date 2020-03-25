@@ -127,6 +127,7 @@ public class BranchApproval implements CommonApprovalTemplate {
 				branchDelete.setLastUpdatedDate(tempDto.getLastUpdatedDate());
 				branchDelete.setLastVerifiedDate(new Date());
 				branchDelete.setStatus(StatusEnum.DELETED);
+				branchDelete.setCompanyId(companyO.get().getId());
 				branchDelete.setId(null);
 				branchDeleteRepository.save(branchDelete);
 				branchMstRepository.delete(optional.get());

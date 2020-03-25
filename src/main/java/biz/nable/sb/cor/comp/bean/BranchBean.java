@@ -24,5 +24,4 @@ public class BranchBean {
 	@NotNull(message = "BranchName should not be null")
 	@Size(max = 60, message = "Branch name character length exceeded")
 	private String branchName;
-
 }
