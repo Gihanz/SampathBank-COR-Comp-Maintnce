@@ -106,7 +106,7 @@ public class UserController {
 //	@ApiOperation(value = "Get User List By Company ID", nickname = "Get User List By Company Id", notes = "Get User List By Company ID.", httpMethod = "GET")
 	@ApiOperation(value = "Get User List ", nickname = "Get User List", notes = "Get User List.", httpMethod = "GET")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching Userlist successful", response = CommonGetListResponse.class),
+			@ApiResponse(code = 200, message = "Fetching Userlist successful", response = UserResponse.class),
 			@ApiResponse(code = 400, message = "Get Userlist fail"),
 			@ApiResponse(code = 500, message = "Internal server error") })
 //	@GetMapping("/v1/user/{companyId}"
@@ -199,7 +199,7 @@ public class UserController {
 				}
 
 //				userCommonResponseList.set(userCommonResponse)
-				userResponse.setUserResponseList(Collections.singletonList(userCommonResponseList));
+				userResponse.setUserResponseList(userCommonResponseList);
 				userResponse.setReturnCode(HttpStatus.OK.value());
 				userResponse.setReturnMessage("Successfully retrieved the User");
 				commonResponse.setReturnCode(200);
@@ -221,7 +221,9 @@ public class UserController {
 		long endTime = System.currentTimeMillis();
 		logger.info("getCustomerids rate: avg_resp={}", (endTime - startTime));
 		MDC.clear();
-		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(userResponse);
+//		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(userResponse);
+		return new ResponseEntity<>(userResponse, HttpStatus.OK);
+//		return ResponseEntity<>(userResponse.HttpStatus.OK);
 	}
 //
 //	@ApiOperation(value = "Get Auth pending User List", nickname = "Get Auth pending User List", notes = "Get Auth pending User List.", httpMethod = "GET")

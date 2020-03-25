@@ -9,5 +9,5 @@ import java.util.List;
 @ToString
 public class UserResponse extends CommonResponse {
 
-    private List<Object> userResponseList;
+    private List<UserCommonResponse> userResponseList;
 }
