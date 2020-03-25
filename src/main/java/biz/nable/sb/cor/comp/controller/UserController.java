@@ -6,9 +6,10 @@ package biz.nable.sb.cor.comp.controller;
 import javax.validation.Valid;
 
 import biz.nable.sb.cor.common.exception.RecordNotFoundException;
+import biz.nable.sb.cor.comp.db.entity.CompanyUser;
+import biz.nable.sb.cor.comp.db.entity.UserFeatures;
 import biz.nable.sb.cor.comp.db.entity.UserMst;
-import biz.nable.sb.cor.comp.response.CommonGetListResponse;
-import biz.nable.sb.cor.comp.response.UserCommonResponse;
+import biz.nable.sb.cor.comp.response.*;
 import biz.nable.sb.cor.comp.utility.StatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -121,7 +123,9 @@ public class UserController {
 
 		logger.info("Start execute method getCustomerids");
 		CommonResponse commonResponse = new CommonResponse();
-		UserCommonResponse userCommonResponse = new UserCommonResponse();
+		UserCommonResponse userCommonResponse ;
+		UserResponse userResponse = new UserResponse();
+		List<UserCommonResponse> userCommonResponseList =  new ArrayList<>();
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
 			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
@@ -135,9 +139,70 @@ public class UserController {
 					userGroup = COMMON_USER_GROUP;
 				}
 				List<UserMst> allUsers = userService.getUseres(userId, userGroup, requestId);
-				userCommonResponse.setUserResponseList(Collections.singletonList(allUsers));
-				userCommonResponse.setReturnCode(HttpStatus.OK.value());
-				userCommonResponse.setReturnMessage("Successfully retrieved the User");
+				CompanyUserResponse companyUserResponse;
+				UserFeaturesResponse userFeaturesResponse;
+
+				for (int i=0; allUsers.size()>i;i++){
+					userCommonResponse = new UserCommonResponse();
+					List<CompanyUser> companyUsers = allUsers.get(i).getCompanyUsers();
+
+					List<CompanyUserResponse> companyUserResponseList = new ArrayList<>();
+					for (int y=0; companyUsers.size()>y;y++){
+						companyUserResponse = new CompanyUserResponse();
+						List<UserFeatures> userFeatures = companyUsers.get(y).getUserFeatures();
+
+						List<UserFeaturesResponse> userFeaturesResponseList = new ArrayList<>();
+						for (int z=0; userFeatures.size()>z;z++){
+							userFeaturesResponse = new UserFeaturesResponse();
+							userFeaturesResponse.setId(userFeatures.get(z).getId());
+							userFeaturesResponse.setCreatedBy(userFeatures.get(z).getCreatedBy());
+							userFeaturesResponse.setCreatedDate(userFeatures.get(z).getCreatedDate());
+							userFeaturesResponse.setLastUpdatedBy(userFeatures.get(z).getLastUpdatedBy());
+							userFeaturesResponse.setLastUpdatedDate(userFeatures.get(z).getLastUpdatedDate());
+							userFeaturesResponse.setLastVerifiedBy(userFeatures.get(z).getLastVerifiedBy());
+							userFeaturesResponse.setLastVerifiedDate(userFeatures.get(z).getLastVerifiedDate());
+							userFeaturesResponse.setUserGroup(userFeatures.get(z).getUserGroup());
+							userFeaturesResponseList.add(z, userFeaturesResponse);
+						}
+						companyUserResponse.setId(companyUsers.get(y).getId());
+						companyUserResponse.setStatus(companyUsers.get(y).getStatus());
+						companyUserResponse.setRecordStatus(companyUsers.get(y).getRecordStatus());
+						companyUserResponse.setUser(companyUsers.get(y).getUser());
+						companyUserResponse.setRole(companyUsers.get(y).getRole());
+						companyUserResponse.setIsPrimeryUser(companyUsers.get(y).getIsPrimeryUser());
+						companyUserResponse.setRemark(companyUsers.get(y).getRemark());
+						companyUserResponse.setCreatedBy(companyUsers.get(y).getCreatedBy());
+						companyUserResponse.setCreatedDate(companyUsers.get(y).getCreatedDate());
+						companyUserResponse.setLastUpdatedBy(companyUsers.get(y).getLastUpdatedBy());
+						companyUserResponse.setLastUpdatedDate(companyUsers.get(y).getLastUpdatedDate());
+						companyUserResponse.setLastVerifiedBy(companyUsers.get(y).getLastVerifiedBy());
+						companyUserResponse.setLastVerifiedDate(companyUsers.get(y).getLastVerifiedDate());
+						companyUserResponse.setUserFeatures(userFeaturesResponseList);
+						companyUserResponseList.add(y,companyUserResponse);
+
+
+					}
+					userCommonResponse.setId(allUsers.get(i).getId());
+					userCommonResponse.setUserName(allUsers.get(i).getUserName());
+					userCommonResponse.setBranch(allUsers.get(i).getBranch());
+					userCommonResponse.setRemark(allUsers.get(i).getRemark());
+					userCommonResponse.setRecordStatus(allUsers.get(i).getRecordStatus());
+					userCommonResponse.setStatus(allUsers.get(i).getStatus());
+					userCommonResponse.setCreatedBy(allUsers.get(i).getCreatedBy());
+					userCommonResponse.setCreatedDate(allUsers.get(i).getCreatedDate());
+					userCommonResponse.setLastUpdatedBy(allUsers.get(i).getLastUpdatedBy());
+					userCommonResponse.setLastUpdatedDate(allUsers.get(i).getLastUpdatedDate());
+					userCommonResponse.setLastVerifiedBy(allUsers.get(i).getLastVerifiedBy());
+					userCommonResponse.setLastVerifiedDate(allUsers.get(i).getLastVerifiedDate());
+					userCommonResponse.setCompanyUsers(companyUserResponseList);
+					userCommonResponseList.add(i,userCommonResponse);
+
+				}
+
+//				userCommonResponseList.set(userCommonResponse)
+				userResponse.setUserResponseList(Collections.singletonList(userCommonResponseList));
+				userResponse.setReturnCode(HttpStatus.OK.value());
+				userResponse.setReturnMessage("Successfully retrieved the User");
 				commonResponse.setReturnCode(200);
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
@@ -157,7 +222,7 @@ public class UserController {
 		long endTime = System.currentTimeMillis();
 		logger.info("getCustomerids rate: avg_resp={}", (endTime - startTime));
 		MDC.clear();
-		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(userCommonResponse);
+		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(userResponse);
 	}
 //
 //	@ApiOperation(value = "Get Auth pending User List", nickname = "Get Auth pending User List", notes = "Get Auth pending User List.", httpMethod = "GET")
