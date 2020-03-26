@@ -162,7 +162,7 @@ public class BranchApproval implements CommonApprovalTemplate {
 
 			if (Boolean.TRUE.equals(isExist)) {
 				if (ActionTypeEnum.CREATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
-					logger.info("Company already linked");
+					logger.info("branch already Created");
 					throw new SystemException(messageSource.getMessage(ErrorCode.BRANCH_RECORD_ALREADY_EXISTS, null,
 							LocaleContextHolder.getLocale()), ErrorCode.BRANCH_RECORD_ALREADY_EXISTS);
 				} else {
@@ -170,7 +170,7 @@ public class BranchApproval implements CommonApprovalTemplate {
 				}
 			} else {
 				if (ActionTypeEnum.UPDATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
-					logger.info("Company already linked");
+					logger.info("Branch not exist");
 					throw new SystemException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
 							LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);
 				}
@@ -193,7 +193,7 @@ public class BranchApproval implements CommonApprovalTemplate {
 			branchMst.setBranchName(createBranchRequest.getBranchName());
 			branchMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
 			branchMst.setLastVerifiedDate(new Date());
-
+			branchMst.setRecordStatus(RecordStatusEnum.ACTIVE);
 			branchMst.setLastUpdatedBy(tempDto.getLastUpdatedBy());
 			branchMst.setLastUpdatedDate(tempDto.getLastUpdatedDate());
 			branchMstRepository.save(branchMst);
