@@ -26,6 +26,10 @@
 			<id>com.ibm.db2.jcc</id>
 			<url>https://artifacts.alfresco.com/nexus/content/repositories/public/</url>
 		</repository>
+        <repository> 
+			<id>github</id>
+			<url>https://maven.pkg.github.com/n-ableprivatelimitedcolombosrilanka/SB_JAVA_COR_Common-Utils</url>
+        </repository>
 	</repositories>
 
 	<dependencyManagement>
