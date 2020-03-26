@@ -143,6 +143,13 @@ public class CompanyService {
 			commonResponse.setReturnMessage(
 					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
 		} else {
+			for (Long feature : updateCompanyRequest.getCompanyFeatures()) {
+				Optional<Features> optionalF = featuresRepository.findById(feature);
+				if (!optionalF.isPresent()) {
+					throw new SystemException(messageSource.getMessage(ErrorCode.INVALID_FEATURE_ID, null,
+							LocaleContextHolder.getLocale()), ErrorCode.INVALID_FEATURE_ID);
+				}
+			}
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			updateCompanyRequest.setCompanyName(optional.get().getCompanyName());
 			updateCompanyRequest.setCompanyId(optional.get().getCompanyId());
