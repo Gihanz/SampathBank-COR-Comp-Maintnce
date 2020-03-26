@@ -402,7 +402,12 @@ public class CompanyService {
 		bean.setUserId(userId);
 		bean.setRequestType(REQUEST_TYPE.name());
 
-		List<TempDto> tempList = companyTempComponent.getAuthPendingRecord(bean).getTempList();
+		List<TempDto> tempList = new ArrayList<>();
+		try {
+			tempList = companyTempComponent.getAuthPendingRecord(bean).getTempList();
+		} catch (Exception e) {
+			logger.info("No Temp record foud");
+		}
 		List<String> companyIdList = new ArrayList<>();
 		List<CompanyListResponseBean> companyListResponseBeans = new ArrayList<>();
 		for (TempDto tempDto : tempList) {
