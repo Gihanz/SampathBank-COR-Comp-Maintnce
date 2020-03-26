@@ -237,6 +237,7 @@ public class BranchService {
 				throw new RecordNotFoundException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);
 			}
+
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			commonRequestBean.setCommonTempBean(updateBranchRequest);
 			String hashTags = BRANCH_HASH_TAG.concat(updateBranchRequest.getCompanyId());
@@ -249,8 +250,8 @@ public class BranchService {
 			commonRequestBean.setUserGroup(userGroup);
 			commonRequestBean.setUserId(userId);
 			commonResponse = branchTempComponent.updateTempCompany(commonRequestBean, requestId);
-			optional.get().setRecordStatus(RecordStatusEnum.UPDATE_PENDING);
-			companyMstRepository.save(optional.get());
+			optionalB.get().setRecordStatus(RecordStatusEnum.UPDATE_PENDING);
+			branchMstRepository.save(optionalB.get());
 			commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
 			commonResponse.setReturnCode(HttpStatus.OK.value());
 		}

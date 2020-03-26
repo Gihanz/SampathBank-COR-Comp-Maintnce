@@ -116,8 +116,8 @@ public class LinkCompanyService {
 	public GetCustomerIdsResponse getCustomerIds(String companyId, String userId, String userGroup, String requestId) {
 		logger.info("================== Start Get Company By Id =================");
 		Optional<CompanyMst> companyMstO = companyMstRepository.findByCompanyId(companyId);
-
 		List<CustomerIdResponseBean> customerIds = getTempList(companyId, userId, userGroup);
+
 		GetCustomerIdsResponse customerIdsResponse = new GetCustomerIdsResponse();
 		customerIdsResponse.getListOfLinkedCompanies().addAll(customerIds);
 		if (companyMstO.isPresent()) {
