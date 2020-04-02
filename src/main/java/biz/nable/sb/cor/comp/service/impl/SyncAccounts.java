@@ -9,12 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.comp.bean.SyncAllAccountRequest;
 import biz.nable.sb.cor.comp.component.FinacleConnector;
@@ -53,11 +51,13 @@ public class SyncAccounts {
 		if ("Y".equalsIgnoreCase(isSyncEnable)) {
 			logger.info("start Account sync CustId : {}", request.getCustId());
 			Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(request.getCustId());
+			List<CompanyAccountMst> entities;
 			if (!optional.isPresent()) {
-				throw new SystemException(messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null,
-						LocaleContextHolder.getLocale()), ErrorCode.NO_COMPANY_RECORD_FOUND);
+				entities = new ArrayList<>();
+			} else {
+				entities = optional.get().getCompanyAccounts();
 			}
-			List<CompanyAccountMst> entities = optional.get().getCompanyAccounts();
+
 			logger.info("Existing DebitAccount count:{} list: {}", entities.size(), entities);
 
 			List<CompanyAccountMst> syncedList = new ArrayList<>();
