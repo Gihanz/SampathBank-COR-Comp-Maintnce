@@ -2,17 +2,9 @@ package biz.nable.sb.cor.comp.db.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -33,10 +25,10 @@ public class CompanyMst extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COMPANY_MST_SEQ")
 	@SequenceGenerator(name = "COMPANY_MST_SEQ", sequenceName = "SB_COR_COMPANY_MST_SEQ", allocationSize = 1)
 	private Long id;
+	@Id
 	@Column(length = 9)
 	private String companyId;
 	@Column(length = 9)
@@ -77,19 +69,23 @@ public class CompanyMst extends Auditable implements Serializable {
 
 	@OneToMany(mappedBy = "company")
 	@JsonManagedReference
-	private List<BranchMst> branchMsts;
+	private Set<BranchMst> branchMsts;
 
 	@OneToMany(mappedBy = "company")
 	@JsonManagedReference
-	private List<CompanyUser> companyUsers;
+	private Set<CompanyUser> companyUsers;
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private List<CompanyFeatures> companyFeatures = new ArrayList<>();
+	private Set<CompanyFeatures> companyFeatures;
 
-	@OneToMany(mappedBy = "companyId", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "companyId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference
-	private List<CompanyAccountMst> companyAccounts = new ArrayList<>();
+	private Set<CompanyAccountMst> companyAccounts;
+
+	@OneToMany(mappedBy = "companyMst", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JsonManagedReference
+	private Set<UserLinkedCompany> userLinkedCompanies;
 
 	private Long corporatePaymentsLimit;
 	private String deviceLocation;

@@ -19,6 +19,7 @@ public class WebHookController {
 	public ResponseEntity<?> webhook(@RequestBody WebHookBean webHookBean) {
 		if (WebHookTypeEnum.APPROVAL.name().equalsIgnoreCase(webHookBean.getWebHookType())) {
 			webhookService.doApprove(webHookBean);
+
 		}
 		return ResponseEntity.accepted().body("Success");
 	}

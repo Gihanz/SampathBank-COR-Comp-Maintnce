@@ -1,47 +1,63 @@
 package biz.nable.sb.cor.comp.db.entity;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.*;
 
-import org.hibernate.validator.constraints.Length;
-
+import biz.nable.sb.cor.comp.utility.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import biz.nable.sb.cor.common.db.audit.Auditable;
-import biz.nable.sb.cor.common.utility.StatusEnum;
-import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @ToString
 @Entity
-public class UserMst extends Auditable implements Serializable {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserMst implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_MST_SEQ")
 	@SequenceGenerator(name = "USER_MST_SEQ", sequenceName = "SB_COR_USER_MST_SEQ", allocationSize = 1)
 	private Long id;
+	@Id
+	private Long userId;
 	private String userName;
 	private String designation;
 	private Long branch;
-	@Length(max = 1000)
-	private String remark;
-	private StatusEnum status;
-	private RecordStatusEnum recordStatus;
-
-	@OneToMany(mappedBy = "user")
+	private StatusUserEnum status;
+	private RecordStatuUsersEnum recordStatus;
+	private UserType userType;
+	private CreateState iamCreateState;
+	private String companyId;
+	private String allAcctAccessFlg;
+	private String email;
+	private Long approvalId;
+	@JsonIgnore
+	private String createBy;
+	@JsonIgnore
+	private Date createDate;
+	@JsonIgnore
+	private String lastModifiedBy;
+	@JsonIgnore
+	private Date lastModifiedDate;
+	@JsonIgnore
+	private String lastVerifiedBy;
+	@JsonIgnore
+	private Date lastVerifiedDate;
+	@OneToMany(mappedBy = "userMst", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference
-	private List<CompanyUser> companyUsers;
+	private Set<UserLinkedCompany> userLinkedCompanies;
 
+	@OneToMany(mappedBy = "userMstAcc", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JsonManagedReference
+	private Set<UserPrimaryAccount> userPrimaryAccounts;
+
+	@OneToMany(mappedBy = "userMstFea", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JsonManagedReference
+	private Set<UserPrimaryFeature> userPrimaryFeatures;
 }
