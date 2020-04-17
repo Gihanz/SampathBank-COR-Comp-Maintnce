@@ -12,7 +12,8 @@
 	<appender name="FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<springProfile name="local">
-			<file>/opt/PROJECT/NBL/log/SBOCMXLOG/company.log</file>
+<!--			<file>/opt/PROJECT/NBL/log/SBOCMXLOG/company.log</file>-->
+			<file>/home/suneth/loges/approvals.log</file>
 			<rollingPolicy
 				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 				<!-- daily rollover -->

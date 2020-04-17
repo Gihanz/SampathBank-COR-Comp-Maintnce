@@ -108,6 +108,12 @@ public class UserApproval implements CommonApprovalTemplate {
         logger.info("Start Inserting a new user");
         userMst = new UserMst();
         userMst = setUserMasterTable(approvalBean, createUserRequest, userMst);
+        userMst.setCreatedBy(approvalBean.getEnteredBy());
+        userMst.setCreatedDate(approvalBean.getEnteredDate());
+        userMst.setLastUpdatedBy(createUserRequest.getLastModifiedBy());
+        userMst.setLastUpdatedDate(createUserRequest.getLastModifiedDate());
+        userMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
+        userMst.setLastVerifiedDate(new Date());
         userMstRepository.save(userMst);
     }
 
@@ -122,14 +128,9 @@ public class UserApproval implements CommonApprovalTemplate {
                 .companyId(createUserRequest.getPrimaryCompanyId())
                 .allAcctAccessFlg(createUserRequest.getAllAccountAccessFlag())
                 .iamCreateState(CreateState.ACTIVATED)
+                .userLinkedCompanies(null)
                 .userPrimaryAccounts(createUserRequest.getUserAccountBeans() != null ? setUserPrimaryAccount(createUserRequest, userMst) : null)
                 .userPrimaryFeatures(createUserRequest.getUserFeatureBeans() != null ? setUserPrimaryFeature(createUserRequest, userMst) : null)
-                .createBy(approvalBean.getEnteredBy())
-                .createDate(approvalBean.getEnteredDate())
-                .lastModifiedBy(createUserRequest.getLastModifiedBy())
-                .lastModifiedDate(createUserRequest.getLastModifiedDate())
-                .lastVerifiedBy(approvalBean.getVerifiedBy())
-                .lastVerifiedDate(new Date())
                 .approvalId(Long.parseLong(approvalBean.getApprovalId()))
                 .userLinkedCompanies(null)
                 .recordStatus(RecordStatuUsersEnum.VERIFIED)

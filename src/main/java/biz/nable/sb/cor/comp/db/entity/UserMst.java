@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import biz.nable.sb.cor.common.db.audit.Auditable;
 import biz.nable.sb.cor.comp.utility.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -18,13 +19,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserMst implements Serializable {
+public class UserMst extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+    @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_MST_SEQ")
 	@SequenceGenerator(name = "USER_MST_SEQ", sequenceName = "SB_COR_USER_MST_SEQ", allocationSize = 1)
-	private Long id;
-	@Id
 	private Long userId;
 	private String userName;
 	private String designation;
@@ -37,18 +38,7 @@ public class UserMst implements Serializable {
 	private String allAcctAccessFlg;
 	private String email;
 	private Long approvalId;
-	@JsonIgnore
-	private String createBy;
-	@JsonIgnore
-	private Date createDate;
-	@JsonIgnore
-	private String lastModifiedBy;
-	@JsonIgnore
-	private Date lastModifiedDate;
-	@JsonIgnore
-	private String lastVerifiedBy;
-	@JsonIgnore
-	private Date lastVerifiedDate;
+
 	@OneToMany(mappedBy = "userMst", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference
 	private Set<UserLinkedCompany> userLinkedCompanies;

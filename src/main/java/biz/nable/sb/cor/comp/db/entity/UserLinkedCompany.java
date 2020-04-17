@@ -5,8 +5,7 @@ import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
 import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -14,12 +13,14 @@ import java.util.List;
 import java.util.Set;
 
 
-@Data
+@Getter
+@Setter
 @ToString
 @Entity
 @Table(name = "SB_COR_USER_LINKED_COMPANY")
 public class UserLinkedCompany extends Auditable implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_LINK_SEQ")
     @SequenceGenerator(name = "USER_LINK_SEQ", sequenceName = "SB_COR_USER_LINKED", allocationSize = 1)

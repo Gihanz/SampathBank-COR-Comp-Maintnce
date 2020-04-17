@@ -247,7 +247,7 @@ public class UserService {
 		}
 		userMstSet.forEach(value -> {
 			userListResponse.builder()
-					.id(value.getId())
+					.id(value.getUserId())
 					.userName(value.getUserName())
 					.designation(value.getDesignation())
 					.branch(value.getBranch())
@@ -256,10 +256,10 @@ public class UserService {
 					.email(value.getEmail())
 					.iamCreateState(value.getIamCreateState())
 					.userType(value.getUserType())
-					.createdBy(value.getCreateBy())
-					.createdDate(value.getCreateDate())
-					.lastUpdatedBy(value.getLastModifiedBy())
-					.lastUpdatedDate(value.getLastModifiedDate())
+					.createdBy(value.getCreatedBy())
+					.createdDate(value.getCreatedDate())
+					.lastUpdatedBy(value.getLastUpdatedBy())
+					.lastUpdatedDate(value.getLastUpdatedDate())
 					.lastVerifiedBy(value.getLastVerifiedBy())
 					.lastVerifiedDate(value.getLastVerifiedDate())
 					.build();
