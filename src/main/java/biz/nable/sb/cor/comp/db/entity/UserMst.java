@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
 import biz.nable.sb.cor.comp.utility.*;
@@ -27,6 +28,7 @@ public class UserMst extends Auditable implements Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_MST_SEQ")
 	@SequenceGenerator(name = "USER_MST_SEQ", sequenceName = "SB_COR_USER_MST_SEQ", allocationSize = 1)
 	private Long userId;
+
 	private String userName;
 	private String designation;
 	private Long branch;
@@ -39,13 +41,16 @@ public class UserMst extends Auditable implements Serializable {
 	private String email;
 	private Long approvalId;
 
+
 	@OneToMany(mappedBy = "userMst", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference
 	private Set<UserLinkedCompany> userLinkedCompanies;
 
+
 	@OneToMany(mappedBy = "userMstAcc", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference
 	private Set<UserPrimaryAccount> userPrimaryAccounts;
+
 
 	@OneToMany(mappedBy = "userMstFea", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference

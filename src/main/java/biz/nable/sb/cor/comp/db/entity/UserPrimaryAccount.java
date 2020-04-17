@@ -2,12 +2,15 @@ package biz.nable.sb.cor.comp.db.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @ToString
 @Entity
 @Table(name = "SB_COR_USER_PRIMARY_ACCOUNT")

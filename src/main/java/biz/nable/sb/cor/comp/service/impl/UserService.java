@@ -19,6 +19,7 @@ import biz.nable.sb.cor.comp.response.ApprovalPendingUserResponse;
 import biz.nable.sb.cor.comp.response.UserListResponseByUserID;
 import biz.nable.sb.cor.comp.response.UserResponseList;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
+import biz.nable.sb.cor.comp.utility.ErrorDescription;
 import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
@@ -317,7 +318,6 @@ public class UserService {
 					PrimaryCompanyFeatures primaryCompanyFeaturesData = new PrimaryCompanyFeatures();
 					primaryCompanyFeaturesData.setFeatureId(features.get().getId());
 					primaryCompanyFeaturesData.setFeatureName(features.get().getDescription());
-
 					userListResponseByUserID.setPrimaryCompanyFeatures(primaryCompanyFeaturesData);
 				});
 			});
@@ -331,6 +331,10 @@ public class UserService {
 			LinkedCompaniesBean linkedCompaniesBean = setLinkedCompaniesBean(value);
 			userListResponseByUserID.setLinkedCompaniesBean(linkedCompaniesBean);
 		});
+        userListResponseByUserID.setReturnCode(HttpStatus.OK.value());
+        userListResponseByUserID.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+        userListResponseByUserID.setReturnMessage(
+                messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, new Object[] {ErrorDescription.SUCCESS}, LocaleContextHolder.getLocale()));
 		logger.info("================== End get user list request =================");
 		return userListResponseByUserID;
 	}

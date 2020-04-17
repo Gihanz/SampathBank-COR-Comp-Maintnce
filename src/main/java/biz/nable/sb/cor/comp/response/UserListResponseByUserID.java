@@ -18,6 +18,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserListResponseByUserID extends CommonResponse {
+
+    public UserListResponseByUserID(int returnCode, String returnMessage, String errorCode) {
+        super(returnCode, returnMessage, errorCode);
+    }
+
     private Long userId;
     private String userName;
     private String designation;

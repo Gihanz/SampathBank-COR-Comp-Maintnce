@@ -70,7 +70,6 @@ public class UserController {
 	public ResponseEntity<CommonResponse> createUser(@Valid @RequestBody CreateUserRequest createUserRequest,
 			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
 			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
-//			@RequestHeader(name = USER_ID) String userId,
 			@RequestHeader(name = USER_GROUP, required = false) String userGroup) {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
@@ -287,7 +286,7 @@ public class UserController {
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error")})
 	@GetMapping(value = "/v1/user/{userId}")
-	public ResponseEntity<UserListResponseByUserID> getUserByIUserId(
+	public ResponseEntity<UserListResponseByUserID> getUserByUserId(
 			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
 			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
 			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
@@ -296,17 +295,16 @@ public class UserController {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
 		UserListResponseByUserID userListResponse = new UserListResponseByUserID();
-		CommonResponse commonResponse = new CommonResponse();
 		try {
 			userListResponse = userService.getUserListByUserID(userId);
 			logger.info(userListResponse.getReturnMessage());
 		} catch (SystemException e) {
 			logger.error("Error occurred while getUserById for {}.", e.toString());
-			commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+            userListResponse = new UserListResponseByUserID(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
 					e.getErrorCode());
 		} catch (Exception e) {
 			logger.error("Error occurred while getUserById for {}.", e.toString());
-			commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+            userListResponse = new UserListResponseByUserID(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 					ErrorCode.UNKNOWN_ERROR);
 		}
 		long endTime = System.currentTimeMillis();
@@ -314,13 +312,14 @@ public class UserController {
 		MDC.clear();
 		return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(userListResponse.getReturnCode()))).body(userListResponse);
 	}
-	@ApiOperation(value = "Change status block or active", nickname = "Change status block or active", notes = "Change status block or active", httpMethod = "PUT")
+
+	@ApiOperation(value = "Change status block or active", nickname = "Change status block or active", notes = "Change status block or active", httpMethod = "PATCH")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successfully Fetched", response = CommonResponse.class),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error")})
-	@GetMapping(value = "/v1/user/{companyId}/{userId}")
+	@PatchMapping(value = "/v1/user/{companyId}/{userId}")
 	public ResponseEntity<CommonResponse> setBlockActive(
 			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
 			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,

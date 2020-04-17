@@ -2,14 +2,12 @@ package biz.nable.sb.cor.comp.db.entity;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
 import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
-import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 

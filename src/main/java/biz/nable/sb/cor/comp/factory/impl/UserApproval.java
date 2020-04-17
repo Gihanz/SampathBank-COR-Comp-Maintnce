@@ -119,23 +119,23 @@ public class UserApproval implements CommonApprovalTemplate {
 
     private UserMst setUserMasterTable(ApprovalBean approvalBean, CreateUserRequest createUserRequest, UserMst userMst){
 
-        return UserMst.builder()
-                .userName(createUserRequest.getUserName())
-                .designation(createUserRequest.getDesignation())
-                .branch(createUserRequest.getBranchCode())
-                .email(createUserRequest.getEmail())
-                .userType(createUserRequest.getUserType())
-                .companyId(createUserRequest.getPrimaryCompanyId())
-                .allAcctAccessFlg(createUserRequest.getAllAccountAccessFlag())
-                .iamCreateState(CreateState.ACTIVATED)
-                .userLinkedCompanies(null)
-                .userPrimaryAccounts(createUserRequest.getUserAccountBeans() != null ? setUserPrimaryAccount(createUserRequest, userMst) : null)
-                .userPrimaryFeatures(createUserRequest.getUserFeatureBeans() != null ? setUserPrimaryFeature(createUserRequest, userMst) : null)
-                .approvalId(Long.parseLong(approvalBean.getApprovalId()))
-                .userLinkedCompanies(null)
-                .recordStatus(RecordStatuUsersEnum.VERIFIED)
-                .status(StatusUserEnum.ACTIVE)
-                .build();
+//        return UserMst.builder()
+        userMst.setUserName(createUserRequest.getUserName());
+        userMst.setDesignation(createUserRequest.getDesignation());
+        userMst.setBranch(createUserRequest.getBranchCode());
+        userMst.setEmail(createUserRequest.getEmail());
+        userMst.setUserType(createUserRequest.getUserType());
+        userMst.setCompanyId(createUserRequest.getPrimaryCompanyId());
+        userMst.setAllAcctAccessFlg(createUserRequest.getAllAccountAccessFlag());
+        userMst.setIamCreateState(CreateState.ACTIVATED);
+        userMst.setUserLinkedCompanies(null);
+        userMst.setUserPrimaryAccounts(createUserRequest.getUserAccountBeans() != null ? setUserPrimaryAccount(createUserRequest, userMst) : null);
+        userMst.setUserPrimaryFeatures(createUserRequest.getUserFeatureBeans() != null ? setUserPrimaryFeature(createUserRequest, userMst) : null);
+        userMst.setApprovalId(Long.parseLong(approvalBean.getApprovalId()));
+        userMst.setRecordStatus(RecordStatuUsersEnum.VERIFIED);
+        userMst.setStatus(StatusUserEnum.ACTIVE);
+        return userMst;
+//                .build();
     }
 
     private Set<UserPrimaryAccount> setUserPrimaryAccount(CreateUserRequest createUserRequest, UserMst userMst){
@@ -143,8 +143,8 @@ public class UserApproval implements CommonApprovalTemplate {
         Set<UserPrimaryAccount> userPrimaryAccountSet =  new HashSet<>();
         for ( UserAccountsBean userAccountsBeanList : userAccountBeans) {
             UserPrimaryAccount userPrimaryAccount = new UserPrimaryAccount();
-            userPrimaryAccount.setUserMstAcc(userMst);
             userPrimaryAccount.setAccountNo(userAccountsBeanList.getAccountId());
+            userPrimaryAccount.setUserMstAcc(userMst);
             userPrimaryAccountSet.add(userPrimaryAccount);
         }
         return userPrimaryAccountSet;
@@ -155,8 +155,8 @@ public class UserApproval implements CommonApprovalTemplate {
         Set<UserPrimaryFeature> userPrimaryFeatureSet =  new HashSet<>();
         for ( UserFeaturesBean userFeaturesBeanList : userFeatureBeans) {
             UserPrimaryFeature userPrimaryFeature = new UserPrimaryFeature();
-            userPrimaryFeature.setUserMstFea(userMst);
             userPrimaryFeature.setFeature(userFeaturesBeanList.getFeatureId());
+            userPrimaryFeature.setUserMstFea(userMst);
             userPrimaryFeatureSet.add(userPrimaryFeature);
         }
         return userPrimaryFeatureSet;
