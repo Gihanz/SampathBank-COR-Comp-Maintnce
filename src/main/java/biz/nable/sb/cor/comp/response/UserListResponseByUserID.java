@@ -11,6 +11,8 @@ import biz.nable.sb.cor.comp.utility.StatusUserEnum;
 import biz.nable.sb.cor.comp.utility.UserType;
 import lombok.*;
 
+import java.util.Set;
+
 
 @Data
 @ToString
@@ -32,9 +34,9 @@ public class UserListResponseByUserID extends CommonResponse {
     private RecordStatuUsersEnum recordStatus;
     private UserType userType;
     private CreateState iamCreateState;
-    private PrimaryCompanyFeatures primaryCompanyFeatures;
-    private PrimaryCompanyAccounts primaryCompanyAccounts;
-    private PrimaryCompanyWorkflowGroups primaryCompanyWorkflowGroups;
+    private Set<PrimaryCompanyFeatures> primaryCompanyFeatures;
+    private Set<PrimaryCompanyAccounts> primaryCompanyAccounts;
+    private Set<PrimaryCompanyWorkflowGroups> primaryCompanyWorkflowGroups;
     private LinkedCompaniesBean linkedCompaniesBean;
 
 }

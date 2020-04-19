@@ -27,4 +27,5 @@ public interface UserMstRepository extends CrudRepository<UserMst, Long> {
 
 	Optional<UserMst> findByUserIdAndCompanyId(String userID, String companyID);
 
+	Optional<UserMst> findByApprovalId(long approvalId);
 }

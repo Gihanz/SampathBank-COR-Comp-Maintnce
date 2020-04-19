@@ -9,6 +9,7 @@ import biz.nable.sb.cor.common.service.impl.CommonConverter;
 import biz.nable.sb.cor.common.template.CommonApprovalTemplate;
 import biz.nable.sb.cor.common.utility.ActionTypeEnum;
 import biz.nable.sb.cor.common.utility.ApprovalStatus;
+import biz.nable.sb.cor.comp.bean.UserWorkFlowGroupsBean;
 import biz.nable.sb.cor.comp.component.UserTempComponent;
 import biz.nable.sb.cor.comp.db.entity.*;
 import biz.nable.sb.cor.comp.db.repository.UserMstHistoryRepository;
@@ -16,6 +17,8 @@ import biz.nable.sb.cor.comp.db.repository.UserMstRepository;
 import biz.nable.sb.cor.comp.request.CreateUserRequest;
 import biz.nable.sb.cor.comp.bean.UserAccountsBean;
 import biz.nable.sb.cor.comp.bean.UserFeaturesBean;
+import biz.nable.sb.cor.comp.thirdparty.GroupsRequest;
+import biz.nable.sb.cor.comp.thirdparty.InsertUpdateUserRequest;
 import biz.nable.sb.cor.comp.utility.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
@@ -23,9 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -115,11 +119,40 @@ public class UserApproval implements CommonApprovalTemplate {
         userMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
         userMst.setLastVerifiedDate(new Date());
         userMstRepository.save(userMst);
+        Optional<UserMst> userMstOptional = userMstRepository.findByApprovalId(Long.parseLong(approvalBean.getApprovalId()));
+        callUserCreation(userMstOptional, createUserRequest);
+    }
+
+    private void callUserCreation(Optional<UserMst> userMstOptional, CreateUserRequest createUserRequest){
+
+        try {
+            InsertUpdateUserRequest insertUpdateUserRequest = new InsertUpdateUserRequest();
+            insertUpdateUserRequest.setCompanyId(userMstOptional.get().getCompanyId());
+            insertUpdateUserRequest.setUserId(userMstOptional.get().getUserId());
+            Set<UserWorkFlowGroupsBean> workFlowGroupsBeans = createUserRequest.getUserWorkFlowGroupBeans();
+            Set<GroupsRequest> groupsRequestSet = new HashSet<>();
+            workFlowGroupsBeans.forEach(values -> {
+                GroupsRequest groupsRequest = new GroupsRequest();
+                groupsRequest.setGroupId(values.getGroupId());
+                groupsRequestSet.add(groupsRequest);
+            });
+            insertUpdateUserRequest.setGroups(groupsRequestSet);
+
+            HttpHeaders headers = new HttpHeaders();
+            MediaType mediaType = new MediaType("application", "merge-patch+json");
+
+            HttpEntity<InsertUpdateUserRequest> request = new HttpEntity<>(insertUpdateUserRequest, headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            String URL = "http://localhost:8080/v1/groups/user-batch";
+            restTemplate.exchange(URL, HttpMethod.POST, request,CommonResponse.class);
+
+        }catch (Exception exception){
+            logger.error("InsertUpdateUser API Calling Error: {}", exception.toString());
+        }
     }
 
     private UserMst setUserMasterTable(ApprovalBean approvalBean, CreateUserRequest createUserRequest, UserMst userMst){
-
-//        return UserMst.builder()
         userMst.setUserName(createUserRequest.getUserName());
         userMst.setDesignation(createUserRequest.getDesignation());
         userMst.setBranch(createUserRequest.getBranchCode());
@@ -135,7 +168,6 @@ public class UserApproval implements CommonApprovalTemplate {
         userMst.setRecordStatus(RecordStatuUsersEnum.VERIFIED);
         userMst.setStatus(StatusUserEnum.ACTIVE);
         return userMst;
-//                .build();
     }
 
     private Set<UserPrimaryAccount> setUserPrimaryAccount(CreateUserRequest createUserRequest, UserMst userMst){
@@ -185,6 +217,8 @@ public class UserApproval implements CommonApprovalTemplate {
         }
         logger.info("================== End user updateUserMaster process =================");
         userMstRepository.save(userMst);
+        Optional<UserMst> userMstOptional = userMstRepository.findByApprovalId(Long.parseLong(approvalBean.getApprovalId()));
+        callUserCreation(userMstOptional, createUserRequest);
     }
 
     private void deleteFromUserMst(ApprovalBean approvalBean, TempDto tempDto) {

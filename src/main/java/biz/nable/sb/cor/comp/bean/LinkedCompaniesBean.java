@@ -2,6 +2,8 @@ package biz.nable.sb.cor.comp.bean;
 
 import lombok.*;
 
+import java.util.Set;
+
 @Data
 @ToString
 @NoArgsConstructor
@@ -12,7 +14,7 @@ public class LinkedCompaniesBean {
     private String companyId;
     private String companyName;
     private String allAccountAccessFlag;
-    private UserCompanyFeaturesBean userCompanyFeaturesBean;
-    private UserCompanyAccountsBean userCompanyAccountsBean;
-    private UserCompanyWorkflowGroupsBean userCompanyWorkflowGroupsBean;
+    private Set<UserCompanyFeaturesBean> userCompanyFeaturesBean;
+    private Set<UserCompanyAccountsBean> userCompanyAccountsBean;
+    private Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroupsBean;
 }

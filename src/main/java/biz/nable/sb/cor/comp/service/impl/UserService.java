@@ -18,6 +18,8 @@ import biz.nable.sb.cor.comp.request.DeleteUserRequest;
 import biz.nable.sb.cor.comp.response.ApprovalPendingUserResponse;
 import biz.nable.sb.cor.comp.response.UserListResponseByUserID;
 import biz.nable.sb.cor.comp.response.UserResponseList;
+import biz.nable.sb.cor.comp.thirdparty.GetUserDetailsResponse;
+import biz.nable.sb.cor.comp.thirdparty.GroupsDetails;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.ErrorDescription;
 import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +41,7 @@ import biz.nable.sb.cor.comp.component.BranchTempComponent;
 import biz.nable.sb.cor.comp.component.UserTempComponent;
 import biz.nable.sb.cor.comp.request.CreateUserRequest;
 import biz.nable.sb.cor.comp.utility.RequestTypeEnum;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UserService {
@@ -314,23 +318,36 @@ public class UserService {
 			primaryCompanyFeatures.forEach(valueRs -> {
 				long feature = valueRs.getFeature();
 				Optional<Features> featuresOptional = featuresRepository.findById(feature);
+				Set<PrimaryCompanyFeatures> primaryCompanyFeaturesSet = new HashSet<>();
 				Optional.ofNullable(featuresOptional).ifPresent(features -> {
 					PrimaryCompanyFeatures primaryCompanyFeaturesData = new PrimaryCompanyFeatures();
 					primaryCompanyFeaturesData.setFeatureId(features.get().getId());
 					primaryCompanyFeaturesData.setFeatureName(features.get().getDescription());
-					userListResponseByUserID.setPrimaryCompanyFeatures(primaryCompanyFeaturesData);
+                    primaryCompanyFeaturesSet.add(primaryCompanyFeaturesData);
 				});
+                userListResponseByUserID.setPrimaryCompanyFeatures(primaryCompanyFeaturesSet);
 			});
 			Set<UserPrimaryAccount> primaryCompanyAccount = value.get().getUserPrimaryAccounts();
+			Set<PrimaryCompanyAccounts> primaryCompanyAccountsSet = new HashSet<>();
 			primaryCompanyAccount.forEach(valueRs -> {
 				PrimaryCompanyAccounts primaryCompanyAccounts = new PrimaryCompanyAccounts();
 				primaryCompanyAccounts.setAccountNumber(valueRs.getAccountNo());
-				userListResponseByUserID.setPrimaryCompanyAccounts(primaryCompanyAccounts);
+                primaryCompanyAccountsSet.add(primaryCompanyAccounts);
 			});
-			userListResponseByUserID.setPrimaryCompanyWorkflowGroups(null);
+            userListResponseByUserID.setPrimaryCompanyAccounts(primaryCompanyAccountsSet);
+            GetUserDetailsResponse getUserDetailsResponse = callGetUsers(value.get().getUserId());
+            Set<GroupsDetails> groupsDetails = getUserDetailsResponse.groups;
+            Set<PrimaryCompanyWorkflowGroups> primaryCompanyWorkflowGroupsSet = new HashSet<>();
+            groupsDetails.forEach( getValues -> {
+                PrimaryCompanyWorkflowGroups primaryCompanyWorkflowGroups = new PrimaryCompanyWorkflowGroups();
+                primaryCompanyWorkflowGroups.setUserGroupId(getValues.getGroupId());
+                primaryCompanyWorkflowGroupsSet.add(primaryCompanyWorkflowGroups);
+            });
+			userListResponseByUserID.setPrimaryCompanyWorkflowGroups(primaryCompanyWorkflowGroupsSet);
 			LinkedCompaniesBean linkedCompaniesBean = setLinkedCompaniesBean(value);
 			userListResponseByUserID.setLinkedCompaniesBean(linkedCompaniesBean);
 		});
+
         userListResponseByUserID.setReturnCode(HttpStatus.OK.value());
         userListResponseByUserID.setErrorCode(ErrorCode.OPARATION_SUCCESS);
         userListResponseByUserID.setReturnMessage(
@@ -339,6 +356,13 @@ public class UserService {
 		return userListResponseByUserID;
 	}
 
+    public GetUserDetailsResponse callGetUsers(long userID){
+        HttpHeaders headers = new HttpHeaders();
+        RestTemplate restTemplate = new RestTemplate();
+        String URL = "http://localhost:8080/v1/groups/user-batch?userId={q}";
+
+        return restTemplate.getForObject(URL, GetUserDetailsResponse.class, userID);
+    }
 	private LinkedCompaniesBean setLinkedCompaniesBean(Optional<UserMst> userMst){
 		logger.info("================== Start set linked companies bean request =================");
 		AtomicReference<LinkedCompaniesBean> linkedCompaniesBean = new AtomicReference<>();
@@ -352,20 +376,32 @@ public class UserService {
 			userCompanyFeatures.forEach(userCompanyFeature -> {
 				long feature = userCompanyFeature.getFeature();
 				Set<CompanyFeatures> features = companyFeaturesRepository.findByFeature(feature);
+                Set<UserCompanyFeaturesBean> userCompanyFeaturesBeanSet = new HashSet<>();
 				features.forEach(featuresList -> {
 					UserCompanyFeaturesBean userCompanyFeaturesBean = new UserCompanyFeaturesBean();
 					userCompanyFeaturesBean.setFeatureId(featuresList.getFeature());
 					userCompanyFeaturesBean.setFeatureName(featuresList.getFeatureDescription());
-					linkedCompaniesBean.get().setUserCompanyFeaturesBean(userCompanyFeaturesBean);
+                    userCompanyFeaturesBeanSet.add(userCompanyFeaturesBean);
 				});
+                linkedCompaniesBean.get().setUserCompanyFeaturesBean(userCompanyFeaturesBeanSet);
 			});
 			Set<UserCompanyAccount> userCompanyAccounts = values.getUserCompanyAccounts();
+            Set<UserCompanyAccountsBean> userCompanyAccountsBeanHashSet = new HashSet<>();
 			userCompanyAccounts.forEach(userCompanyAccount -> {
 				UserCompanyAccountsBean userCompanyAccountsBean =  new UserCompanyAccountsBean();
 				userCompanyAccountsBean.setAccountNumber(userCompanyAccount.getAccountNo());
-				linkedCompaniesBean.get().setUserCompanyAccountsBean(userCompanyAccountsBean);
+				userCompanyAccountsBeanHashSet.add(userCompanyAccountsBean);
 			});
-			linkedCompaniesBean.get().setUserCompanyWorkflowGroupsBean(null);
+            linkedCompaniesBean.get().setUserCompanyAccountsBean(userCompanyAccountsBeanHashSet);
+            GetUserDetailsResponse getUserDetailsResponse = callGetUsers(values.getUserMst().getUserId());
+            Set<GroupsDetails> groupsDetails = getUserDetailsResponse.groups;
+            Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroupsBeanHashSet = new HashSet<>();
+            groupsDetails.forEach( getValues -> {
+                UserCompanyWorkflowGroupsBean userCompanyWorkflowGroupsBean = new UserCompanyWorkflowGroupsBean();
+                userCompanyWorkflowGroupsBean.setUserGroupId(getValues.getGroupId());
+                userCompanyWorkflowGroupsBeanHashSet.add(userCompanyWorkflowGroupsBean);
+            });
+			linkedCompaniesBean.get().setUserCompanyWorkflowGroupsBean(userCompanyWorkflowGroupsBeanHashSet);
 		});
 		logger.info("================== end set linked companies bean request =================");
 		return linkedCompaniesBean.get();

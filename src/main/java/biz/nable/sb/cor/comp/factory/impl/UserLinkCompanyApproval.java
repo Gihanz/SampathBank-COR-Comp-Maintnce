@@ -11,10 +11,13 @@ import biz.nable.sb.cor.common.utility.ActionTypeEnum;
 import biz.nable.sb.cor.common.utility.ApprovalStatus;
 import biz.nable.sb.cor.comp.bean.UserAccountsBean;
 import biz.nable.sb.cor.comp.bean.UserFeaturesBean;
+import biz.nable.sb.cor.comp.bean.UserWorkFlowGroupsBean;
 import biz.nable.sb.cor.comp.component.UserLinkCompanyTempComponent;
 import biz.nable.sb.cor.comp.db.entity.*;
 import biz.nable.sb.cor.comp.db.repository.UserLinkCompanyRepository;
 import biz.nable.sb.cor.comp.request.UserLinkRequest;
+import biz.nable.sb.cor.comp.thirdparty.GroupsRequest;
+import biz.nable.sb.cor.comp.thirdparty.InsertUpdateUserRequest;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
 import org.apache.commons.beanutils.BeanUtils;
@@ -23,9 +26,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -84,6 +88,7 @@ public class UserLinkCompanyApproval implements CommonApprovalTemplate {
         userMst.setUserId(Long.valueOf(userId[0]));
         userLinkedCompany = buildUserLinkedCompany(userLinkRequest, userMst, companyMst);
         saveMasterLinkTable(userLinkRequest, userLinkedCompany, approvalBean, commonTemp);
+        callUserCreation(userMst, userLinkRequest);
     }
 
     private void updateUserToLinkCompanyMst(ApprovalBean approvalBean, TempDto commonTemp){
@@ -116,6 +121,7 @@ public class UserLinkCompanyApproval implements CommonApprovalTemplate {
         userMst.setUserId(Long.valueOf(String.valueOf(userId[0])));
         userLinkedCompany = buildUserLinkedCompany(userLinkRequest, userMst, companyMst);
         saveMasterLinkTable(userLinkRequest, userLinkedCompany, approvalBean, commonTemp);
+        callUserCreation(userMst, userLinkRequest);
     }
 
     private UserLinkedCompany buildUserLinkedCompany(UserLinkRequest userLinkRequest, UserMst userMst, CompanyMst companyMst) {
@@ -145,6 +151,27 @@ public class UserLinkCompanyApproval implements CommonApprovalTemplate {
         userLinkCompanyRepository.save(userLinkedCompany);
     }
 
+    private void callUserCreation (UserMst userMst , UserLinkRequest userLinkRequest){
+
+        InsertUpdateUserRequest insertUpdateUserRequest = new InsertUpdateUserRequest();
+        insertUpdateUserRequest.setCompanyId(userMst.getCompanyId());
+        insertUpdateUserRequest.setUserId(userMst.getUserId());
+        Set<UserWorkFlowGroupsBean> workFlowGroupsBeans = userLinkRequest.getUserWorkFlowGroupBeans();
+        Set<GroupsRequest> groupsRequestSet = new HashSet<>();
+        workFlowGroupsBeans.forEach(values -> {
+            GroupsRequest groupsRequest = new GroupsRequest();
+            groupsRequest.setGroupId(values.getGroupId());
+            groupsRequestSet.add(groupsRequest);
+        });
+        insertUpdateUserRequest.setGroups(groupsRequestSet);
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<InsertUpdateUserRequest> request = new HttpEntity<>(insertUpdateUserRequest, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String URL = "http://localhost:8080/v1/groups/user-batch";
+        restTemplate.exchange(URL, HttpMethod.POST, request,CommonResponse.class);
+    }
     private Set<UserCompanyAccount> setUserCompanyAccount(UserLinkRequest userLinkRequest, UserLinkedCompany userLinkedCompany){
         Set<UserAccountsBean> userAccountBeans = userLinkRequest.getUserAccountBeans();
         Set<UserCompanyAccount> userCompanyAccounts =  new HashSet<>();

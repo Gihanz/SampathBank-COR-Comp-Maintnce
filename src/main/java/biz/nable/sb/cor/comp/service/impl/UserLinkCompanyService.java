@@ -15,6 +15,8 @@ import biz.nable.sb.cor.comp.db.repository.UserMstRepository;
 import biz.nable.sb.cor.comp.request.UserLinkRequest;
 import biz.nable.sb.cor.comp.response.ApprovalPendingUserLinkResponse;
 import biz.nable.sb.cor.comp.response.UserLinkListByApprovalIDResponse;
+import biz.nable.sb.cor.comp.thirdparty.GetUserDetailsResponse;
+import biz.nable.sb.cor.comp.thirdparty.GroupsDetails;
 import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.ErrorDescription;
 import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
@@ -46,6 +48,9 @@ public class UserLinkCompanyService {
 
     @Autowired
     MessageSource messageSource;
+
+    @Autowired
+    UserService userService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -185,7 +190,6 @@ public class UserLinkCompanyService {
                 userLinkListResponse.setSignature(tempResponse.getSignature());
                 LinkedCompaniesBean linkedCompaniesBean = commonConverter.mapToPojo(tempResponse.getRequestPayload(), LinkedCompaniesBean.class);
                 userLinkListResponse.setLinkedCompaniesBean(linkedCompaniesBean);
-
                 userLinkListResponseSet.add(userLinkListResponse);
             });
             approvalPendingUserLinkResponse.setUserLinkListResponseHashSet(userLinkListResponseSet);
@@ -257,17 +261,30 @@ public class UserLinkCompanyService {
                 linkedCompaniesBean.setCompanyName(userLinkedCompany.get().getCompanyMst().getCompanyName());
                 linkedCompaniesBean.setAllAccountAccessFlag(userLinkedCompany.get().getAllAcctAccessFlg());
                 Set<UserCompanyFeature> userCompanyFeatures = userLinkedCompany.get().getUserCompanyFeatures();
-                UserCompanyFeaturesBean userCompanyFeaturesBean = new UserCompanyFeaturesBean();
+                Set<UserCompanyFeaturesBean> userCompanyFeaturesBeanSet = new HashSet<>();
                 userCompanyFeatures.forEach(userCompanyFeature -> {
+                    UserCompanyFeaturesBean userCompanyFeaturesBean = new UserCompanyFeaturesBean();
                     userCompanyFeaturesBean.setFeatureId(userCompanyFeature.getFeature());
+                    userCompanyFeaturesBeanSet.add(userCompanyFeaturesBean);
                 });
-                linkedCompaniesBean.setUserCompanyFeaturesBean(userCompanyFeaturesBean);
+                linkedCompaniesBean.setUserCompanyFeaturesBean(userCompanyFeaturesBeanSet);
                 Set<UserCompanyAccount> userCompanyAccounts = userLinkedCompany.get().getUserCompanyAccounts();
-                UserCompanyAccountsBean userCompanyAccountsBean = new UserCompanyAccountsBean();
+                Set<UserCompanyAccountsBean> userCompanyAccountsBeanHashSet = new HashSet<>();
                 userCompanyAccounts.forEach(userCompanyAccount -> {
+                    UserCompanyAccountsBean userCompanyAccountsBean = new UserCompanyAccountsBean();
                     userCompanyAccountsBean.setAccountNumber(userCompanyAccount.getAccountNo());
+                    userCompanyAccountsBeanHashSet.add(userCompanyAccountsBean);
                 });
-                linkedCompaniesBean.setUserCompanyAccountsBean(userCompanyAccountsBean);
+                linkedCompaniesBean.setUserCompanyAccountsBean(userCompanyAccountsBeanHashSet);
+                GetUserDetailsResponse getUserDetailsResponse = userService.callGetUsers(Long.parseLong(userId[0]));
+                Set<GroupsDetails> groupsDetails = getUserDetailsResponse.groups;
+                Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroupsBeanHashSet = new HashSet<>();
+                groupsDetails.forEach( getValues -> {
+                    UserCompanyWorkflowGroupsBean userCompanyWorkflowGroupsBean = new UserCompanyWorkflowGroupsBean();
+                    userCompanyWorkflowGroupsBean.setUserGroupId(getValues.getGroupId());
+                    userCompanyWorkflowGroupsBeanHashSet.add(userCompanyWorkflowGroupsBean);
+                });
+                linkedCompaniesBean.setUserCompanyWorkflowGroupsBean(userCompanyWorkflowGroupsBeanHashSet);
                 originalUserLinkBean.setLinkedCompaniesBean(linkedCompaniesBean);
                 userLinkListByApprovalIDResponse.setOriginalUserLinkBean(originalUserLinkBean);
             });
