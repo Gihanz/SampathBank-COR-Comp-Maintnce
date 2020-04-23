@@ -3,11 +3,35 @@ package biz.nable.sb.cor.comp.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+
+import biz.nable.sb.cor.common.bean.CommonSearchBean;
+import biz.nable.sb.cor.common.bean.TempDto;
+import biz.nable.sb.cor.common.exception.SystemException;
+import biz.nable.sb.cor.common.utility.ActionTypeEnum;
+import biz.nable.sb.cor.comp.bean.*;
+import biz.nable.sb.cor.comp.db.entity.*;
+import biz.nable.sb.cor.comp.db.repository.*;
+import biz.nable.sb.cor.comp.request.BlockRequest;
+import biz.nable.sb.cor.comp.request.DeleteUserRequest;
+import biz.nable.sb.cor.comp.response.ApprovalPendingUserResponse;
+import biz.nable.sb.cor.comp.response.UserListResponseByUserID;
+import biz.nable.sb.cor.comp.response.UserResponseList;
+import biz.nable.sb.cor.comp.thirdparty.GetUserDetailsResponse;
+import biz.nable.sb.cor.comp.thirdparty.GroupsDetails;
+import biz.nable.sb.cor.comp.utility.ErrorCode;
+import biz.nable.sb.cor.comp.utility.ErrorDescription;
+import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +41,9 @@ import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.common.service.impl.CommonConverter;
 import biz.nable.sb.cor.comp.component.BranchTempComponent;
 import biz.nable.sb.cor.comp.component.UserTempComponent;
-import biz.nable.sb.cor.comp.db.entity.CompanyMst;
-import biz.nable.sb.cor.comp.db.entity.UserMst;
-import biz.nable.sb.cor.comp.db.repository.BranchDeleteRepository;
-import biz.nable.sb.cor.comp.db.repository.BranchMstRepository;
-import biz.nable.sb.cor.comp.db.repository.CompanyMstRepository;
-import biz.nable.sb.cor.comp.db.repository.UserMstRepository;
 import biz.nable.sb.cor.comp.request.CreateUserRequest;
-import biz.nable.sb.cor.comp.utility.ErrorCode;
 import biz.nable.sb.cor.comp.utility.RequestTypeEnum;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UserService {
@@ -54,250 +72,518 @@ public class UserService {
 	@Autowired
 	UserTempComponent userTempComponent;
 
+	@Autowired
+	FeaturesRepository featuresRepository;
+
+	@Autowired
+	CompanyFeaturesRepository companyFeaturesRepository;
+
+    @Value("${get.user.details.url}")
+    private String getUserDetailsURL;
+
 	private static final RequestTypeEnum REQUEST_TYPE = RequestTypeEnum.USER;
 
-	private static final String USER_HASH_TAG = "#companyId=";
+	private static final String USER_HASH_TAG = "COMPANY_ID=";
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public CommonResponse createTempUser(CreateUserRequest createUserRequest, String userId, String userGroup,
-			String requestId) {
+	public CommonResponse createTempUser(CreateUserRequest createUserRequest, String userGroup,
+			String requestId,String adminUser) {
 		logger.info("================== Start Create User Request =================");
-		logger.info("Create User {} to {}", createUserRequest.getUserName(), createUserRequest.getCompanyId());
+		logger.info("Create User {} to {}", createUserRequest.getUserName(), createUserRequest.getPrimaryCompanyId());
 		CommonResponse commonResponse = new CommonResponse();
-		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(createUserRequest.getCompanyId());
+		CommonRequestBean commonRequestBean ;
+		createUserRequest.setCreateDate(new Date());
+		createUserRequest.setCreateBy(adminUser);
+		createUserRequest.setUserGroup(userGroup);
+        commonRequestBean = setCommonRequestBean(userGroup, requestId, createUserRequest);
+		logger.info("Create commonRequestBean");
+		CommonResponseBean commonResponseBean = userTempComponent.createTempRecord(commonRequestBean, requestId);
+		commonResponse.setErrorCode(commonResponseBean.getErrorCode());
+		commonResponse.setReturnCode(commonResponseBean.getReturnCode());
+		commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
+		logger.info("================== End Create User Request =================");
+		return commonResponse;
+	}
+
+
+	public CommonResponse updateTempUser(CreateUserRequest createUserRequest, String userId, String userGroup,
+										 String requestId,String adminUser) {
+		logger.info("================== Start update user request=================");
+		Optional<UserMst> optional = userMstRepository.findByUserId(Long.parseLong(userId));
+		CommonResponse commonResponse = new CommonResponse();
+		CommonRequestBean commonRequestBean = new CommonRequestBean();
 		if (!optional.isPresent()) {
 			logger.info(
-					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
-			commonResponse.setErrorCode(ErrorCode.NO_COMPANY_RECORD_FOUND);
+					messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
+			commonResponse.setErrorCode(ErrorCode.NO_USER_RECORD_FOUND);
 			commonResponse.setReturnCode(HttpStatus.NOT_FOUND.value());
 			commonResponse.setReturnMessage(
-					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
-		} else {
-			Optional<UserMst> optional2 = userMstRepository.findByUserName(createUserRequest.getUserName());
-			Boolean isExist = optional2.isPresent();
-
-			if (Boolean.TRUE.equals(isExist)) {
-				logger.info(messageSource.getMessage(ErrorCode.USER_RECORD_ALREADY_EXISTS, null,
-						LocaleContextHolder.getLocale()));
-				commonResponse.setErrorCode(ErrorCode.USER_RECORD_ALREADY_EXISTS);
-				commonResponse.setReturnCode(HttpStatus.CONFLICT.value());
-				commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.USER_RECORD_ALREADY_EXISTS, null,
-						LocaleContextHolder.getLocale()));
-			} else {
-				CommonRequestBean commonRequestBean = new CommonRequestBean();
-				commonRequestBean.setCommonTempBean(createUserRequest);
-				String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getCompanyId()));
-				String referenceNo = String.valueOf(createUserRequest.getUserName());
-				commonRequestBean.setHashTags(hashTags);
-				commonRequestBean.setReferenceNo(referenceNo);
-				commonRequestBean.setRequestType(REQUEST_TYPE.name());
-				commonRequestBean.setUserGroup(userGroup);
-				commonRequestBean.setUserId(userId);
-				logger.info("Create commonRequestBean");
-				CommonResponseBean commonResponseBean = userTempComponent.createTempRecord(commonRequestBean,
-						requestId);
-				commonResponse.setErrorCode(commonResponseBean.getErrorCode());
-				commonResponse.setReturnCode(commonResponseBean.getReturnCode());
-				commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
-				logger.info("================== End Create Branch Request =================");
-			}
+					messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
+		}else {
+            createUserRequest.setLastModifiedDate(new Date());
+            createUserRequest.setLastModifiedBy(adminUser);
+            createUserRequest.setUserId(optional.get().getUserId());
+            String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
+            String referenceNo;
+            if (createUserRequest.getPrimaryCompanyId() != null){
+                referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
+            }else{
+                referenceNo = requestId;
+            }
+            commonRequestBean.setCommonTempBean(createUserRequest);
+            commonRequestBean.setHashTags(hashTags);
+            commonRequestBean.setReferenceNo(referenceNo);
+            commonRequestBean.setRequestType(REQUEST_TYPE.name());
+            commonRequestBean.setUserGroup(userGroup);
+            commonRequestBean.setUserId(userId);
+            CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
+            optional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
+            userMstRepository.save(optional.get());
+            commonResponse.setErrorCode(commonResponseBean.getErrorCode());
+            commonResponse.setReturnCode(commonResponseBean.getReturnCode());
+            commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
+			logger.info("================== End update user request =================");
 		}
 		return commonResponse;
 	}
 
-	public List<UserMst> getUseres(String userId, String userGroup, String requestId){
+	public ApprovalPendingUserResponse getPendingAuthUseres(String userId, String userGroup, String approvalStatus) {
+		logger.info("================== Start auth pending user request=================");
+		ApprovalPendingUserResponse commonResponse = new ApprovalPendingUserResponse();
+		CommonSearchBean bean = setCommonSearchBean(userId, userGroup, approvalStatus);
+		List<TempDto> tempResponseList = new ArrayList<>();
+		try{
+			tempResponseList = userTempComponent.getAuthPendingRecord(bean).getTempList();
 
-		return userMstRepository.findAll();
+			if (tempResponseList == null){
+				logger.info(
+						messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
+				commonResponse.setErrorCode(ErrorCode.NO_USER_RECORD_FOUND);
+				commonResponse.setReturnCode(HttpStatus.NOT_FOUND.value());
+				commonResponse.setReturnMessage(
+						messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
+			}
+		}catch (Exception exception){
+			logger.error("Error in get auth pending record: {}", exception.toString());
+		}
+		Set<Long> userReferenceList = new HashSet<>();
+		Set<UserListResponseBean> userListResponseBeanSet = new HashSet<>();
+		tempResponseList.forEach(tempDto -> {
+			UserListResponseBean userListResponseBean =  new UserListResponseBean();
+			try{
+				userListResponseBean.setId(String.valueOf(tempDto.getId()));
+				userListResponseBean.setApprovalId(tempDto.getApprovalId());
+				userListResponseBean.setSignature(String.valueOf(tempDto.getSignature()));
+				userListResponseBean.setRequestType(tempDto.getRequestType());
+				userListResponseBean.setReferenceNo(String.valueOf(tempDto.getReferenceNo()));
+				userListResponseBean.setActionType(tempDto.getActionType());
+//				BeanUtils.copyProperties(userListResponseBean, tempDto);
+			}catch (Exception exception){
+				logger.error("Error in copying tempDTO to userListResponseBean.: {}", exception.toString());
+			}
 
+			ModifiedUserResponse modifiedUserResponse = commonConverter.mapToPojo(tempDto.getRequestPayload(), ModifiedUserResponse.class);
+			userListResponseBean.setModifiedUserResponseSet(modifiedUserResponse);
+			if (!ActionTypeEnum.CREATE.equals(tempDto.getActionType())) {
+				long userID = Long.parseLong(tempDto.getRequestPayload().get("userId").toString());
+				userReferenceList.add(userID);
+			}
+			Optional.of(userReferenceList).ifPresent(userList -> {
+				Set<UserMst> userMstSet = userMstRepository.findByUserIdIn(userReferenceList);
+				userListResponseBean.setOriginalUserResponseSet(setAuthUserListResponse(userMstSet));
+			});
+			userListResponseBeanSet.add(userListResponseBean);
+		});
+
+
+		commonResponse.setUserListResponseBeanSet(userListResponseBeanSet);
+		commonResponse.setReturnCode(HttpStatus.OK.value());
+		commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+		commonResponse.setReturnMessage(
+				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
+		logger.info("================== End auth pending user request=================");
+		return commonResponse;
 	}
-//
-//	public CommonResponse getPendingAuthBranches(String userId, String userGroup, String requestId) {
-//		logger.info("================== Start getPendingAuthBranches =================");
-//
-//		CommonSearchBean bean = new CommonSearchBean();
-//		bean.setRequestType(REQUEST_TYPE.name());
-//		List<TempDto> tempList = branchTempComponent.getAuthPendingRecord(bean).getTempList();
-//		CommonGetListResponse<AuthPendingBranchBean> commonGetListResponse = new CommonGetListResponse<>();
-//		List<AuthPendingBranchBean> authPendingBranchBeans = new ArrayList<>();
-//		for (TempDto tempDto : tempList) {
-//			CreateBranchRequest customerId = commonConverter.mapToPojo(tempDto.getRequestPayload(),
-//					CreateBranchRequest.class);
-//			Optional<CompanyMst> companyO = companyMstRepository.findByCompanyId(customerId.getCompanyId());
-//			if (companyO.isPresent()) {
-//				AuthPendingBranchBean branchBean = new AuthPendingBranchBean();
-//				branchBean.setCompanyId(companyO.get().getCompanyId());
-//				branchBean.setCompanyName(companyO.get().getCompanyName());
-//				branchBean.setBranchId(customerId.getBranchId());
-//				branchBean.setBranchName(customerId.getBranchName());
-//				branchBean.setAuthorizationId(Long.parseLong(tempDto.getApprovalId()));
-//				branchBean.setSignature(tempDto.getSignature());
-//				branchBean.setActionType(tempDto.getActionType());
-//				branchBean.setStatus(StatusEnum.PENDING);
-//				authPendingBranchBeans.add(branchBean);
-//			}
-//
-//		}
-//		commonGetListResponse.setPayLoad(authPendingBranchBeans);
-//		commonGetListResponse.setReturnCode(HttpStatus.OK.value());
-//		commonGetListResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-//		commonGetListResponse.setReturnMessage(
-//				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
-//		logger.info("================== End getPendingAuthBranches =================");
-//
-//		return commonGetListResponse;
-//	}
-//
-//	public CommonResponse deleteBranch(DeleteBranchRequest deleteBranchRequest, String userId, String userGroup,
-//			String requestId) {
-//
-//		logger.info("================== Start Delete branch =================");
-//		Optional<CompanyMst> optional1 = companyMstRepository.findByCompanyId(deleteBranchRequest.getCompanyId());
-//
-//		if (!optional1.isPresent()) {
-//			throw new RecordNotFoundException(
-//					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
-//					ErrorCode.NO_COMPANY_RECORD_FOUND);
-//		}
-//		Optional<BranchMst> optional = branchMstRepository.findByBranchIdAndCompany(deleteBranchRequest.getBranchId(),
-//				optional1.get().getId());
-//		if (optional.isPresent()) {
-//			CreateBranchRequest linkCompanyBean = new CreateBranchRequest();
-//			try {
-//				BeanUtils.copyProperties(linkCompanyBean, optional.get());
-//			} catch (IllegalAccessException | InvocationTargetException e) {
-//				throw new SystemException(
-//						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
-//						ErrorCode.DATA_COPY_ERROR);
-//			}
-//			CommonRequestBean commonRequestBean = new CommonRequestBean();
-//			commonRequestBean.setCommonTempBean(linkCompanyBean);
-//			String hashTags = BRANCH_HASH_TAG.concat(linkCompanyBean.getCompanyId());
-//			String referenceNo = linkCompanyBean.getBranchId();
-//			commonRequestBean.setHashTags(hashTags);
-//			commonRequestBean.setReferenceNo(referenceNo);
-//			commonRequestBean.setRequestType(REQUEST_TYPE.name());
-//			commonRequestBean.setUserGroup(userGroup);
-//			commonRequestBean.setUserId(userId);
-//
-//			CommonResponseBean commonResponseBean = branchTempComponent.deleteBranchTemp(commonRequestBean, requestId);
-//			optional.get().setRecordStatus(RecordStatusEnum.DELETE_PENDING);
-//			branchMstRepository.save(optional.get());
-//			CommonResponse commonResponse = new CommonResponse();
-//			commonResponse.setErrorCode(commonResponseBean.getErrorCode());
-//			commonResponse.setReturnCode(commonResponseBean.getReturnCode());
-//			commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
-//
-//			logger.info("================== End Delete  branch =================");
-//			return commonResponse;
-//		} else {
-//			throw new RecordNotFoundException(
-//					messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
-//					ErrorCode.NO_BRANCH_RECORD_FOUND);
-//		}
-//	}
-//
-//	public CommonResponse updateTempCompany(@Valid UpdateBranchRequest updateBranchRequest, String userId,
-//			String userGroup, String requestId) {
-//
-//		logger.info("================== Start Update  branch =================");
-//		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(updateBranchRequest.getCompanyId());
-//		CommonResponse commonResponse;
-//		if (!optional.isPresent()) {
-//			throw new RecordNotFoundException(
-//					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
-//					ErrorCode.NO_COMPANY_RECORD_FOUND);
-//		} else {
-//			Optional<BranchMst> optionalB = branchMstRepository
-//					.findByBranchIdAndCompany(updateBranchRequest.getBranchId(), optional.get().getId());
-//			if (!optionalB.isPresent()) {
-//				throw new RecordNotFoundException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
-//						LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);
-//			}
-//			CommonRequestBean commonRequestBean = new CommonRequestBean();
-//			commonRequestBean.setCommonTempBean(updateBranchRequest);
-//			String hashTags = BRANCH_HASH_TAG.concat(updateBranchRequest.getCompanyId());
-//			String referenceNo = updateBranchRequest.getBranchId();
-//			commonRequestBean.setHashTags(hashTags);
-//			commonRequestBean.setReferenceNo(referenceNo);
-//
-//			commonRequestBean.setRequestType(REQUEST_TYPE.name());
-//			commonRequestBean.setUserGroup(userGroup);
-//			commonRequestBean.setUserId(userId);
-//			commonResponse = branchTempComponent.updateTempCompany(commonRequestBean, requestId);
-//			optional.get().setRecordStatus(RecordStatusEnum.UPDATE_PENDING);
-//			companyMstRepository.save(optional.get());
-//			commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-//			commonResponse.setReturnCode(HttpStatus.OK.value());
-//		}
-//		logger.info("================== End update  branch =================");
-//		return commonResponse;
-//	}
-//
-//	public CommonResponse getBranches(String companyId, StatusEnum status, String userId, String userGroup,
-//			String requestId) {
-//		CommonGetListResponse<BranchDetailBean> branchDetailBeans = new CommonGetListResponse<>();
-//		logger.info("================== Start Find  branch =================");
-//		Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(companyId);
-//		if (!optional.isPresent()) {
-//			throw new RecordNotFoundException(
-//					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
-//					ErrorCode.NO_COMPANY_RECORD_FOUND);
-//		} else {
-//			CompanyMst companyMst = optional.get();
-//			for (BranchMst branch : companyMst.getBranchMsts()) {
-//				logger.info("Get records form master table");
-//				if (status == branch.getStatus()) {
-//					BranchDetailBean branchDetailBean = new BranchDetailBean();
-//					branchDetailBean.setBranchId(branch.getBranchId());
-//					branchDetailBean.setBranchName(branch.getBranchName());
-//					branchDetailBean.setCompanyId(companyMst.getCompanyId());
-//					branchDetailBean.setCompanyName(companyMst.getCompanyName());
-//					branchDetailBean.setStatus(branch.getStatus());
-//					branchDetailBeans.getPayLoad().add(branchDetailBean);
-//				}
-//			}
-//			if (StatusEnum.DELETED == status) {
-//				logger.info("Get records form Delete table");
-//				List<BranchDelete> branchDeletes = branchDeleteRepository.findByCompanyId(companyMst.getId());
-//				for (BranchDelete branchDelete : branchDeletes) {
-//					BranchDetailBean branchDetailBean = new BranchDetailBean();
-//					branchDetailBean.setBranchId(branchDelete.getBranchId());
-//					branchDetailBean.setBranchName(branchDelete.getBranchName());
-//					branchDetailBean.setCompanyId(companyMst.getCompanyId());
-//					branchDetailBean.setCompanyName(companyMst.getCompanyName());
-//					branchDetailBean.setStatus(StatusEnum.DELETED);
-//					branchDetailBeans.getPayLoad().add(branchDetailBean);
-//				}
-//			}
-//			if (StatusEnum.PENDING == status || StatusEnum.INACTIVE == status) {
-//				logger.info("Get records form Temp table");
-//				CommonSearchBean bean = new CommonSearchBean();
-//				bean.setHashTags(BRANCH_HASH_TAG.concat(companyId));
-//				bean.setRequestType(REQUEST_TYPE.name());
-//				bean.setActionType(ActionTypeEnum.CREATE);
-//				List<TempDto> tempList = branchTempComponent.getTempRecord(bean).getTempList();
-//				for (TempDto tempDto : tempList) {
-//					BranchDetailBean branchDetailBean = new BranchDetailBean();
-//					BranchBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(),
-//							BranchBean.class);
-//					branchDetailBean.setCompanyId(companyMst.getCompanyId());
-//					branchDetailBean.setCompanyName(companyMst.getCompanyName());
-//					branchDetailBean.setBranchId(companyTempBean.getBranchId());
-//					branchDetailBean.setBranchName(companyTempBean.getBranchName());
-//					branchDetailBean.setStatus(StatusEnum.INACTIVE);
-//					branchDetailBeans.getPayLoad().add(branchDetailBean);
-//				}
-//			}
-//		}
-//
-//		branchDetailBeans.setReturnCode(HttpStatus.OK.value());
-//		branchDetailBeans.setReturnMessage(
-//				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
-//		branchDetailBeans.setErrorCode(ErrorCode.OPARATION_SUCCESS);
-//
-//		logger.info("================== End Find  branch =================");
-//		return branchDetailBeans;
-//	}
 
+	public CommonSearchBean setCommonSearchBean(String userId, String userGroup, String approvalStatus){
+		logger.info("================== Start set common search bean=================");
+		CommonSearchBean bean = setCommonSearchBean(userGroup, userId, approvalStatus, REQUEST_TYPE);
+		logger.info("================== End set common search bean=================");
+		return bean;
+	}
+
+	private CommonSearchBean setCommonSearchBean(String userGroup, String adminUserId, String approvalStatus, RequestTypeEnum requestType) {
+		logger.info("================== Start set common search bean for user request =================");
+		CommonSearchBean bean = new CommonSearchBean();
+		bean.setRequestType(requestType.name());
+		bean.setUserGroup(userGroup);
+		bean.setUserId(adminUserId);
+		if (approvalStatus != null){
+			switch (approvalStatus) {
+				case "NEW_PENDING":
+					bean.setActionType(ActionTypeEnum.valueOf("CREATE"));
+					break;
+				case "MODIFY_PENDING":
+					bean.setActionType(ActionTypeEnum.valueOf("UPDATE"));
+					break;
+				case "DELETE_PENDING":
+					bean.setActionType(ActionTypeEnum.valueOf("DELETE"));
+					break;
+			}
+		}
+		logger.info("================== End set common search bean request =================");
+		return bean;
+	}
+	private OriginalUserResponse setAuthUserListResponse(Set<UserMst> userMstSet){
+		logger.info("================== Start set auth user list request =================");
+		OriginalUserResponse originalUserResponse = new OriginalUserResponse();
+		userMstSet.forEach(value -> {
+			try {
+				BeanUtils.copyProperties(originalUserResponse, value);
+				UserListResponseBean userListResponseBean = new UserListResponseBean();
+				originalUserResponse.setUserAccounts(setUserAccountBean(value.getUserPrimaryAccounts()));
+				originalUserResponse.setUserFeatures(setUserFeatureBean(value.getUserPrimaryFeatures()));
+				originalUserResponse.setUserWorkFlowGroupBeans(null);
+
+			}catch (IllegalAccessException | InvocationTargetException exception){
+				throw new SystemException(
+						messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), exception,
+						ErrorCode.DATA_COPY_ERROR);
+			}
+			logger.info("================== End set auth user list response =================");
+		});
+		return originalUserResponse;
+	}
+
+	public UserResponseList getUserList(String companyId, RecordStatuUsersEnum recordStatus) {
+		logger.info("================== Start get user list request =================");
+        UserResponseList userResponseListSet =  new UserResponseList();
+
+		Set<UserMst> userMstSet;
+		if (companyId != null && recordStatus == null){
+			userMstSet = userMstRepository.findByCompanyId(companyId);
+		}else if (companyId == null && recordStatus != null){
+			userMstSet = userMstRepository.findByRecordStatus(recordStatus);
+		}else {
+			userMstSet = userMstRepository.findAll();
+		}
+        Set<UserListResponse> userListResponseSet = new HashSet<>();
+		userMstSet.forEach( values -> {
+            AtomicReference<UserListResponse> userListResponse = new AtomicReference<>(new UserListResponse());
+                 userListResponse.set(UserListResponse.builder()
+                .userId(values.getUserId())
+                .userName(values.getUserName())
+                .designation(values.getDesignation())
+                .branch(values.getBranch())
+                .recordStatus(values.getRecordStatus())
+                .status(values.getStatus())
+                .email(values.getEmail())
+                .iamCreateState(values.getIamCreateState())
+                .userType(values.getUserType())
+                .createdBy(values.getCreatedBy())
+                .createdDate(values.getCreatedDate())
+                .lastUpdatedBy(values.getLastUpdatedBy())
+                .lastUpdatedDate(values.getLastUpdatedDate())
+                .lastVerifiedBy(values.getLastVerifiedBy())
+                .lastVerifiedDate(values.getLastVerifiedDate())
+                .build());
+            userListResponseSet.add(userListResponse.get());
+		});
+
+        userResponseListSet.setUserListResponses(userListResponseSet);
+        userResponseListSet.setReturnCode(HttpStatus.OK.value());
+        userResponseListSet.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+        userResponseListSet.setReturnMessage(
+                messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, new Object[] {ErrorDescription.SUCCESS}, LocaleContextHolder.getLocale()));
+		logger.info("================== End get user list response =================");
+		return userResponseListSet;
+	}
+
+	public CommonResponse deleteUser(String userId, String requestId, String userGroup, String adminUserId, DeleteUserRequest deleteUserRequest){
+        logger.info("================== Start Delete User =================");
+        Optional<UserMst> userMstOptional = userMstRepository.findByUserId(Long.parseLong(userId));
+        CommonResponse commonResponse = new CommonResponse();
+        CommonRequestBean commonRequestBean = new CommonRequestBean();
+        CreateUserRequest createUserRequest;
+        if (!userMstOptional.isPresent()) {
+            logger.info(
+                    messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
+            commonResponse.setErrorCode(ErrorCode.NO_USER_RECORD_FOUND);
+            commonResponse.setReturnCode(HttpStatus.NOT_FOUND.value());
+            commonResponse.setReturnMessage(
+                    messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
+        }else {
+			String hashTags = USER_HASH_TAG.concat(String.valueOf(userMstOptional.get().getCompanyId()));
+			String referenceNo = null;
+			if (userMstOptional.get().getCompanyId() != null){
+				referenceNo = requestId.concat("-").concat(userMstOptional.get().getCompanyId());
+			}else{
+				referenceNo = requestId;
+			}
+			createUserRequest = setCreateUserRequest(userMstOptional);
+			commonRequestBean.setCommonTempBean(createUserRequest);
+			commonRequestBean.setHashTags(hashTags);
+			commonRequestBean.setReferenceNo(referenceNo);
+			commonRequestBean.setRequestType(REQUEST_TYPE.name());
+			commonRequestBean.setUserGroup(userGroup);
+			commonRequestBean.setUserId(String.valueOf(userMstOptional.get().getUserId()));
+			CommonResponseBean commonResponseBean = userTempComponent.deleteUserTemp(commonRequestBean, requestId);
+			userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.DELETE_PENDING);
+            userMstRepository.save(userMstOptional.get());
+            commonResponse.setErrorCode(commonResponseBean.getErrorCode());
+            commonResponse.setReturnCode(commonResponseBean.getReturnCode());
+            commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
+        }
+        logger.info("================== End Delete User =================");
+		return commonResponse;
+    }
+
+    private CreateUserRequest setCreateUserRequest(Optional<UserMst> userMstOptional){
+		CreateUserRequest createUserRequest = new CreateUserRequest();
+		createUserRequest.setUserId(userMstOptional.get().getUserId());
+		createUserRequest.setUserName(userMstOptional.get().getUserName());
+		createUserRequest.setDesignation(userMstOptional.get().getDesignation());
+		createUserRequest.setBranchCode(userMstOptional.get().getBranch());
+		createUserRequest.setUserName(userMstOptional.get().getUserName());
+		createUserRequest.setEmail(userMstOptional.get().getEmail());
+		createUserRequest.setUserType(userMstOptional.get().getUserType());
+		createUserRequest.setPrimaryCompanyId(userMstOptional.get().getCompanyId());
+		createUserRequest.setAllAccountAccessFlag(userMstOptional.get().getAllAcctAccessFlg());
+        createUserRequest.setUserAccountBeans(setUserAccountBean(userMstOptional.get().getUserPrimaryAccounts()));
+        createUserRequest.setUserFeatureBeans(setUserFeatureBean(userMstOptional.get().getUserPrimaryFeatures()));
+        createUserRequest.setCreateBy(userMstOptional.get().getCreatedBy());
+		createUserRequest.setCreateDate(userMstOptional.get().getCreatedDate());
+		createUserRequest.setLastModifiedBy(userMstOptional.get().getLastUpdatedBy());
+		createUserRequest.setLastModifiedDate(userMstOptional.get().getLastUpdatedDate());
+		createUserRequest.setLastVerifiedBy(userMstOptional.get().getLastVerifiedBy());
+		createUserRequest.setLastVerifiedDate(userMstOptional.get().getLastVerifiedDate());
+		return createUserRequest;
+	}
+    private Set<UserAccountsBean> userAccountsBeanSet = new HashSet<>();
+	private Set<UserAccountsBean> setUserAccountBean(Set<UserPrimaryAccount> userPrimaryAccounts){
+        UserAccountsBean userAccountsBean = new UserAccountsBean();
+        userPrimaryAccounts.forEach(values -> {
+            userAccountsBean.setAccountId(values.getAccountNo());
+            userAccountsBeanSet.add(userAccountsBean);
+        });
+       return userAccountsBeanSet;
+    }
+	private Set<UserFeaturesBean> userFeatureBeanSet = new HashSet<>();
+	private Set<UserFeaturesBean> setUserFeatureBean(Set<UserPrimaryFeature> userPrimaryFeatures){
+		UserFeaturesBean userFeatureBean = new UserFeaturesBean();
+		userPrimaryFeatures.forEach(values -> {
+			userFeatureBean.setFeatureId(values.getFeature());
+			userFeatureBeanSet.add(userFeatureBean);
+		});
+		return userFeatureBeanSet;
+	}
+	public UserListResponseByUserID getUserListByUserID(String userID) {
+		logger.info("================== Start get user list request =================");
+		UserListResponseByUserID userListResponseByUserID =  new UserListResponseByUserID();
+		Optional<UserMst> optionalUserMst = userMstRepository.findByUserId(Long.parseLong(userID));
+		Optional.ofNullable(optionalUserMst).ifPresent( value -> {
+			userListResponseByUserID.setUserId(value.get().getUserId());
+			userListResponseByUserID.setUserName(value.get().getUserName());
+			userListResponseByUserID.setUserType(value.get().getUserType());
+			userListResponseByUserID.setDesignation(value.get().getDesignation());
+			userListResponseByUserID.setBranch(value.get().getBranch());
+			userListResponseByUserID.setStatus(value.get().getStatus());
+			userListResponseByUserID.setRecordStatus(value.get().getRecordStatus());
+			userListResponseByUserID.setIamCreateState(value.get().getIamCreateState());
+
+			Set<UserPrimaryFeature> primaryCompanyFeatures = value.get().getUserPrimaryFeatures();
+			primaryCompanyFeatures.forEach(valueRs -> {
+				long feature = valueRs.getFeature();
+				Optional<Features> featuresOptional = featuresRepository.findById(feature);
+				Set<PrimaryCompanyFeatures> primaryCompanyFeaturesSet = new HashSet<>();
+				Optional.ofNullable(featuresOptional).ifPresent(features -> {
+					PrimaryCompanyFeatures primaryCompanyFeaturesData = new PrimaryCompanyFeatures();
+					primaryCompanyFeaturesData.setFeatureId(features.get().getId());
+					primaryCompanyFeaturesData.setFeatureName(features.get().getDescription());
+                    primaryCompanyFeaturesSet.add(primaryCompanyFeaturesData);
+				});
+                userListResponseByUserID.setPrimaryCompanyFeatures(primaryCompanyFeaturesSet);
+			});
+			Set<UserPrimaryAccount> primaryCompanyAccount = value.get().getUserPrimaryAccounts();
+			Set<PrimaryCompanyAccounts> primaryCompanyAccountsSet = new HashSet<>();
+			primaryCompanyAccount.forEach(valueRs -> {
+				PrimaryCompanyAccounts primaryCompanyAccounts = new PrimaryCompanyAccounts();
+				primaryCompanyAccounts.setAccountNumber(valueRs.getAccountNo());
+                primaryCompanyAccountsSet.add(primaryCompanyAccounts);
+			});
+            userListResponseByUserID.setPrimaryCompanyAccounts(primaryCompanyAccountsSet);
+            GetUserDetailsResponse getUserDetailsResponse = callGetUsers(value.get().getUserId());
+            Set<GroupsDetails> groupsDetails = getUserDetailsResponse.groups;
+            Set<PrimaryCompanyWorkflowGroups> primaryCompanyWorkflowGroupsSet = new HashSet<>();
+            groupsDetails.forEach( getValues -> {
+                PrimaryCompanyWorkflowGroups primaryCompanyWorkflowGroups = new PrimaryCompanyWorkflowGroups();
+                primaryCompanyWorkflowGroups.setUserGroupId(getValues.getGroupId());
+                primaryCompanyWorkflowGroupsSet.add(primaryCompanyWorkflowGroups);
+            });
+			userListResponseByUserID.setPrimaryCompanyWorkflowGroups(primaryCompanyWorkflowGroupsSet);
+			LinkedCompaniesBean linkedCompaniesBean = setLinkedCompaniesBean(value);
+			userListResponseByUserID.setLinkedCompaniesBean(linkedCompaniesBean);
+		});
+
+        userListResponseByUserID.setReturnCode(HttpStatus.OK.value());
+        userListResponseByUserID.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+        userListResponseByUserID.setReturnMessage(
+                messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, new Object[] {ErrorDescription.SUCCESS}, LocaleContextHolder.getLocale()));
+		logger.info("================== End get user list request =================");
+		return userListResponseByUserID;
+	}
+
+    public GetUserDetailsResponse callGetUsers(long userID){
+        HttpHeaders headers = new HttpHeaders();
+        RestTemplate restTemplate = new RestTemplate();
+        String URL = getUserDetailsURL;
+
+        return restTemplate.getForObject(URL, GetUserDetailsResponse.class, userID);
+    }
+    
+	private LinkedCompaniesBean setLinkedCompaniesBean(Optional<UserMst> userMst){
+		logger.info("================== Start set linked companies bean request =================");
+		AtomicReference<LinkedCompaniesBean> linkedCompaniesBean = new AtomicReference<>();
+		Set<UserLinkedCompany> userLinkedCompanies = userMst.get().getUserLinkedCompanies();
+		userLinkedCompanies.forEach(values -> {
+			linkedCompaniesBean.set(new LinkedCompaniesBean());
+			CompanyMst companyMst = values.getCompanyMst();
+			linkedCompaniesBean.get().setCompanyId(companyMst.getCompanyId());
+			linkedCompaniesBean.get().setCompanyName(companyMst.getCompanyName());
+			Set<UserCompanyFeature> userCompanyFeatures = values.getUserCompanyFeatures();
+			userCompanyFeatures.forEach(userCompanyFeature -> {
+				long feature = userCompanyFeature.getFeature();
+				Set<CompanyFeatures> features = companyFeaturesRepository.findByFeature(feature);
+                Set<UserCompanyFeaturesBean> userCompanyFeaturesBeanSet = new HashSet<>();
+				features.forEach(featuresList -> {
+					UserCompanyFeaturesBean userCompanyFeaturesBean = new UserCompanyFeaturesBean();
+					userCompanyFeaturesBean.setFeatureId(featuresList.getFeature());
+					userCompanyFeaturesBean.setFeatureName(featuresList.getFeatureDescription());
+                    userCompanyFeaturesBeanSet.add(userCompanyFeaturesBean);
+				});
+                linkedCompaniesBean.get().setUserCompanyFeaturesBean(userCompanyFeaturesBeanSet);
+			});
+			Set<UserCompanyAccount> userCompanyAccounts = values.getUserCompanyAccounts();
+            Set<UserCompanyAccountsBean> userCompanyAccountsBeanHashSet = new HashSet<>();
+			userCompanyAccounts.forEach(userCompanyAccount -> {
+				UserCompanyAccountsBean userCompanyAccountsBean =  new UserCompanyAccountsBean();
+				userCompanyAccountsBean.setAccountNumber(userCompanyAccount.getAccountNo());
+				userCompanyAccountsBeanHashSet.add(userCompanyAccountsBean);
+			});
+            linkedCompaniesBean.get().setUserCompanyAccountsBean(userCompanyAccountsBeanHashSet);
+            GetUserDetailsResponse getUserDetailsResponse = callGetUsers(values.getUserMst().getUserId());
+            Set<GroupsDetails> groupsDetails = getUserDetailsResponse.groups;
+            Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroupsBeanHashSet = new HashSet<>();
+            groupsDetails.forEach( getValues -> {
+                UserCompanyWorkflowGroupsBean userCompanyWorkflowGroupsBean = new UserCompanyWorkflowGroupsBean();
+                userCompanyWorkflowGroupsBean.setUserGroupId(getValues.getGroupId());
+                userCompanyWorkflowGroupsBeanHashSet.add(userCompanyWorkflowGroupsBean);
+            });
+			linkedCompaniesBean.get().setUserCompanyWorkflowGroupsBean(userCompanyWorkflowGroupsBeanHashSet);
+		});
+		logger.info("================== end set linked companies bean request =================");
+		return linkedCompaniesBean.get();
+	}
+
+	public CommonResponse changeStatus(String userId,String companyId, String requestId, String userGroup, String adminUserId, BlockRequest blockRequest){
+		logger.info("================== Start change status request =================");
+		CommonResponse commonResponse = new CommonResponse();
+		Optional<UserMst> userMstOptional = userMstRepository.findByUserIdAndCompanyId(Long.parseLong(userId), companyId);
+		CommonRequestBean commonRequestBean = new CommonRequestBean();
+		CreateUserRequest createUserRequest ;
+		if (userMstOptional.get().getRecordStatus().equals(blockRequest.getBlockedStatus())){
+			logger.info(
+					messageSource.getMessage(ErrorCode.USER_ALREADY_SAME_STATUS, null, LocaleContextHolder.getLocale()));
+			commonResponse.setErrorCode(ErrorCode.USER_ALREADY_SAME_STATUS);
+			commonResponse.setReturnCode(HttpStatus.OK.value());
+			commonResponse.setReturnMessage(
+					messageSource.getMessage(ErrorCode.USER_ALREADY_SAME_STATUS, null, LocaleContextHolder.getLocale()));
+		}else {
+            createUserRequest = setCreateUserRequest(userMstOptional);
+            createUserRequest.setLastModifiedDate(new Date());
+            createUserRequest.setLastModifiedBy(adminUserId);
+            createUserRequest.setUserId(userMstOptional.get().getUserId());
+            String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
+            String referenceNo;
+            if (createUserRequest.getPrimaryCompanyId() != null){
+                referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
+            }else{
+                referenceNo = requestId;
+            }
+            commonRequestBean.setCommonTempBean(createUserRequest);
+            commonRequestBean.setHashTags(hashTags);
+            commonRequestBean.setReferenceNo(referenceNo);
+            commonRequestBean.setRequestType(REQUEST_TYPE.name());
+            commonRequestBean.setUserGroup(userGroup);
+            commonRequestBean.setUserId(userId);
+            CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
+            userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
+            userMstOptional.get().setStatus(blockRequest.getBlockedStatus());
+            userMstRepository.save(userMstOptional.get());
+            commonResponse.setErrorCode(commonResponseBean.getErrorCode());
+            commonResponse.setReturnCode(commonResponseBean.getReturnCode());
+            commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
+        }
+		logger.info("================== End change status request =================");
+		return commonResponse;
+	}
+
+	private CommonResponse setCommonResponse(String requestId, CommonResponse commonResponse, Optional<UserMst> userMstOptional,
+											 CommonRequestBean commonRequestBean) {
+		logger.info("================== Start set common response request =================");
+		CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
+		userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
+		userMstRepository.save(userMstOptional.get());
+		commonResponse.setErrorCode(commonResponseBean.getErrorCode());
+		commonResponse.setReturnCode(commonResponseBean.getReturnCode());
+		commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
+		logger.info("================== End set common response request =================");
+		return commonResponseBean;
+	}
+
+	private void setModifyRequest(String userGroup, String requestId,String adminUserId, Optional<UserMst> userMstOptional,
+								  CommonRequestBean commonRequestBean, CreateUserRequest createUserRequest) {
+		logger.info("================== Start set modify request request =================");
+		try {
+			BeanUtils.copyProperties(createUserRequest, userMstOptional.get());
+		}catch (IllegalAccessException | InvocationTargetException exception){
+			throw new SystemException(
+					messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), exception,
+					ErrorCode.DATA_COPY_ERROR);
+		}
+		setCreateUserRequest(userGroup, requestId, adminUserId, commonRequestBean, createUserRequest);
+		logger.info("================== End set modify request request =================");
+	}
+
+	private void setCreateUserRequest(String userGroup, String requestId, String adminUserId, CommonRequestBean commonRequestBean,
+									  CreateUserRequest createUserRequest) {
+		logger.info("================== Start set create user request =================");
+		createUserRequest.setLastModifiedDate(new Date());
+		createUserRequest.setLastModifiedBy(adminUserId);
+		createUserRequest.setUserGroup(userGroup);
+		setCommonRequestBean(userGroup, requestId, createUserRequest);
+		commonRequestBean.setCommonTempBean(createUserRequest);
+		logger.info("================== End set create user request =================");
+	}
+
+	private CommonRequestBean setCommonRequestBean(String userGroup, String requestId,CreateUserRequest createUserRequest) {
+		logger.info("================== Start set common request bean=================");
+        CommonRequestBean commonRequestBean = new CommonRequestBean();
+		String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
+        String referenceNo = null;
+		if (createUserRequest.getPrimaryCompanyId() != null){
+             referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
+        }else{
+            referenceNo = requestId;
+        }
+        commonRequestBean.setCommonTempBean(createUserRequest);
+		commonRequestBean.setHashTags(hashTags);
+		commonRequestBean.setReferenceNo(referenceNo);
+		commonRequestBean.setRequestType(REQUEST_TYPE.name());
+		commonRequestBean.setUserGroup(userGroup);
+		commonRequestBean.setUserId(String.valueOf(createUserRequest.getUserId()));
+		logger.info("================== End set common request bean=================");
+		return commonRequestBean;
+	}
 }

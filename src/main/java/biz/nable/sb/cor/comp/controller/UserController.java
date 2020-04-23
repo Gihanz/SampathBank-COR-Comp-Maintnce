@@ -6,11 +6,12 @@ package biz.nable.sb.cor.comp.controller;
 import javax.validation.Valid;
 
 import biz.nable.sb.cor.common.exception.RecordNotFoundException;
-import biz.nable.sb.cor.comp.db.entity.CompanyUser;
-import biz.nable.sb.cor.comp.db.entity.UserFeatures;
-import biz.nable.sb.cor.comp.db.entity.UserMst;
+import biz.nable.sb.cor.comp.request.BlockRequest;
+import biz.nable.sb.cor.comp.request.DeleteUserRequest;
 import biz.nable.sb.cor.comp.response.*;
-import biz.nable.sb.cor.comp.utility.StatusEnum;
+import biz.nable.sb.cor.comp.utility.ErrorDescription;
+import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
+import biz.nable.sb.cor.comp.validator.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -33,9 +34,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
+
 
 /*
  * @Description	:This controller class is acting as controller 
@@ -49,329 +49,316 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	private static final String COMMON_USER_GROUP = "SYSTEM";
-	private String invalidUserLoggingMsg = "User Id is invalid: {}";
+
 	private static final String REQUEST_ID_HEADER = "request-id";
+	private static final String ADMIN_USER_ID = "adminUserId";
+	private static final String USER_ID = "userId";
+	private static final String USER_GROUP = "userGroup";
 	@Autowired
 	ObjectMapper objectMapper;
 
 	@Autowired
 	private MessageSource messageSource;
 
+	@Autowired
+	private Validator inputValidator;
+
 	@ApiOperation(value = "Create User request", nickname = "Create User", notes = "Create Temp User.", httpMethod = "POST")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "User Request successful", response = CommonResponse.class),
-			@ApiResponse(code = 400, message = "Input parameters are not valid"),
-			@ApiResponse(code = 500, message = "Internal server error") })
+			@ApiResponse(code = 200, message = ErrorDescription.REQUEST_SUCCESS, response = CommonResponse.class),
+			@ApiResponse(code = 400, message = ErrorDescription.INPUT_PARAMETERS_NOT_VALID),
+			@ApiResponse(code = 500, message = ErrorDescription.INTERNAL_SERVER_ERROR) })
 	@PostMapping(value = "/v1/user")
 	public ResponseEntity<CommonResponse> createUser(@Valid @RequestBody CreateUserRequest createUserRequest,
-			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
-			@RequestHeader(name = "userId", required = true) String userId,
-			@RequestHeader(name = "userGroup", required = false) String userGroup) {
+			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
+			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
+			@RequestHeader(name = USER_GROUP, required = false) String userGroup) {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
 
-		logger.info("Start exicute method createUser");
+		logger.info("Start execute method createUser: CreateUserRequest: {} RequestId: {} AdminUserID: {} UserGroup: {}",
+				createUserRequest ,requestId ,adminUserId ,userGroup);
 		CommonResponse commonResponse;
-		if (StringUtils.isEmpty(userId)) {
-			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
-					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
-							LocaleContextHolder.getLocale()),
-					ErrorCode.INVALID_USER_ID);
-		} else {
+//		commonResponse =  inputValidator.validateRequest(createUserRequest, userId);
+//		if(commonResponse != null){
+//			logger.info("CreateUser method validation response: {}",
+//					ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
+//			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+//		}else {
 			try {
-				logger.debug("Create User for {}.", createUserRequest.getCompanyId());
 				if (StringUtils.isEmpty(userGroup)) {
 					userGroup = COMMON_USER_GROUP;
 				}
-				commonResponse = userService.createTempUser(createUserRequest, userId, userGroup, requestId);
+				commonResponse = userService.createTempUser(createUserRequest, userGroup, requestId, adminUserId);
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
-				logger.info("SystemException occured while createUser for {}.", e.getMessage());
+				logger.error("SystemException occurred while createUser for {}.", e.getMessage());
 				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-						"Error occured while createUser. " + e.getMessage(), e.getErrorCode());
+						"Error occurred while createUser. " + e.getMessage(), e.getErrorCode());
 			} catch (Exception e) {
-				logger.error("Error occured while createUser for {}.", e);
+				logger.error("Error occurred while createUser for {}.", e.toString());
 				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-						"Error occured while creating User. " + e.getMessage(), ErrorCode.UNKNOWN_ERROR);
+						"Error occurred while creating User. " + e.getMessage(), ErrorCode.UNKNOWN_ERROR);
 			}
-		}
-		long endTime = System.currentTimeMillis();
-		logger.info("createUser rate: avg_resp={}", (endTime - startTime));
-		MDC.clear();
-		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
+
+			long endTime = System.currentTimeMillis();
+			logger.info("createUser rate: avg_resp={}", (endTime - startTime));
+			MDC.clear();
+			logger.info("createUser method Response: {}", ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
+			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+//			return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
+//		}
 	}
 
-//
-//	@ApiOperation(value = "Get User List By Company ID", nickname = "Get User List By Company Id", notes = "Get User List By Company ID.", httpMethod = "GET")
-	@ApiOperation(value = "Get User List ", nickname = "Get User List", notes = "Get User List.", httpMethod = "GET")
+	@ApiOperation(value = "Update User request", nickname = "Update User", notes = "Update user request.", httpMethod = "PUT")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Fetching Userlist successful", response = UserResponse.class),
-			@ApiResponse(code = 400, message = "Get Userlist fail"),
-			@ApiResponse(code = 500, message = "Internal server error") })
-//	@GetMapping("/v1/user/{companyId}"
-	@GetMapping("/v1/user")
-	public ResponseEntity<CommonResponse> getCustomerids(
-			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
-			@RequestHeader(name = "userId", required = true) String userId,
-			@RequestHeader(name = "userGroup", required = false) String userGroup
-//			@RequestParam(name = "status", required = true) StatusEnum status,
-//			@PathVariable("companyId") String companyId
-	) {
+			@ApiResponse(code = 200, message = ErrorDescription.REQUEST_UPDATE_SUCCESS, response = CommonResponse.class),
+			@ApiResponse(code = 404, message = ErrorDescription.RESOURCE_NOT_FOUND),
+			@ApiResponse(code = 400, message = ErrorDescription.INPUT_PARAMETERS_NOT_VALID),
+			@ApiResponse(code = 500, message = ErrorDescription.INTERNAL_SERVER_ERROR) })
+	@PutMapping(value = "/v1/user/{userId}")
+	public ResponseEntity<CommonResponse> updateUser(@RequestBody CreateUserRequest createUserRequest,
+													 @PathVariable(name = USER_ID) String userId,
+													 @RequestHeader(name = ADMIN_USER_ID) String adminUserId,
+													 @RequestHeader(name = REQUEST_ID_HEADER) String requestId,
+													 @RequestHeader(name = USER_GROUP, required = false) String userGroup ) {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
-
-		logger.info("Start execute method getCustomerids");
+		logger.info("Start execute method updateUser: CreateUserRequest: {} RequestId: {} AdminUserID: {} UserID: {} UserGroup: {}",
+				createUserRequest ,requestId ,adminUserId ,userId ,userGroup);
 		CommonResponse commonResponse = new CommonResponse();
-		UserCommonResponse userCommonResponse ;
-		UserResponse userResponse = new UserResponse();
-		List<UserCommonResponse> userCommonResponseList =  new ArrayList<>();
-		if (StringUtils.isEmpty(userId)) {
-			logger.error(invalidUserLoggingMsg, userId);
-			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
-					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
-							LocaleContextHolder.getLocale()),
-					ErrorCode.INVALID_USER_ID);
-		} else {
+//		commonResponse =  inputValidator.validateRequest(createUserRequest, userId);
+//		if(commonResponse != null){
+//			logger.info("CreateUser method validation response: {}",
+//					ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
+//			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+//		}else {
 			try {
-//				logger.debug("Fetch Customerids by CompanyId: {}", companyId);
 				if (StringUtils.isEmpty(userGroup)) {
 					userGroup = COMMON_USER_GROUP;
 				}
-				List<UserMst> allUsers = userService.getUseres(userId, userGroup, requestId);
-				CompanyUserResponse companyUserResponse;
-				UserFeaturesResponse userFeaturesResponse;
-
-				for (int i=0; allUsers.size()>i;i++){
-					userCommonResponse = new UserCommonResponse();
-					List<CompanyUser> companyUsers = allUsers.get(i).getCompanyUsers();
-
-					List<CompanyUserResponse> companyUserResponseList = new ArrayList<>();
-					for (int y=0; companyUsers.size()>y;y++){
-						companyUserResponse = new CompanyUserResponse();
-						List<UserFeatures> userFeatures = companyUsers.get(y).getUserFeatures();
-
-						List<UserFeaturesResponse> userFeaturesResponseList = new ArrayList<>();
-						for (int z=0; userFeatures.size()>z;z++){
-							userFeaturesResponse = new UserFeaturesResponse();
-							userFeaturesResponse.setId(userFeatures.get(z).getId());
-							userFeaturesResponse.setCreatedBy(userFeatures.get(z).getCreatedBy());
-							userFeaturesResponse.setCreatedDate(userFeatures.get(z).getCreatedDate());
-							userFeaturesResponse.setLastUpdatedBy(userFeatures.get(z).getLastUpdatedBy());
-							userFeaturesResponse.setLastUpdatedDate(userFeatures.get(z).getLastUpdatedDate());
-							userFeaturesResponse.setLastVerifiedBy(userFeatures.get(z).getLastVerifiedBy());
-							userFeaturesResponse.setLastVerifiedDate(userFeatures.get(z).getLastVerifiedDate());
-							userFeaturesResponse.setUserGroup(userFeatures.get(z).getUserGroup());
-							userFeaturesResponseList.add(z, userFeaturesResponse);
-						}
-						companyUserResponse.setId(companyUsers.get(y).getId());
-						companyUserResponse.setStatus(companyUsers.get(y).getStatus());
-						companyUserResponse.setRecordStatus(companyUsers.get(y).getRecordStatus());
-						companyUserResponse.setRole(companyUsers.get(y).getRole());
-						companyUserResponse.setIsPrimeryUser(companyUsers.get(y).getIsPrimeryUser());
-						companyUserResponse.setRemark(companyUsers.get(y).getRemark());
-						companyUserResponse.setCreatedBy(companyUsers.get(y).getCreatedBy());
-						companyUserResponse.setCreatedDate(companyUsers.get(y).getCreatedDate());
-						companyUserResponse.setLastUpdatedBy(companyUsers.get(y).getLastUpdatedBy());
-						companyUserResponse.setLastUpdatedDate(companyUsers.get(y).getLastUpdatedDate());
-						companyUserResponse.setLastVerifiedBy(companyUsers.get(y).getLastVerifiedBy());
-						companyUserResponse.setLastVerifiedDate(companyUsers.get(y).getLastVerifiedDate());
-						companyUserResponse.setUserFeatures(userFeaturesResponseList);
-						companyUserResponseList.add(y,companyUserResponse);
-
-
-					}
-					userCommonResponse.setId(allUsers.get(i).getId());
-					userCommonResponse.setUserName(allUsers.get(i).getUserName());
-					userCommonResponse.setBranch(allUsers.get(i).getBranch());
-					userCommonResponse.setRemark(allUsers.get(i).getRemark());
-					userCommonResponse.setRecordStatus(allUsers.get(i).getRecordStatus());
-					userCommonResponse.setStatus(allUsers.get(i).getStatus());
-					userCommonResponse.setCreatedBy(allUsers.get(i).getCreatedBy());
-					userCommonResponse.setCreatedDate(allUsers.get(i).getCreatedDate());
-					userCommonResponse.setLastUpdatedBy(allUsers.get(i).getLastUpdatedBy());
-					userCommonResponse.setLastUpdatedDate(allUsers.get(i).getLastUpdatedDate());
-					userCommonResponse.setLastVerifiedBy(allUsers.get(i).getLastVerifiedBy());
-					userCommonResponse.setLastVerifiedDate(allUsers.get(i).getLastVerifiedDate());
-					userCommonResponse.setCompanyUsers(companyUserResponseList);
-					userCommonResponseList.add(i,userCommonResponse);
-
-				}
-
-//				userCommonResponseList.set(userCommonResponse)
-				userResponse.setUserResponseList(userCommonResponseList);
-				userResponse.setReturnCode(HttpStatus.OK.value());
-				userResponse.setReturnMessage("Successfully retrieved the User");
-				commonResponse.setReturnCode(200);
+				commonResponse = userService.updateTempUser(createUserRequest, userId, userGroup, requestId, adminUserId);
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
-				logger.error("Error occured while getCustomerids for {}.", e);
-				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+				logger.info("Error occurred while updating Company for {}.", e.getMessage());
+				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						e.getErrorCode());
 			} catch (RecordNotFoundException e) {
-				logger.info("RecordNotFoundException occured while getCustomerids for {}.", e.getMessage());
+				logger.info("RecordNotFoundException occurred while updating Company for {}.", e.getMessage());
 				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
 			} catch (Exception e) {
-				logger.error("Error occured while getCustomerids for {}.", e);
+				logger.error("Unknown Error occurred while updating Company for {}.", e.toString());
 				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
 			}
+			long endTime = System.currentTimeMillis();
+			logger.info("updateCompany rate: avg_resp={}", (endTime - startTime));
+			MDC.clear();
+			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+//		}
+	}
 
+	@ApiOperation(value = "Get Auth pending User List", nickname = "Get Auth pending User List", notes = "Get Auth pending User List.", httpMethod = "GET")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Fetching Auth pending User list successful", response = ApprovalPendingUserResponse.class),
+			@ApiResponse(code = 400, message = "Get Auth pending user list fail", response = CommonResponse.class),
+			@ApiResponse(code = 500, message = "Internal server error", response = CommonResponse.class) })
+	@GetMapping("/v1/user/requests")
+	public ResponseEntity<CommonResponse> getPendingAuthUsers(
+			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
+			@RequestHeader(name = USER_ID) String userId,
+			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
+            @RequestParam(name = "approvalStatus", required = false) String approvalStatus) {
+		MDC.put(REQUEST_ID_HEADER, requestId);
+		long startTime = System.currentTimeMillis();
+		logger.info("Start execute method getPendingAuthUser's");
+		CommonResponse commonResponse;
+		if (StringUtils.isEmpty(userId)) {
+			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+					messageSource.getMessage(ErrorCode.INVALID_USER_ID, new Object[] { userId },
+							LocaleContextHolder.getLocale()),
+					ErrorCode.INVALID_USER_ID);
+		} else {
+			try {
+				logger.debug("Fetch Pending auth Customer's");
+				if (StringUtils.isEmpty(userGroup)) {
+					userGroup = COMMON_USER_GROUP;
+				}
+				commonResponse = userService.getPendingAuthUseres(userId, userGroup, approvalStatus);
+				logger.info(commonResponse.getReturnMessage());
+			} catch (SystemException e) {
+				logger.error("Error occurred while getPendingAuthUser's for {}.", e.toString());
+				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+						e.getErrorCode());
+			} catch (Exception e) {
+				logger.error("Error occurred while getPendingAuthUser's for {}.", e.toString());
+				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+						ErrorCode.UNKNOWN_ERROR);
+			}
 		}
 		long endTime = System.currentTimeMillis();
-		logger.info("getCustomerids rate: avg_resp={}", (endTime - startTime));
+		logger.info("getPendingAuthUser's rate: avg_resp={}", (endTime - startTime));
 		MDC.clear();
-//		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(userResponse);
-		return new ResponseEntity<>(userResponse, HttpStatus.OK);
-//		return ResponseEntity<>(userResponse.HttpStatus.OK);
+		return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
 	}
-//
-//	@ApiOperation(value = "Get Auth pending User List", nickname = "Get Auth pending User List", notes = "Get Auth pending User List.", httpMethod = "GET")
-//	@ApiResponses(value = {
-//			@ApiResponse(code = 200, message = "Fetching Auth pending User list successful", response = CommonGetListResponse.class),
-//			@ApiResponse(code = 400, message = "Get Auth pending Userlist fail", response = CommonResponse.class),
-//			@ApiResponse(code = 500, message = "Internal server error", response = CommonResponse.class) })
-//	@GetMapping("/v1/user/pending")
-//	public ResponseEntity<CommonResponse> getPendingAuthUseres(
-//			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
-//			@RequestHeader(name = "userId", required = true) String userId,
-//			@RequestHeader(name = "userGroup", required = false) String userGroup) {
-//		MDC.put(REQUEST_ID_HEADER, requestId);
-//		long startTime = System.currentTimeMillis();
-//
-//		logger.info("Start exicute method getPendingAuthUseres");
-//		CommonResponse commonResponse;
-//		if (StringUtils.isEmpty(userId)) {
-//			logger.error(invalidUserLoggingMsg, userId);
-//			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
-//					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
-//							LocaleContextHolder.getLocale()),
-//					ErrorCode.INVALID_USER_ID);
-//		} else {
-//			try {
-//				logger.debug("Fetch Pending auth Customerids");
-//				if (StringUtils.isEmpty(userGroup)) {
-//					userGroup = COMMON_USER_GROUP;
-//				}
-//				commonResponse = userService.getPendingAuthUseres(userId, userGroup, requestId);
-//				logger.info(commonResponse.getReturnMessage());
-//			} catch (SystemException e) {
-//				logger.error("Error occured while getPendingAuthUseres for {}.", e);
-//				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
-//						e.getErrorCode());
-//			} catch (Exception e) {
-//				logger.error("Error occured while getPendingAuthUseres for {}.", e);
-//				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
-//						ErrorCode.UNKNOWN_ERROR);
-//			}
-//
-//		}
-//		long endTime = System.currentTimeMillis();
-//		logger.info("getPendingAuthUseres rate: avg_resp={}", (endTime - startTime));
-//		MDC.clear();
-//		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
-//	}
-//
-//	@ApiOperation(value = "Delete User API", nickname = "Delete User API", notes = "Delete User API", httpMethod = "DELETE")
-//	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully deleted", response = CommonResponse.class),
-//			@ApiResponse(code = 404, message = "Resource not found"),
-//			@ApiResponse(code = 400, message = "Input parameters are not valid"),
-//			@ApiResponse(code = 500, message = "Internal server error") })
-//	@DeleteMapping(value = "/v1/user")
-//	public ResponseEntity<CommonResponse> deletUser(
-//			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
-//			@RequestHeader(name = "userId", required = true) String userId,
-//			@RequestHeader(name = "userGroup", required = false) String userGroup,
-//			@RequestBody DeleteUserRequest deleteUserRequest) {
-//		MDC.put(REQUEST_ID_HEADER, requestId);
-//		long startTime = System.currentTimeMillis();
-//
-//		logger.info("Start exicute method deletUser");
-//		CommonResponse commonResponse;
-//		if (StringUtils.isEmpty(userId)) {
-//			logger.error(invalidUserLoggingMsg, userId);
-//			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
-//					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
-//							LocaleContextHolder.getLocale()),
-//					ErrorCode.INVALID_USER_ID);
-//		} else {
-//			try {
-//				logger.debug("Delete User : {} of Company : {}", deleteUserRequest.getUserId(),
-//						deleteUserRequest.getCompanyId());
-//				if (StringUtils.isEmpty(userGroup)) {
-//					userGroup = COMMON_USER_GROUP;
-//				}
-//				commonResponse = userService.deleteUser(deleteUserRequest, userId, userGroup, requestId);
-//				logger.info(commonResponse.getReturnMessage());
-//			} catch (SystemException e) {
-//				logger.error("Error occured while deletCustomerById for {}.", e);
-//				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
-//						e.getErrorCode());
-//			} catch (Exception e) {
-//				logger.error("Error occured while deletCustomerById for {}.", e);
-//				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//						messageSource.getMessage(ErrorCode.UNKNOWN_ERROR, null, LocaleContextHolder.getLocale())
-//								+ e.getMessage(),
-//						ErrorCode.UNKNOWN_ERROR);
-//			}
-//
-//		}
-//		long endTime = System.currentTimeMillis();
-//		logger.info("deletCustomerById rate: avg_resp={}", (endTime - startTime));
-//		MDC.clear();
-//		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
-//	}
-//
-//	@ApiOperation(value = "Update User request", nickname = "Update User", notes = "Update User Request.", httpMethod = "PUT")
-//	@ApiResponses(value = {
-//			@ApiResponse(code = 200, message = "User updated successfully", response = CommonResponse.class),
-//			@ApiResponse(code = 404, message = "Resource not found"),
-//			@ApiResponse(code = 400, message = "Input parameters are not valid"),
-//			@ApiResponse(code = 500, message = "Internal server error") })
-//	@PutMapping(value = "/v1/user/{companyId}/{userId}")
-//	public ResponseEntity<CommonResponse> updateUser(@RequestBody @Valid UpdateUserRequest updateUserRequest,
-//			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
-//			@RequestHeader(name = "userId", required = true) String userId,
-//			@RequestHeader(name = "userGroup", required = false) String userGroup,
-//			@PathVariable("companyId") String companyId, @PathVariable("userId") String userId) {
-//		MDC.put(REQUEST_ID_HEADER, requestId);
-//		long startTime = System.currentTimeMillis();
-//
-//		logger.info("Start exicute method updateUser");
-//		CommonResponse commonResponse;
-//		if (StringUtils.isEmpty(userId)) {
-//			logger.error(invalidUserLoggingMsg, userId);
-//			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
-//					messageSource.getMessage(String.valueOf(ErrorCode.INVALID_USER_ID), new Object[] { userId },
-//							LocaleContextHolder.getLocale()),
-//					ErrorCode.INVALID_USER_ID);
-//		} else {
-//			try {
-//				logger.debug("Update User (CompId: {}, UserId: {}).", companyId, userId);
-//				if (StringUtils.isEmpty(userGroup)) {
-//					userGroup = COMMON_USER_GROUP;
-//				}
-//				updateUserRequest.setCompanyId(companyId);
-//				updateUserRequest.setUserId(userId);
-//				commonResponse = userService.updateTempCompany(updateUserRequest, userId, userGroup, requestId);
-//				logger.info(commonResponse.getReturnMessage());
-//			} catch (SystemException e) {
-//				logger.info("Error occured while updateUser for {}.", e.getMessage());
-//				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
-//						e.getErrorCode());
-//			} catch (RecordNotFoundException e) {
-//				logger.info("RecordNotFoundException occured while updateUser for {}.", e.getMessage());
-//				commonResponse = new CommonResponse(HttpStatus.NOT_FOUND.value(), e.getMessage(), e.getErrorCode());
-//			} catch (Exception e) {
-//				logger.error("Unknown Error occured while updateUser for {}.", e);
-//				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
-//						ErrorCode.UNKNOWN_ERROR);
-//			}
-//
-//		}
-//		long endTime = System.currentTimeMillis();
-//		logger.info("updateUser rate: avg_resp={}", (endTime - startTime));
-//		MDC.clear();
-//		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
-//	}
+
+	@ApiOperation(value = "Get User By CompanyID & RecordStatus API", nickname = "Get User By CompanyID & RecordStatus API", notes = "Get User By CompanyID & RecordStatus API", httpMethod = "GET")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully Fetched", response = UserResponseList.class),
+			@ApiResponse(code = 404, message = "Resource not found"),
+			@ApiResponse(code = 400, message = "Input parameters are not valid"),
+			@ApiResponse(code = 500, message = "Internal server error")})
+	@GetMapping(value = "/v1/user")
+	public ResponseEntity<UserResponseList> getUserById(
+			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
+			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
+			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
+			@RequestParam(name = "companyId", required = false) String companyId,
+			@RequestParam(name = "recordStatus", required = false) RecordStatuUsersEnum recordStatus){
+		MDC.put(REQUEST_ID_HEADER, requestId);
+		long startTime = System.currentTimeMillis();
+        UserResponseList userListResponse = new UserResponseList();
+		CommonResponse commonResponse = new CommonResponse();
+		try {
+			userListResponse = userService.getUserList(companyId, recordStatus);
+			logger.info(userListResponse.getReturnMessage());
+		} catch (SystemException e) {
+			logger.error("Error occurred while getUserById for {}.", e.toString());
+			commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+					e.getErrorCode());
+		} catch (Exception e) {
+			logger.error("Error occurred while getUserById for {}.", e.toString());
+			commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+					ErrorCode.UNKNOWN_ERROR);
+		}
+		long endTime = System.currentTimeMillis();
+		logger.info("getUserById rate: avg_resp={}", (endTime - startTime));
+		MDC.clear();
+		return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(userListResponse.getReturnCode()))).body(userListResponse);
+	}
+
+	@ApiOperation(value = "Delete User API", nickname = "Delete User API", notes = "Delete User API", httpMethod = "DELETE")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully deleted", response = CommonResponse.class),
+			@ApiResponse(code = 404, message = "Resource not found"),
+			@ApiResponse(code = 400, message = "Input parameters are not valid"),
+			@ApiResponse(code = 500, message = "Internal server error") })
+	@DeleteMapping(value = "/v1/user")
+	public ResponseEntity<CommonResponse> deletUser(
+			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
+            @RequestHeader(name = USER_GROUP, required = false) String userGroup,
+			@RequestHeader(name = USER_ID) String userId,
+            @RequestHeader(name = ADMIN_USER_ID) String adminUserId,
+			@RequestBody DeleteUserRequest deleteUserRequest) {
+		MDC.put(REQUEST_ID_HEADER, requestId);
+		long startTime = System.currentTimeMillis();
+		logger.info("Start execute method deleteUser");
+		CommonResponse commonResponse;
+		if (StringUtils.isEmpty(userId)) {
+			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+					messageSource.getMessage(ErrorCode.INVALID_USER_ID, new Object[] { userId },
+							LocaleContextHolder.getLocale()),
+					ErrorCode.INVALID_USER_ID);
+            logger.error("UserID IsEmpty response: {} userID: {}", commonResponse, userId);
+		} else {
+			try {
+				commonResponse = userService.deleteUser(userId, requestId, userGroup, adminUserId, deleteUserRequest);
+				logger.info(commonResponse.getReturnMessage());
+			} catch (SystemException e) {
+				logger.error("Error occurred while deleteUserById for {}.", e.toString());
+				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+						e.getErrorCode());
+			} catch (Exception e) {
+				logger.error("Error occurred while deleteUserById for {}.", e.toString());
+				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+						messageSource.getMessage(ErrorCode.UNKNOWN_ERROR, new Object[] { e.toString() }, LocaleContextHolder.getLocale())
+								+ e.getMessage(),
+						ErrorCode.UNKNOWN_ERROR);
+			}
+		}
+		long endTime = System.currentTimeMillis();
+		logger.info("deleteUserById rate: avg_resp={}", (endTime - startTime));
+		MDC.clear();
+		return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+	}
+
+	@ApiOperation(value = "Get User By UserID API", nickname = "Get User By UserID API", notes = "Get User By UserID API", httpMethod = "GET")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully Fetched", response = UserListResponseByUserID.class),
+			@ApiResponse(code = 404, message = "Resource not found"),
+			@ApiResponse(code = 400, message = "Input parameters are not valid"),
+			@ApiResponse(code = 500, message = "Internal server error")})
+	@GetMapping(value = "/v1/user/{userId}")
+	public ResponseEntity<UserListResponseByUserID> getUserByUserId(
+			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
+			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
+			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
+			@PathVariable(name = USER_ID, required = false) String userId){
+
+		MDC.put(REQUEST_ID_HEADER, requestId);
+		long startTime = System.currentTimeMillis();
+		UserListResponseByUserID userListResponse = new UserListResponseByUserID();
+		try {
+			userListResponse = userService.getUserListByUserID(userId);
+			logger.info(userListResponse.getReturnMessage());
+		} catch (SystemException e) {
+			logger.error("Error occurred while getUserById for {}.", e.toString());
+            userListResponse = new UserListResponseByUserID(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+					e.getErrorCode());
+		} catch (Exception e) {
+			logger.error("Error occurred while getUserById for {}.", e.toString());
+            userListResponse = new UserListResponseByUserID(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+					ErrorCode.UNKNOWN_ERROR);
+		}
+		long endTime = System.currentTimeMillis();
+		logger.info("getUserById rate: avg_resp={}", (endTime - startTime));
+		MDC.clear();
+		return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(userListResponse.getReturnCode()))).body(userListResponse);
+	}
+
+	@ApiOperation(value = "Change status block or active", nickname = "Change status block or active", notes = "Change status block or active", httpMethod = "PATCH")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully Fetched", response = CommonResponse.class),
+			@ApiResponse(code = 404, message = "Resource not found"),
+			@ApiResponse(code = 400, message = "Input parameters are not valid"),
+			@ApiResponse(code = 500, message = "Internal server error")})
+	@PatchMapping(value = "/v1/user/{companyId}/{userId}")
+	public ResponseEntity<CommonResponse> setBlockActive(
+			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
+			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
+			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
+			@PathVariable(name = USER_ID, required = false) String userId,
+			@PathVariable(name = "companyId", required = false) String companyId,
+			@RequestBody BlockRequest blockRequest){
+		MDC.put(REQUEST_ID_HEADER, requestId);
+		long startTime = System.currentTimeMillis();
+		CommonResponse commonResponse = new CommonResponse();
+
+		if (StringUtils.isEmpty(userId)) {
+			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
+					messageSource.getMessage(ErrorCode.INVALID_USER_ID, new Object[] { userId },
+							LocaleContextHolder.getLocale()),
+					ErrorCode.INVALID_USER_ID);
+			logger.error("UserID IsEmpty response: {} userID: {}", commonResponse, userId);
+		} else {
+			try {
+				commonResponse = userService.changeStatus(userId, companyId, requestId, userGroup, adminUserId, blockRequest);
+				logger.info(commonResponse.getReturnMessage());
+			} catch (SystemException e) {
+				logger.error("Error occurred while setBlockActive for {}.", e.toString());
+				commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+						e.getErrorCode());
+			} catch (Exception e) {
+				logger.error("Error occurred while setBlockActive for {}.", e.toString());
+				commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+						messageSource.getMessage(ErrorCode.UNKNOWN_ERROR, new Object[] { e.toString() }, LocaleContextHolder.getLocale())
+								+ e.getMessage(),
+						ErrorCode.UNKNOWN_ERROR);
+			}
+		}
+		long endTime = System.currentTimeMillis();
+		logger.info("deleteUserById rate: avg_resp={}", (endTime - startTime));
+		MDC.clear();
+		return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+	}
+
 }

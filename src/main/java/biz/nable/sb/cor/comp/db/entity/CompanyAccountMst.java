@@ -1,6 +1,7 @@
 package biz.nable.sb.cor.comp.db.entity;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -72,5 +73,5 @@ public class CompanyAccountMst extends Auditable {
 
 	@OneToMany(mappedBy = "companyUser")
 	@JsonManagedReference
-	private List<UserAccount> userAccounts;
+	private Set<UserAccount> userAccounts;
 }

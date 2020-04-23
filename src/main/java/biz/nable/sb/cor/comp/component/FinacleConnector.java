@@ -36,9 +36,13 @@ public class FinacleConnector {
 		requestType.setController(retrieveFinacleBean.getController());
 		requestType.setCustId(custId);
 		try {
+			logger.info("Success Response: {} ", blzAdapter.getCustomerInfo(iibFinacleIntegrationUrl,
+					objectFactory.createGetCustomerInfoRequest(requestType)));
 			return blzAdapter.getCustomerInfo(iibFinacleIntegrationUrl,
 					objectFactory.createGetCustomerInfoRequest(requestType));
+
 		} catch (Exception e) {
+			logger.error("Response Error:{} ClassName: {} MethodName: {}", e ,"FinacleConnector", "getCustomerInfo");
 			throw new FinacleCallException("getCustomerInfo finacle call error", e);
 		}
 

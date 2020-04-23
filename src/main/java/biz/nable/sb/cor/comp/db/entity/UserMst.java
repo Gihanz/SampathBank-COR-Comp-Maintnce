@@ -1,47 +1,58 @@
 package biz.nable.sb.cor.comp.db.entity;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-
-import org.hibernate.validator.constraints.Length;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
-import biz.nable.sb.cor.common.utility.StatusEnum;
-import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import biz.nable.sb.cor.comp.utility.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Getter
 @Setter
 @ToString
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserMst extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	@Id
+
+    @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_MST_SEQ")
 	@SequenceGenerator(name = "USER_MST_SEQ", sequenceName = "SB_COR_USER_MST_SEQ", allocationSize = 1)
-	private Long id;
+	private Long userId;
+
 	private String userName;
 	private String designation;
 	private Long branch;
-	@Length(max = 1000)
-	private String remark;
-	private StatusEnum status;
-	private RecordStatusEnum recordStatus;
+	private StatusUserEnum status;
+	private RecordStatuUsersEnum recordStatus;
+	private UserType userType;
+	private CreateState iamCreateState;
+	private String companyId;
+	private String allAcctAccessFlg;
+	private String email;
+	private Long approvalId;
 
-	@OneToMany(mappedBy = "user")
+
+	@OneToMany(mappedBy = "linkId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JsonManagedReference
-	private List<CompanyUser> companyUsers;
+	private Set<UserLinkedCompany> userLinkedCompanies;
 
+
+	@OneToMany(mappedBy = "userMstAcc", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JsonManagedReference
+	private Set<UserPrimaryAccount> userPrimaryAccounts;
+
+
+	@OneToMany(mappedBy = "userMstFea", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JsonManagedReference
+	private Set<UserPrimaryFeature> userPrimaryFeatures;
 }

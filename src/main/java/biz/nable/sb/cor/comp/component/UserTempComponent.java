@@ -25,7 +25,7 @@ public class UserTempComponent {
 	}
 
 	@TempRecord(actionType = ActionTypeEnum.UPDATE)
-	public CommonResponseBean updateTempCompany(CommonRequestBean commonRequestBean, String requestId) {
+	public CommonResponseBean updateTempUser(CommonRequestBean commonRequestBean, String requestId) {
 		CommonResponseBean commonResponseBean = new CommonResponseBean();
 		commonResponseBean.setReturnCode(HttpStatus.OK.value());
 		return commonResponseBean;
@@ -42,10 +42,10 @@ public class UserTempComponent {
 	}
 
 	@TempRecord(actionType = ActionTypeEnum.DELETE)
-	public CommonResponseBean deleteBranchTemp(CommonRequestBean commonRequestBean, String requestId) {
+	public CommonResponseBean deleteUserTemp(CommonRequestBean commonRequestBean, String requestId) {
 		CommonResponseBean commonResponseBean = new CommonResponseBean();
 		commonResponseBean.setReturnCode(HttpStatus.OK.value());
-		return commonResponseBean;
+  		return commonResponseBean;
 	}
 
 	@Approve

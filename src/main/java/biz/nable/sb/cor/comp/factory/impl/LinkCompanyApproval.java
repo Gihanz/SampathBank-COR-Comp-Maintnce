@@ -45,6 +45,7 @@ public class LinkCompanyApproval implements CommonApprovalTemplate {
 
 	@Autowired
 	private CommonConverter commonConverter;
+
 	@Autowired
 	private MessageSource messageSource;
 
@@ -167,7 +168,6 @@ public class LinkCompanyApproval implements CommonApprovalTemplate {
 		logger.info("Start build companyCummData");
 		companyCummData.setCustomerId(linkCompanyRequest.getCustomerId());
 		companyCummData.setParentCompanyId(linkCompanyRequest.getParentCompanyId());
-
 		return companyCummData;
 	}
 

@@ -18,6 +18,9 @@ public class ErrorCode {
 	public static final String NO_BRANCH_RECORD_FOUND = "B4043";
 	public static final String NO_USER_RECORD_FOUND = "B4044";
 	public static final String NO_FEATURE_RECORD_FOUND = "B4045";
+	public static final String NO_COMPANY_ACCOUNT_FOUND = "B4046";
+	public static final String USER_ALREADY_SAME_STATUS = "B4047";
+	public static final String NO_USER_LINK_COMPANY_RECORD_FOUND = "B4048";
 
 	public static final String OPARATION_SUCCESS = "B200";
 	public static final String RETRIVE_COMPANY_SUCCESS = "B201";
@@ -28,6 +31,7 @@ public class ErrorCode {
 	public static final String USER_RECORD_ALREADY_EXISTS = "B4094";
 
 	public static final String CUSTOMER_ID_ALREADY_LINK = "BCMT10";
+	public static final String USER_ID_ALREADY_LINK = "BCMT10";
 
 	// Runtime
 	public static final String UNKNOWN_ERROR = "T500";
