@@ -20,6 +20,7 @@ import java.util.Set;
 public class CreateUserRequest implements CommonTempBean {
 
 
+    private long userId;
     private String userName;
     private long branchCode;
     private String designation;

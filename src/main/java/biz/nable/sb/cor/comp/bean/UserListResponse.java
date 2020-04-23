@@ -12,7 +12,7 @@ import java.util.Date;
 @Builder
 public class UserListResponse  {
 
-    private Long id;
+    private Long userId;
     private String userName;
     private String designation;
     private Long branch;

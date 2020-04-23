@@ -24,6 +24,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
@@ -49,6 +50,9 @@ public class UserLinkCompanyApproval implements CommonApprovalTemplate {
 
     @Autowired
     private CommonConverter commonConverter;
+
+    @Value("${add.user.url}")
+    private String addUserURL;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -169,7 +173,8 @@ public class UserLinkCompanyApproval implements CommonApprovalTemplate {
         HttpEntity<InsertUpdateUserRequest> request = new HttpEntity<>(insertUpdateUserRequest, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String URL = "http://localhost:8080/v1/groups/user-batch";
+        String URL = addUserURL;
+//        String URL = "http://localhost:8080/v1/groups/user-batch";
         restTemplate.exchange(URL, HttpMethod.POST, request,CommonResponse.class);
     }
     private Set<UserCompanyAccount> setUserCompanyAccount(UserLinkRequest userLinkRequest, UserLinkedCompany userLinkedCompany){

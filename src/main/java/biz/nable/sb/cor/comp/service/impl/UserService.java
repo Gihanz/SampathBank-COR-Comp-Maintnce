@@ -27,6 +27,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
@@ -76,6 +77,9 @@ public class UserService {
 	@Autowired
 	CompanyFeaturesRepository companyFeaturesRepository;
 
+    @Value("${get.user.details.url}")
+    private String getUserDetailsURL;
+
 	private static final RequestTypeEnum REQUEST_TYPE = RequestTypeEnum.USER;
 
 	private static final String USER_HASH_TAG = "COMPANY_ID=";
@@ -116,8 +120,28 @@ public class UserService {
 			commonResponse.setReturnMessage(
 					messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
 		}else {
-			setCreateUserRequest(userGroup, requestId, adminUser, commonRequestBean, createUserRequest);
-			setCommonResponse(requestId, commonResponse, optional, commonRequestBean);
+            createUserRequest.setLastModifiedDate(new Date());
+            createUserRequest.setLastModifiedBy(adminUser);
+            createUserRequest.setUserId(optional.get().getUserId());
+            String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
+            String referenceNo;
+            if (createUserRequest.getPrimaryCompanyId() != null){
+                referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
+            }else{
+                referenceNo = requestId;
+            }
+            commonRequestBean.setCommonTempBean(createUserRequest);
+            commonRequestBean.setHashTags(hashTags);
+            commonRequestBean.setReferenceNo(referenceNo);
+            commonRequestBean.setRequestType(REQUEST_TYPE.name());
+            commonRequestBean.setUserGroup(userGroup);
+            commonRequestBean.setUserId(userId);
+            CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
+            optional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
+            userMstRepository.save(optional.get());
+            commonResponse.setErrorCode(commonResponseBean.getErrorCode());
+            commonResponse.setReturnCode(commonResponseBean.getReturnCode());
+            commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
 			logger.info("================== End update user request =================");
 		}
 		return commonResponse;
@@ -130,6 +154,7 @@ public class UserService {
 		List<TempDto> tempResponseList = new ArrayList<>();
 		try{
 			tempResponseList = userTempComponent.getAuthPendingRecord(bean).getTempList();
+
 			if (tempResponseList == null){
 				logger.info(
 						messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
@@ -141,7 +166,7 @@ public class UserService {
 		}catch (Exception exception){
 			logger.error("Error in get auth pending record: {}", exception.toString());
 		}
-		Set<String> userReferenceList = new HashSet<>();
+		Set<Long> userReferenceList = new HashSet<>();
 		Set<UserListResponseBean> userListResponseBeanSet = new HashSet<>();
 		tempResponseList.forEach(tempDto -> {
 			UserListResponseBean userListResponseBean =  new UserListResponseBean();
@@ -160,7 +185,8 @@ public class UserService {
 			ModifiedUserResponse modifiedUserResponse = commonConverter.mapToPojo(tempDto.getRequestPayload(), ModifiedUserResponse.class);
 			userListResponseBean.setModifiedUserResponseSet(modifiedUserResponse);
 			if (!ActionTypeEnum.CREATE.equals(tempDto.getActionType())) {
-				userReferenceList.add(tempDto.getReferenceNo());
+				long userID = Long.parseLong(tempDto.getRequestPayload().get("userId").toString());
+				userReferenceList.add(userID);
 			}
 			Optional.of(userReferenceList).ifPresent(userList -> {
 				Set<UserMst> userMstSet = userMstRepository.findByUserIdIn(userReferenceList);
@@ -214,19 +240,10 @@ public class UserService {
 		userMstSet.forEach(value -> {
 			try {
 				BeanUtils.copyProperties(originalUserResponse, value);
-//				UserListResponseBean userListResponseBean = userListResponseBeanSet.stream()
-//						.filter(userListResponseValue -> userListResponseValue.getId().equals(originalUserResponse.getId())).findAny().orElse(null);
 				UserListResponseBean userListResponseBean = new UserListResponseBean();
-//				Set<UserPrimaryAccount> userAccount = new HashSet<>(value.getUserPrimaryAccounts());
-//				Set<UserPrimaryFeature> userFeature = new HashSet<>(value.getUserPrimaryFeatures());
-				Set<UserAccountsBean> userAccountsBeanSet  = Collections.singleton((UserAccountsBean) value.getUserPrimaryAccounts());
-				Set<UserFeaturesBean> userFeaturesBeanSet  = Collections.singleton((UserFeaturesBean) value.getUserPrimaryFeatures());
-				originalUserResponse.setUserAccounts(userAccountsBeanSet);
-				originalUserResponse.setUserFeatures(userFeaturesBeanSet);
+				originalUserResponse.setUserAccounts(setUserAccountBean(value.getUserPrimaryAccounts()));
+				originalUserResponse.setUserFeatures(setUserFeatureBean(value.getUserPrimaryFeatures()));
 				originalUserResponse.setUserWorkFlowGroupBeans(null);
-//				Optional.ofNullable(userListResponseBean).ifPresent(response -> {
-//					userListResponseBean.setOriginalUserResponseSet(originalUserResponse);
-//				});
 
 			}catch (IllegalAccessException | InvocationTargetException exception){
 				throw new SystemException(
@@ -238,10 +255,10 @@ public class UserService {
 		return originalUserResponse;
 	}
 
-	public UserResponseList getUserList(String companyId, String recordStatus) {
+	public UserResponseList getUserList(String companyId, RecordStatuUsersEnum recordStatus) {
 		logger.info("================== Start get user list request =================");
         UserResponseList userResponseListSet =  new UserResponseList();
-		UserListResponse userListResponse = new UserListResponse();
+
 		Set<UserMst> userMstSet;
 		if (companyId != null && recordStatus == null){
 			userMstSet = userMstRepository.findByCompanyId(companyId);
@@ -250,26 +267,34 @@ public class UserService {
 		}else {
 			userMstSet = userMstRepository.findAll();
 		}
-		userMstSet.forEach(value -> {
-			userListResponse.builder()
-					.id(value.getUserId())
-					.userName(value.getUserName())
-					.designation(value.getDesignation())
-					.branch(value.getBranch())
-					.recordStatus(value.getRecordStatus())
-					.status(value.getStatus())
-					.email(value.getEmail())
-					.iamCreateState(value.getIamCreateState())
-					.userType(value.getUserType())
-					.createdBy(value.getCreatedBy())
-					.createdDate(value.getCreatedDate())
-					.lastUpdatedBy(value.getLastUpdatedBy())
-					.lastUpdatedDate(value.getLastUpdatedDate())
-					.lastVerifiedBy(value.getLastVerifiedBy())
-					.lastVerifiedDate(value.getLastVerifiedDate())
-					.build();
+        Set<UserListResponse> userListResponseSet = new HashSet<>();
+		userMstSet.forEach( values -> {
+            AtomicReference<UserListResponse> userListResponse = new AtomicReference<>(new UserListResponse());
+                 userListResponse.set(UserListResponse.builder()
+                .userId(values.getUserId())
+                .userName(values.getUserName())
+                .designation(values.getDesignation())
+                .branch(values.getBranch())
+                .recordStatus(values.getRecordStatus())
+                .status(values.getStatus())
+                .email(values.getEmail())
+                .iamCreateState(values.getIamCreateState())
+                .userType(values.getUserType())
+                .createdBy(values.getCreatedBy())
+                .createdDate(values.getCreatedDate())
+                .lastUpdatedBy(values.getLastUpdatedBy())
+                .lastUpdatedDate(values.getLastUpdatedDate())
+                .lastVerifiedBy(values.getLastVerifiedBy())
+                .lastVerifiedDate(values.getLastVerifiedDate())
+                .build());
+            userListResponseSet.add(userListResponse.get());
 		});
-        userResponseListSet.setUserListResponses(userListResponse);
+
+        userResponseListSet.setUserListResponses(userListResponseSet);
+        userResponseListSet.setReturnCode(HttpStatus.OK.value());
+        userResponseListSet.setErrorCode(ErrorCode.OPARATION_SUCCESS);
+        userResponseListSet.setReturnMessage(
+                messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, new Object[] {ErrorDescription.SUCCESS}, LocaleContextHolder.getLocale()));
 		logger.info("================== End get user list response =================");
 		return userResponseListSet;
 	}
@@ -279,7 +304,7 @@ public class UserService {
         Optional<UserMst> userMstOptional = userMstRepository.findByUserId(Long.parseLong(userId));
         CommonResponse commonResponse = new CommonResponse();
         CommonRequestBean commonRequestBean = new CommonRequestBean();
-        CreateUserRequest createUserRequest = new CreateUserRequest();
+        CreateUserRequest createUserRequest;
         if (!userMstOptional.isPresent()) {
             logger.info(
                     messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
@@ -288,8 +313,21 @@ public class UserService {
             commonResponse.setReturnMessage(
                     messageSource.getMessage(ErrorCode.NO_USER_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
         }else {
-			setModifyRequest(userGroup, requestId, adminUserId, userMstOptional, commonRequestBean, createUserRequest);
-			CommonResponseBean commonResponseBean = userTempComponent.deleteBranchTemp(commonRequestBean, requestId);
+			String hashTags = USER_HASH_TAG.concat(String.valueOf(userMstOptional.get().getCompanyId()));
+			String referenceNo = null;
+			if (userMstOptional.get().getCompanyId() != null){
+				referenceNo = requestId.concat("-").concat(userMstOptional.get().getCompanyId());
+			}else{
+				referenceNo = requestId;
+			}
+			createUserRequest = setCreateUserRequest(userMstOptional);
+			commonRequestBean.setCommonTempBean(createUserRequest);
+			commonRequestBean.setHashTags(hashTags);
+			commonRequestBean.setReferenceNo(referenceNo);
+			commonRequestBean.setRequestType(REQUEST_TYPE.name());
+			commonRequestBean.setUserGroup(userGroup);
+			commonRequestBean.setUserId(String.valueOf(userMstOptional.get().getUserId()));
+			CommonResponseBean commonResponseBean = userTempComponent.deleteUserTemp(commonRequestBean, requestId);
 			userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.DELETE_PENDING);
             userMstRepository.save(userMstOptional.get());
             commonResponse.setErrorCode(commonResponseBean.getErrorCode());
@@ -300,6 +338,45 @@ public class UserService {
 		return commonResponse;
     }
 
+    private CreateUserRequest setCreateUserRequest(Optional<UserMst> userMstOptional){
+		CreateUserRequest createUserRequest = new CreateUserRequest();
+		createUserRequest.setUserId(userMstOptional.get().getUserId());
+		createUserRequest.setUserName(userMstOptional.get().getUserName());
+		createUserRequest.setDesignation(userMstOptional.get().getDesignation());
+		createUserRequest.setBranchCode(userMstOptional.get().getBranch());
+		createUserRequest.setUserName(userMstOptional.get().getUserName());
+		createUserRequest.setEmail(userMstOptional.get().getEmail());
+		createUserRequest.setUserType(userMstOptional.get().getUserType());
+		createUserRequest.setPrimaryCompanyId(userMstOptional.get().getCompanyId());
+		createUserRequest.setAllAccountAccessFlag(userMstOptional.get().getAllAcctAccessFlg());
+        createUserRequest.setUserAccountBeans(setUserAccountBean(userMstOptional.get().getUserPrimaryAccounts()));
+        createUserRequest.setUserFeatureBeans(setUserFeatureBean(userMstOptional.get().getUserPrimaryFeatures()));
+        createUserRequest.setCreateBy(userMstOptional.get().getCreatedBy());
+		createUserRequest.setCreateDate(userMstOptional.get().getCreatedDate());
+		createUserRequest.setLastModifiedBy(userMstOptional.get().getLastUpdatedBy());
+		createUserRequest.setLastModifiedDate(userMstOptional.get().getLastUpdatedDate());
+		createUserRequest.setLastVerifiedBy(userMstOptional.get().getLastVerifiedBy());
+		createUserRequest.setLastVerifiedDate(userMstOptional.get().getLastVerifiedDate());
+		return createUserRequest;
+	}
+    private Set<UserAccountsBean> userAccountsBeanSet = new HashSet<>();
+	private Set<UserAccountsBean> setUserAccountBean(Set<UserPrimaryAccount> userPrimaryAccounts){
+        UserAccountsBean userAccountsBean = new UserAccountsBean();
+        userPrimaryAccounts.forEach(values -> {
+            userAccountsBean.setAccountId(values.getAccountNo());
+            userAccountsBeanSet.add(userAccountsBean);
+        });
+       return userAccountsBeanSet;
+    }
+	private Set<UserFeaturesBean> userFeatureBeanSet = new HashSet<>();
+	private Set<UserFeaturesBean> setUserFeatureBean(Set<UserPrimaryFeature> userPrimaryFeatures){
+		UserFeaturesBean userFeatureBean = new UserFeaturesBean();
+		userPrimaryFeatures.forEach(values -> {
+			userFeatureBean.setFeatureId(values.getFeature());
+			userFeatureBeanSet.add(userFeatureBean);
+		});
+		return userFeatureBeanSet;
+	}
 	public UserListResponseByUserID getUserListByUserID(String userID) {
 		logger.info("================== Start get user list request =================");
 		UserListResponseByUserID userListResponseByUserID =  new UserListResponseByUserID();
@@ -359,10 +436,11 @@ public class UserService {
     public GetUserDetailsResponse callGetUsers(long userID){
         HttpHeaders headers = new HttpHeaders();
         RestTemplate restTemplate = new RestTemplate();
-        String URL = "http://localhost:8080/v1/groups/user-batch?userId={q}";
+        String URL = getUserDetailsURL;
 
         return restTemplate.getForObject(URL, GetUserDetailsResponse.class, userID);
     }
+    
 	private LinkedCompaniesBean setLinkedCompaniesBean(Optional<UserMst> userMst){
 		logger.info("================== Start set linked companies bean request =================");
 		AtomicReference<LinkedCompaniesBean> linkedCompaniesBean = new AtomicReference<>();
@@ -410,9 +488,9 @@ public class UserService {
 	public CommonResponse changeStatus(String userId,String companyId, String requestId, String userGroup, String adminUserId, BlockRequest blockRequest){
 		logger.info("================== Start change status request =================");
 		CommonResponse commonResponse = new CommonResponse();
-		Optional<UserMst> userMstOptional = userMstRepository.findByUserIdAndCompanyId(userId, companyId);
+		Optional<UserMst> userMstOptional = userMstRepository.findByUserIdAndCompanyId(Long.parseLong(userId), companyId);
 		CommonRequestBean commonRequestBean = new CommonRequestBean();
-		CreateUserRequest createUserRequest = new CreateUserRequest();
+		CreateUserRequest createUserRequest ;
 		if (userMstOptional.get().getRecordStatus().equals(blockRequest.getBlockedStatus())){
 			logger.info(
 					messageSource.getMessage(ErrorCode.USER_ALREADY_SAME_STATUS, null, LocaleContextHolder.getLocale()));
@@ -421,9 +499,31 @@ public class UserService {
 			commonResponse.setReturnMessage(
 					messageSource.getMessage(ErrorCode.USER_ALREADY_SAME_STATUS, null, LocaleContextHolder.getLocale()));
 		}else {
-			setModifyRequest(userGroup, requestId, adminUserId, userMstOptional, commonRequestBean, createUserRequest);
-			commonResponse = setCommonResponse(requestId, commonResponse, userMstOptional, commonRequestBean);
-		}
+            createUserRequest = setCreateUserRequest(userMstOptional);
+            createUserRequest.setLastModifiedDate(new Date());
+            createUserRequest.setLastModifiedBy(adminUserId);
+            createUserRequest.setUserId(userMstOptional.get().getUserId());
+            String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
+            String referenceNo;
+            if (createUserRequest.getPrimaryCompanyId() != null){
+                referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
+            }else{
+                referenceNo = requestId;
+            }
+            commonRequestBean.setCommonTempBean(createUserRequest);
+            commonRequestBean.setHashTags(hashTags);
+            commonRequestBean.setReferenceNo(referenceNo);
+            commonRequestBean.setRequestType(REQUEST_TYPE.name());
+            commonRequestBean.setUserGroup(userGroup);
+            commonRequestBean.setUserId(userId);
+            CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
+            userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
+            userMstOptional.get().setStatus(blockRequest.getBlockedStatus());
+            userMstRepository.save(userMstOptional.get());
+            commonResponse.setErrorCode(commonResponseBean.getErrorCode());
+            commonResponse.setReturnCode(commonResponseBean.getReturnCode());
+            commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
+        }
 		logger.info("================== End change status request =================");
 		return commonResponse;
 	}
@@ -431,7 +531,7 @@ public class UserService {
 	private CommonResponse setCommonResponse(String requestId, CommonResponse commonResponse, Optional<UserMst> userMstOptional,
 											 CommonRequestBean commonRequestBean) {
 		logger.info("================== Start set common response request =================");
-		CommonResponseBean commonResponseBean = userTempComponent.updateTempCompany(commonRequestBean, requestId);
+		CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
 		userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
 		userMstRepository.save(userMstOptional.get());
 		commonResponse.setErrorCode(commonResponseBean.getErrorCode());
@@ -470,13 +570,18 @@ public class UserService {
 		logger.info("================== Start set common request bean=================");
         CommonRequestBean commonRequestBean = new CommonRequestBean();
 		String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
-		String referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
+        String referenceNo = null;
+		if (createUserRequest.getPrimaryCompanyId() != null){
+             referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
+        }else{
+            referenceNo = requestId;
+        }
         commonRequestBean.setCommonTempBean(createUserRequest);
 		commonRequestBean.setHashTags(hashTags);
 		commonRequestBean.setReferenceNo(referenceNo);
 		commonRequestBean.setRequestType(REQUEST_TYPE.name());
 		commonRequestBean.setUserGroup(userGroup);
-		commonRequestBean.setUserId(createUserRequest.getUserName());
+		commonRequestBean.setUserId(String.valueOf(createUserRequest.getUserId()));
 		logger.info("================== End set common request bean=================");
 		return commonRequestBean;
 	}

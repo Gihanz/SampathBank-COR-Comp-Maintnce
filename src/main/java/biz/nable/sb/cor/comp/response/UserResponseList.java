@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Set;
 
 
 @Data
@@ -14,6 +15,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseList extends CommonResponse {
-    UserListResponse userListResponses;
+    Set<UserListResponse> userListResponses;
 }
 

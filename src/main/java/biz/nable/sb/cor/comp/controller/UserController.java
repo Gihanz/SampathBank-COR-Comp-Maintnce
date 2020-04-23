@@ -10,6 +10,7 @@ import biz.nable.sb.cor.comp.request.BlockRequest;
 import biz.nable.sb.cor.comp.request.DeleteUserRequest;
 import biz.nable.sb.cor.comp.response.*;
 import biz.nable.sb.cor.comp.utility.ErrorDescription;
+import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
 import biz.nable.sb.cor.comp.validator.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,7 +213,7 @@ public class UserController {
 			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
 			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
 			@RequestParam(name = "companyId", required = false) String companyId,
-			@RequestParam(name = "recordStatus", required = false) String recordStatus){
+			@RequestParam(name = "recordStatus", required = false) RecordStatuUsersEnum recordStatus){
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
         UserResponseList userListResponse = new UserResponseList();

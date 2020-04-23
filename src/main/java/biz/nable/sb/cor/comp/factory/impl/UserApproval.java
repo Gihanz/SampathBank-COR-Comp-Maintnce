@@ -24,6 +24,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
@@ -55,6 +56,10 @@ public class UserApproval implements CommonApprovalTemplate {
 
     @Autowired
     UserMstHistoryRepository userMstHistoryRepository;
+
+    @Value("${add.user.url}")
+    private String addUserURL;
+
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -139,12 +144,13 @@ public class UserApproval implements CommonApprovalTemplate {
             insertUpdateUserRequest.setGroups(groupsRequestSet);
 
             HttpHeaders headers = new HttpHeaders();
-            MediaType mediaType = new MediaType("application", "merge-patch+json");
 
             HttpEntity<InsertUpdateUserRequest> request = new HttpEntity<>(insertUpdateUserRequest, headers);
 
             RestTemplate restTemplate = new RestTemplate();
-            String URL = "http://localhost:8080/v1/groups/user-batch";
+
+            String URL;
+            URL = addUserURL;
             restTemplate.exchange(URL, HttpMethod.POST, request,CommonResponse.class);
 
         }catch (Exception exception){
@@ -153,6 +159,8 @@ public class UserApproval implements CommonApprovalTemplate {
     }
 
     private UserMst setUserMasterTable(ApprovalBean approvalBean, CreateUserRequest createUserRequest, UserMst userMst){
+
+        userMst.setUserId(createUserRequest.getUserId());
         userMst.setUserName(createUserRequest.getUserName());
         userMst.setDesignation(createUserRequest.getDesignation());
         userMst.setBranch(createUserRequest.getBranchCode());
@@ -161,7 +169,7 @@ public class UserApproval implements CommonApprovalTemplate {
         userMst.setCompanyId(createUserRequest.getPrimaryCompanyId());
         userMst.setAllAcctAccessFlg(createUserRequest.getAllAccountAccessFlag());
         userMst.setIamCreateState(CreateState.ACTIVATED);
-        userMst.setUserLinkedCompanies(null);
+//        userMst.setUserLinkedCompanies(null);
         userMst.setUserPrimaryAccounts(createUserRequest.getUserAccountBeans() != null ? setUserPrimaryAccount(createUserRequest, userMst) : null);
         userMst.setUserPrimaryFeatures(createUserRequest.getUserFeatureBeans() != null ? setUserPrimaryFeature(createUserRequest, userMst) : null);
         userMst.setApprovalId(Long.parseLong(approvalBean.getApprovalId()));
@@ -197,33 +205,43 @@ public class UserApproval implements CommonApprovalTemplate {
     private void updateUserMaster(ApprovalBean approvalBean, TempDto tempDto){
         logger.info("================== Start user updateUserMaster process =================");
         CreateUserRequest createUserRequest = commonConverter.mapToPojo(tempDto.getRequestPayload(),CreateUserRequest.class);
-        Optional<UserMst> userMasterResponse = userMstRepository.findByUserId(Long.parseLong(approvalBean.getReferenceId()));
-        UserMst userMst;
+        Optional<UserMst> userMasterResponse = userMstRepository.findByUserId(createUserRequest.getUserId());
+        UserMst userMst = new UserMst();
         if (!userMasterResponse.isPresent()) {
             throw new SystemException(
                     messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()),
                     ErrorCode.NO_COMPANY_RECORD_FOUND);
         }
-        userMst = userMasterResponse.get();
+//        userMst = userMasterResponse.get();
 
-        try {
-            BeanUtils.copyProperties(userMst, createUserRequest);
-            userMst = setUserMasterTable(approvalBean, createUserRequest, userMst);
-        }catch (Exception exception){
-            logger.error("createUserRequest to userMst data mapping error {}", exception.toString());
-            throw new SystemException(
-                    messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()),
-                    ErrorCode.DATA_COPY_ERROR);
-        }
+//        try {
+//            BeanUtils.copyProperties(userMst, createUserRequest);
+//            userMst = setUserMasterTable(approvalBean, createUserRequest, userMst);
+//        }catch (Exception exception){
+//            logger.error("createUserRequest to userMst data mapping error {}", exception.toString());
+//            throw new SystemException(
+//                    messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()),
+//                    ErrorCode.DATA_COPY_ERROR);
+//        }
+        userMst = setUserMasterTable(approvalBean, createUserRequest, userMst);
+        userMst.setCreatedBy(approvalBean.getEnteredBy());
+        userMst.setCreatedDate(approvalBean.getEnteredDate());
+        userMst.setLastUpdatedBy(createUserRequest.getLastModifiedBy());
+        userMst.setLastUpdatedDate(createUserRequest.getLastModifiedDate());
+        userMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
+
+        userMst.setLastVerifiedDate(new Date());
         logger.info("================== End user updateUserMaster process =================");
         userMstRepository.save(userMst);
-        Optional<UserMst> userMstOptional = userMstRepository.findByApprovalId(Long.parseLong(approvalBean.getApprovalId()));
+//        Optional<UserMst> userMstOptional = userMstRepository.findByApprovalId(Long.parseLong(approvalBean.getApprovalId()));
+        Optional<UserMst> userMstOptional = userMstRepository.findByUserId(userMst.getUserId());
         callUserCreation(userMstOptional, createUserRequest);
     }
 
     private void deleteFromUserMst(ApprovalBean approvalBean, TempDto tempDto) {
         logger.info("================== Start delete from user master process =================");
-        Set<UserMst> optionalUserMst = userMstRepository.findByCompanyId(approvalBean.getReferenceId());
+        long userID = Long.parseLong(tempDto.getRequestPayload().get("userId").toString());
+        Optional<UserMst> optionalUserMst = userMstRepository.findByUserId(userID);
         Set<UserMst> userMst = new HashSet<>();
         UserMstHistory userMstHistory = new UserMstHistory();
         UserMst userMstlist = new UserMst();
@@ -247,7 +265,7 @@ public class UserApproval implements CommonApprovalTemplate {
                     ErrorCode.DATA_COPY_ERROR);
         }
         userMstHistoryRepository.save(userMstHistory);
-        userMstRepository.delete(userMstlist);
+        userMstRepository.deleteById(optionalUserMst.get().getUserId());
         logger.info("================== End delete from user master process =================");
     }
 }

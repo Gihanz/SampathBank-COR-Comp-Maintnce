@@ -42,7 +42,7 @@ public class UserMst extends Auditable implements Serializable {
 	private Long approvalId;
 
 
-	@OneToMany(mappedBy = "userMst", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OneToMany(mappedBy = "linkId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JsonManagedReference
 	private Set<UserLinkedCompany> userLinkedCompanies;
 

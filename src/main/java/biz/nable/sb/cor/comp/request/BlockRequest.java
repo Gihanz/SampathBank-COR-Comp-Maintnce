@@ -1,5 +1,6 @@
 package biz.nable.sb.cor.comp.request;
 
+import biz.nable.sb.cor.comp.utility.StatusUserEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,5 @@ import lombok.ToString;
 public class BlockRequest {
 
     private String reason;
-    private String blockedStatus;
+    private StatusUserEnum blockedStatus;
 }
