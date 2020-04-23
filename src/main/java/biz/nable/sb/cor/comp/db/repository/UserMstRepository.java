@@ -1,5 +1,6 @@
 package biz.nable.sb.cor.comp.db.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,5 +30,6 @@ public interface UserMstRepository extends CrudRepository<UserMst, Long> {
 	Optional<UserMst> findByUserIdAndCompanyId(long userID, String companyID);
 
 	Optional<UserMst> findByApprovalId(long approvalId);
+
 
 }

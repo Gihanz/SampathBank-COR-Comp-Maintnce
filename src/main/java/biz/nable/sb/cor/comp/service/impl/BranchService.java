@@ -237,6 +237,7 @@ public class BranchService {
 				throw new RecordNotFoundException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);
 			}
+
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			commonRequestBean.setCommonTempBean(updateBranchRequest);
 			String hashTags = BRANCH_HASH_TAG.concat(updateBranchRequest.getCompanyId());
@@ -249,8 +250,8 @@ public class BranchService {
 			commonRequestBean.setUserGroup(userGroup);
 			commonRequestBean.setUserId(userId);
 			commonResponse = branchTempComponent.updateTempCompany(commonRequestBean, requestId);
-			optional.get().setRecordStatus(RecordStatusEnum.UPDATE_PENDING);
-			companyMstRepository.save(optional.get());
+			optionalB.get().setRecordStatus(RecordStatusEnum.UPDATE_PENDING);
+			branchMstRepository.save(optionalB.get());
 			commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
 			commonResponse.setReturnCode(HttpStatus.OK.value());
 		}
@@ -258,7 +259,7 @@ public class BranchService {
 		return commonResponse;
 	}
 
-	public CommonGetListResponse<BranchDetailBean> getBranches(String companyId, StatusEnum status, String userId,
+	public CommonGetListResponse<BranchDetailBean> getBranches(String companyId, RecordStatusEnum status, String userId,
 			String userGroup, String requestId) {
 		CommonGetListResponse<BranchDetailBean> branchDetailBeans = new CommonGetListResponse<>();
 		logger.info("================== Start Find  branch =================");
@@ -269,13 +270,14 @@ public class BranchService {
 					ErrorCode.NO_COMPANY_RECORD_FOUND);
 		} else {
 			CompanyMst companyMst = optional.get();
-
-			addActiveBranchList(companyMst, branchDetailBeans, status);
-
-			addDeletedBranchList(companyMst, branchDetailBeans, status);
-
-			addPendingBranchList(companyMst, branchDetailBeans, status, ActionTypeEnum.CREATE);
-
+			if (RecordStatusEnum.ACTIVE.equals(status) || RecordStatusEnum.UPDATE_PENDING.equals(status)
+					|| RecordStatusEnum.DELETE_PENDING.equals(status)) {
+				addActiveBranchList(companyMst, branchDetailBeans, status);
+			} else if (RecordStatusEnum.DELETED.equals(status)) {
+				addDeletedBranchList(companyMst, branchDetailBeans, status);
+			} else if (RecordStatusEnum.CREATE_PENDING.equals(status)) {
+				addPendingBranchList(companyMst, branchDetailBeans, status, ActionTypeEnum.CREATE);
+			}
 		}
 
 		branchDetailBeans.setReturnCode(HttpStatus.OK.value());
@@ -310,16 +312,23 @@ public class BranchService {
 	}
 
 	private void addActiveBranchList(CompanyMst companyMst, CommonGetListResponse<BranchDetailBean> branchDetailBeans,
-			StatusEnum status) {
+			RecordStatusEnum status) {
 		for (BranchMst branch : companyMst.getBranchMsts()) {
 			logger.info("Get records form master table");
-			if (status == branch.getStatus()) {
+			if (status == branch.getRecordStatus()) {
 				BranchDetailBean branchDetailBean = new BranchDetailBean();
 				branchDetailBean.setBranchId(branch.getBranchId());
 				branchDetailBean.setBranchName(branch.getBranchName());
 				branchDetailBean.setCompanyId(companyMst.getCompanyId());
 				branchDetailBean.setCompanyName(companyMst.getCompanyName());
-				branchDetailBean.setStatus(branch.getStatus());
+				branchDetailBean.setStatus(branch.getRecordStatus().name());
+
+				branchDetailBean.setCreatedBy(branch.getCreatedBy());
+				branchDetailBean.setCreatedDate(branch.getCreatedDate());
+				branchDetailBean.setLastUpdatedBy(branch.getLastUpdatedBy());
+				branchDetailBean.setLastUpdatedDate(branch.getLastUpdatedDate());
+				branchDetailBean.setLastVerifiedBy(branch.getLastVerifiedBy());
+				branchDetailBean.setLastVerifiedDate(branch.getLastVerifiedDate());
 				branchDetailBeans.getPayLoad().add(branchDetailBean);
 			}
 		}
@@ -338,8 +347,8 @@ public class BranchService {
 	}
 
 	private void addPendingBranchList(CompanyMst companyMst, CommonGetListResponse<BranchDetailBean> branchDetailBeans,
-			StatusEnum status, ActionTypeEnum actionTypeEnum) {
-		if (StatusEnum.PENDING == status || StatusEnum.INACTIVE == status) {
+			RecordStatusEnum status, ActionTypeEnum actionTypeEnum) {
+		if (RecordStatusEnum.CREATE_PENDING == status) {
 			logger.info("Get records form Temp table");
 			CommonSearchBean bean = new CommonSearchBean();
 			bean.setHashTags(BRANCH_HASH_TAG.concat(companyMst.getCompanyId()));
@@ -353,7 +362,11 @@ public class BranchService {
 				branchDetailBean.setCompanyName(companyMst.getCompanyName());
 				branchDetailBean.setBranchId(companyTempBean.getBranchId());
 				branchDetailBean.setBranchName(companyTempBean.getBranchName());
-				branchDetailBean.setStatus(StatusEnum.INACTIVE);
+				branchDetailBean.setStatus(RecordStatusEnum.CREATE_PENDING.name());
+
+				branchDetailBean.setCreatedBy(tempDto.getCreatedBy());
+				branchDetailBean.setCreatedDate(tempDto.getCreatedDate());
+
 				branchDetailBeans.getPayLoad().add(branchDetailBean);
 			}
 		}
@@ -361,8 +374,8 @@ public class BranchService {
 	}
 
 	private void addDeletedBranchList(CompanyMst companyMst, CommonGetListResponse<BranchDetailBean> branchDetailBeans,
-			StatusEnum status) {
-		if (StatusEnum.DELETED == status) {
+			RecordStatusEnum status) {
+		if (RecordStatusEnum.DELETED == status) {
 			logger.info("Get records form Delete table");
 			List<BranchDelete> branchDeletes = branchDeleteRepository.findByCompanyId(companyMst.getId());
 			for (BranchDelete branchDelete : branchDeletes) {
@@ -371,7 +384,14 @@ public class BranchService {
 				branchDetailBean.setBranchName(branchDelete.getBranchName());
 				branchDetailBean.setCompanyId(companyMst.getCompanyId());
 				branchDetailBean.setCompanyName(companyMst.getCompanyName());
-				branchDetailBean.setStatus(StatusEnum.DELETED);
+				branchDetailBean.setStatus(RecordStatusEnum.DELETED.name());
+
+				branchDetailBean.setCreatedBy(branchDelete.getCreatedBy());
+				branchDetailBean.setCreatedDate(branchDelete.getCreatedDate());
+				branchDetailBean.setLastUpdatedBy(branchDelete.getLastUpdatedBy());
+				branchDetailBean.setLastUpdatedDate(branchDelete.getLastUpdatedDate());
+				branchDetailBean.setLastVerifiedBy(branchDelete.getLastVerifiedBy());
+				branchDetailBean.setLastVerifiedDate(branchDelete.getLastVerifiedDate());
 				branchDetailBeans.getPayLoad().add(branchDetailBean);
 			}
 		}

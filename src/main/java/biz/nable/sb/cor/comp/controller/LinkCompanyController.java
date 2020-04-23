@@ -14,10 +14,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -202,13 +202,13 @@ public class LinkCompanyController {
 		return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
 	}
 
-	@ApiOperation(value = "Delete Customer ID API", nickname = "Delete Customer ID API", notes = "Delete Customer ID API", httpMethod = "DELETE")
+	@ApiOperation(value = "Delete Customer ID API", nickname = "Delete Customer ID API", notes = "Delete Customer ID API", httpMethod = "PUT")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successfully deleted", response = GetCompanyByIdResponse.class),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })
-	@DeleteMapping(value = "/v1/customer/{customerId}")
+	@PutMapping(value = "/v1/customer/{customerId}")
 	public ResponseEntity<CommonResponse> deletCustomerById(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,

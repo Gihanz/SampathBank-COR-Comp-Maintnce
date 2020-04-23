@@ -65,10 +65,9 @@ public class BranchApproval implements CommonApprovalTemplate {
 		ApprovalResponseBean approvalResponseBean = branchTempComponent.doApprove(approvalBean);
 		TempDto commonTemp = approvalResponseBean.getTempDto();
 		if (ApprovalStatus.VERIFIED.name().equalsIgnoreCase(approvalBean.getApprovalStatus())) {
-			if (ActionTypeEnum.CREATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
+			if (ActionTypeEnum.CREATE.name().equalsIgnoreCase(approvalBean.getActionType())
+					|| ActionTypeEnum.UPDATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
 				addToBranchMst(approvalBean, commonTemp);
-			} else if (ActionTypeEnum.UPDATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
-				updateBranchMst(approvalBean, commonTemp);
 			} else if (ActionTypeEnum.DELETE.name().equalsIgnoreCase(approvalBean.getActionType())) {
 				deleteBranch(approvalBean, commonTemp);
 			}
@@ -80,11 +79,6 @@ public class BranchApproval implements CommonApprovalTemplate {
 		commonResponse.setReturnMessage(
 				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
 		return commonResponse;
-	}
-
-	private void updateBranchMst(ApprovalBean approvalBean, TempDto commonTemp) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private void changeMstStatus(ApprovalBean approvalBean, TempDto tempDto) {
@@ -131,7 +125,9 @@ public class BranchApproval implements CommonApprovalTemplate {
 				branchDelete.setLastVerifiedBy(approvalBean.getVerifiedBy());
 				branchDelete.setLastUpdatedBy(tempDto.getLastUpdatedBy());
 				branchDelete.setLastUpdatedDate(tempDto.getLastUpdatedDate());
+				branchDelete.setLastVerifiedDate(new Date());
 				branchDelete.setStatus(StatusEnum.DELETED);
+				branchDelete.setCompanyId(companyO.get().getId());
 				branchDelete.setId(null);
 				branchDeleteRepository.save(branchDelete);
 				branchMstRepository.delete(optional.get());
@@ -165,17 +161,44 @@ public class BranchApproval implements CommonApprovalTemplate {
 					.anyMatch(x -> x.getBranchId().equals(createBranchRequest.getBranchId()));
 
 			if (Boolean.TRUE.equals(isExist)) {
-				logger.info("Company already linked");
-				throw new SystemException(messageSource.getMessage(ErrorCode.BRANCH_RECORD_ALREADY_EXISTS, null,
-						LocaleContextHolder.getLocale()), ErrorCode.BRANCH_RECORD_ALREADY_EXISTS);
-			}
-			logger.info("Start Inserting a link");
-			BranchMst branchMst = new BranchMst();
+				if (ActionTypeEnum.CREATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
+					logger.info("branch already Created");
+					throw new SystemException(messageSource.getMessage(ErrorCode.BRANCH_RECORD_ALREADY_EXISTS, null,
+							LocaleContextHolder.getLocale()), ErrorCode.BRANCH_RECORD_ALREADY_EXISTS);
+				} else {
+					update(createBranchRequest, optional.get(), approvalBean, tempDto);
+				}
+			} else {
+				if (ActionTypeEnum.UPDATE.name().equalsIgnoreCase(approvalBean.getActionType())) {
+					logger.info("Branch not exist");
+					throw new SystemException(messageSource.getMessage(ErrorCode.NO_BRANCH_RECORD_FOUND, null,
+							LocaleContextHolder.getLocale()), ErrorCode.NO_BRANCH_RECORD_FOUND);
+				}
+				logger.info("Start Inserting a link");
+				BranchMst branchMst = new BranchMst();
 
-			buildCompanyCummData(branchMst, createBranchRequest, optional.get());
-			saveBranch(branchMst, approvalBean, tempDto);
+				buildCompanyCummData(branchMst, createBranchRequest, optional.get());
+				saveBranch(branchMst, approvalBean, tempDto);
+			}
 
 		}
+	}
+
+	private void update(CreateBranchRequest createBranchRequest, CompanyMst optional, ApprovalBean approvalBean,
+			TempDto tempDto) {
+		Optional<BranchMst> oBranch = optional.getBranchMsts().stream()
+				.filter(x -> x.getBranchId().equals(createBranchRequest.getBranchId())).findFirst();
+		if (oBranch.isPresent()) {
+			BranchMst branchMst = oBranch.get();
+			branchMst.setBranchName(createBranchRequest.getBranchName());
+			branchMst.setLastVerifiedBy(approvalBean.getVerifiedBy());
+			branchMst.setLastVerifiedDate(new Date());
+			branchMst.setRecordStatus(RecordStatusEnum.ACTIVE);
+			branchMst.setLastUpdatedBy(tempDto.getLastUpdatedBy());
+			branchMst.setLastUpdatedDate(tempDto.getLastUpdatedDate());
+			branchMstRepository.save(branchMst);
+		}
+
 	}
 
 	private void saveBranch(BranchMst branchMst, ApprovalBean approvalBean, TempDto tempDto) {

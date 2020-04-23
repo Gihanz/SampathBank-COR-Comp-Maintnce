@@ -5,7 +5,7 @@ import biz.nable.sb.cor.common.utility.StatusEnum;
 import lombok.Data;
 
 @Data
-public class LinkCompanyResponseBean {
+public class PendingLinkCompanyBean {
 	private String companyId;
 	private String companyName;
 	private String linkedCompanyID;

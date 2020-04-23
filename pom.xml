@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>biz.nable.sb.cor.comp</groupId>
 	<artifactId>SB_JAVA_COR_COMP_MAINTNCE</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<parent>
@@ -26,6 +26,10 @@
 			<id>com.ibm.db2.jcc</id>
 			<url>https://artifacts.alfresco.com/nexus/content/repositories/public/</url>
 		</repository>
+        <repository> 
+			<id>github</id>
+			<url>https://maven.pkg.github.com/n-ableprivatelimitedcolombosrilanka/SB_JAVA_COR_Common-Utils</url>
+        </repository>
 	</repositories>
 
 	<dependencyManagement>
@@ -144,7 +148,7 @@
 		<dependency>
 			<groupId>biz.nable.sb.cor.common.utils</groupId>
 			<artifactId>SB_COR_Common-Utils</artifactId>
-			<version>0.0.6-GA</version>
+			<version>0.0.7-GA</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

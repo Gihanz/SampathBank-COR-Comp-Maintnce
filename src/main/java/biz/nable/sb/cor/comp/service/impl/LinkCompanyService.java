@@ -26,7 +26,7 @@ import biz.nable.sb.cor.common.utility.ActionTypeEnum;
 import biz.nable.sb.cor.common.utility.StatusEnum;
 import biz.nable.sb.cor.comp.bean.AuthPendingLinkCompanyBean;
 import biz.nable.sb.cor.comp.bean.CustomerIdResponseBean;
-import biz.nable.sb.cor.comp.bean.LinkCompanyResponseBean;
+import biz.nable.sb.cor.comp.bean.PendingLinkCompanyBean;
 import biz.nable.sb.cor.comp.component.LinkCompanyTempComponent;
 import biz.nable.sb.cor.comp.db.entity.CompanyCummData;
 import biz.nable.sb.cor.comp.db.entity.CompanyMst;
@@ -117,7 +117,12 @@ public class LinkCompanyService {
 		logger.info("================== Start Get Company By Id =================");
 		Optional<CompanyMst> companyMstO = companyMstRepository.findByCompanyId(companyId);
 
-		List<CustomerIdResponseBean> customerIds = getTempList(companyId, userId, userGroup);
+		List<CustomerIdResponseBean> customerIds = new ArrayList<>();
+		try {
+			customerIds = getTempList(companyId, userId, userGroup);
+		} catch (Exception e) {
+			logger.info("No temp record found");
+		}
 		GetCustomerIdsResponse customerIdsResponse = new GetCustomerIdsResponse();
 		customerIdsResponse.getListOfLinkedCompanies().addAll(customerIds);
 		if (companyMstO.isPresent()) {
@@ -129,10 +134,10 @@ public class LinkCompanyService {
 				if (customerO.isPresent()) {
 					customerId.setCompanyId(customerO.get().getCompanyId());
 					customerId.setCompanyName(customerO.get().getCompanyName());
-					customerId.setStatus(companyCummData.getStatus().name());
+					customerId.setStatus(companyCummData.getRecordStatus().name());
 				} else {
 					customerId.setCompanyId(companyCummData.getCustomerId());
-					customerId.setStatus(companyCummData.getStatus().name());
+					customerId.setStatus(companyCummData.getRecordStatus().name());
 				}
 				customerIdsResponse.getListOfLinkedCompanies().add(customerId);
 			}
@@ -164,7 +169,7 @@ public class LinkCompanyService {
 				CustomerIdResponseBean customerIdResopnse = new CustomerIdResponseBean();
 				customerIdResopnse.setCompanyId(customerO.get().getCompanyId());
 				customerIdResopnse.setCompanyName(customerO.get().getCompanyName());
-				customerIdResopnse.setStatus(StatusEnum.PENDING.name());
+				customerIdResopnse.setStatus(tempDto.getActionType().name());
 				customerIdsResponse.add(customerIdResopnse);
 			}
 
@@ -186,7 +191,7 @@ public class LinkCompanyService {
 					LinkCompanyRequest.class);
 			Optional<CompanyMst> companyO = companyMstRepository.findByCompanyId(customerId.getParentCompanyId());
 			if (companyO.isPresent()) {
-				LinkCompanyResponseBean linkCompanyBean = new LinkCompanyResponseBean();
+				PendingLinkCompanyBean linkCompanyBean = new PendingLinkCompanyBean();
 				linkCompanyBean.setCompanyId(companyO.get().getCompanyId());
 				linkCompanyBean.setCompanyName(companyO.get().getCompanyName());
 				linkCompanyBean.setLinkedCompanyID(customerId.getCustomerId());

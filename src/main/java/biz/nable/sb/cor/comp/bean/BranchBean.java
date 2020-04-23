@@ -17,12 +17,11 @@ public class BranchBean {
 
 	@NotEmpty(message = "BranchId should not be empty")
 	@NotNull(message = "BranchId should not be null")
-	@Size(max = 6, message = "Branch code craracter length exceeded")
+	@Size(max = 6, message = "Branch code character length exceeded")
 	private String branchId;
 
 	@NotEmpty(message = "BranchName should not be empty")
 	@NotNull(message = "BranchName should not be null")
-	@Size(max = 60, message = "Branch name craracter length exceeded")
+	@Size(max = 60, message = "Branch name character length exceeded")
 	private String branchName;
-
 }

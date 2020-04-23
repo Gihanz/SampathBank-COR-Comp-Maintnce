@@ -156,6 +156,7 @@ public class CompanyApproval implements CommonApprovalTemplate {
 		companyMst = companyO.get();
 		try {
 			BeanUtils.copyProperties(companyMst, updateCompanyRequest);
+			companyMst.setCompanyFeatures(null);
 			addFeatureList(companyMst, updateCompanyRequest.getCompanyFeatures());
 		} catch (Exception e) {
 			logger.error("updateCompanyRequest to companyMst data mapping error {}", e);
@@ -262,12 +263,10 @@ public class CompanyApproval implements CommonApprovalTemplate {
 	}
 
 	private void addFeatureList(CompanyMst companyMst, List<Long> requestedFeatures) {
-
 //		List<Features> features = (List<Features>) featuresRepository.findAll();
 //		List<CompanyFeatures> companyFeatures = new ArrayList<>();
 
 		Iterable<Features> features = featuresRepository.findAll();
-
 		Set<CompanyFeatures> companyFeatures = new HashSet<>();
 
 		for (Features feature : features) {

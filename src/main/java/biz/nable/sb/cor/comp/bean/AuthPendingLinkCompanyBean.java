@@ -21,6 +21,6 @@ public class AuthPendingLinkCompanyBean extends CommonResponse {
 
 	}
 
-	private List<LinkCompanyResponseBean> newCustomers = new ArrayList<>();
-	private List<LinkCompanyResponseBean> deletedCustomers = new ArrayList<>();
+	private List<PendingLinkCompanyBean> newCustomers = new ArrayList<>();
+	private List<PendingLinkCompanyBean> deletedCustomers = new ArrayList<>();
 }

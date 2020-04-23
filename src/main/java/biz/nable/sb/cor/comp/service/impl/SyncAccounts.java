@@ -49,6 +49,7 @@ public class SyncAccounts {
 		if ("Y".equalsIgnoreCase(isSyncEnable)) {
 			logger.info("start Account sync CustId : {}", request.getCustId());
 			Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(request.getCustId());
+
 			Set<CompanyAccountMst> entities;
 			if (!optional.isPresent()) {
 				entities = new HashSet<>();

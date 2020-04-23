@@ -30,6 +30,7 @@ import biz.nable.sb.cor.comp.bean.CompanyListResponseBean;
 import biz.nable.sb.cor.comp.bean.CompanySummeryBean;
 import biz.nable.sb.cor.comp.bean.CompanyTempBean;
 import biz.nable.sb.cor.comp.bean.FindCompanyBean;
+import biz.nable.sb.cor.comp.bean.LinkedCompantBean;
 import biz.nable.sb.cor.comp.component.CompanyTempComponent;
 import biz.nable.sb.cor.comp.db.criteria.CompanyCustomRepository;
 import biz.nable.sb.cor.comp.db.entity.CompanyCummData;
@@ -98,7 +99,6 @@ public class CompanyService {
 			commonResponse.setReturnMessage(messageSource.getMessage(ErrorCode.COMPANY_RECORD_ALREADY_EXISTS, null,
 					LocaleContextHolder.getLocale()));
 		} else {
-
 			for (Long feature : createCompanyRequest.getCompanyFeatures()) {
 				Optional<Features> optionalF = featuresRepository.findById(feature);
 				if (!optionalF.isPresent()) {
@@ -143,6 +143,13 @@ public class CompanyService {
 			commonResponse.setReturnMessage(
 					messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null, LocaleContextHolder.getLocale()));
 		} else {
+			for (Long feature : updateCompanyRequest.getCompanyFeatures()) {
+				Optional<Features> optionalF = featuresRepository.findById(feature);
+				if (!optionalF.isPresent()) {
+					throw new SystemException(messageSource.getMessage(ErrorCode.INVALID_FEATURE_ID, null,
+							LocaleContextHolder.getLocale()), ErrorCode.INVALID_FEATURE_ID);
+				}
+			}
 			CommonRequestBean commonRequestBean = new CommonRequestBean();
 			updateCompanyRequest.setCompanyName(optional.get().getCompanyName());
 			updateCompanyRequest.setCompanyId(optional.get().getCompanyId());
@@ -183,6 +190,7 @@ public class CompanyService {
 				companyMst.setCompanyAccounts(null);
 				companyMst.setCompanyUsers(null);
 				BeanUtils.copyProperties(companyResponse, companyMst);
+				companyResponse.setStatus(companyMst.getRecordStatus().name());
 			} catch (IllegalAccessException e) {
 				logger.error("Property copping error: IllegalAccessException");
 			} catch (InvocationTargetException e) {
@@ -192,12 +200,15 @@ public class CompanyService {
 			for (CompanyFeatures features : companyMst.getCompanyFeatures()) {
 				list.add(features.getFeature());
 			}
+			companyResponse.setCompanyFeatures(list);
 			List<CompanyCummData> companyCummDatas = linkCompanyRepository
 					.findByParentCompanyId(companyMst.getCompanyId());
 			for (CompanyCummData companyCummData : companyCummDatas) {
-				companyResponse.getListOfLinkedCustIds().add(companyCummData.getCustomerId());
+				LinkedCompantBean linkedCompantBean = genarateLinkCustomer(companyCummData);
+				if (null != linkedCompantBean.getCustomerId()) {
+					companyResponse.getListOfLinkedCustIds().add(linkedCompantBean);
+				}
 			}
-			companyResponse.setCompanyFeatures(list);
 			companyResponseList.add(companyResponse);
 		}
 
@@ -210,6 +221,19 @@ public class CompanyService {
 
 		logger.info("================== End Get Company List =================");
 		return companyListResponse;
+	}
+
+	private LinkedCompantBean genarateLinkCustomer(CompanyCummData companyCummData) {
+		LinkedCompantBean companyBean = null;
+		try {
+			companyBean = new LinkedCompantBean();
+			BeanUtils.copyProperties(companyBean, companyCummData);
+		} catch (IllegalAccessException e) {
+			logger.error("Propperty copping error: IllegalAccessException");
+		} catch (InvocationTargetException e) {
+			logger.info("Propperty copping error: InvocationTargetException");
+		}
+		return companyBean;
 	}
 
 	public CompanySummeryListResponse getCompanySummeryList(StatusEnum status, String userId, String userGroup) {
@@ -268,16 +292,20 @@ public class CompanyService {
 			companyMstO.get().setCompanyUsers(null);
 			try {
 				BeanUtils.copyProperties(companyBean, companyMstO.get());
+				companyBean.setStatus(companyMstO.get().getRecordStatus().name());
 				List<Long> list = new ArrayList<>();
 				for (CompanyFeatures features : companyMstO.get().getCompanyFeatures()) {
 					list.add(features.getFeature());
 				}
+				companyBean.setCompanyFeatures(list);
 				List<CompanyCummData> companyCummDatas = linkCompanyRepository
 						.findByParentCompanyId(companyMstO.get().getCompanyId());
 				for (CompanyCummData companyCummData : companyCummDatas) {
-					companyBean.getListOfLinkedCustIds().add(companyCummData.getCustomerId());
+					LinkedCompantBean linkedCompantBean = genarateLinkCustomer(companyCummData);
+					if (null != linkedCompantBean.getCustomerId()) {
+						companyBean.getListOfLinkedCustIds().add(linkedCompantBean);
+					}
 				}
-				companyBean.setCompanyFeatures(list);
 			} catch (IllegalAccessException e) {
 				logger.error("Propperty copping error: IllegalAccessException");
 			} catch (InvocationTargetException e) {
@@ -290,18 +318,7 @@ public class CompanyService {
 			bean.setRequestType(REQUEST_TYPE.name());
 			TempDto tempDto = companyTempComponent.getTempRecordByRef(bean);
 			if (null != tempDto) {
-				CompanyTempBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(),
-						CompanyTempBean.class);
-				try {
-					BeanUtils.copyProperties(companyBean, companyTempBean);
-
-					companyBean.setStatus(StatusEnum.INACTIVE);
-					getCompanyByIdResponse.setCompanyBean(companyBean);
-				} catch (IllegalAccessException | InvocationTargetException e) {
-					throw new SystemException(
-							messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()),
-							e, ErrorCode.DATA_COPY_ERROR);
-				}
+				genarateCompanyBean(companyBean, tempDto, getCompanyByIdResponse);
 			} else {
 				throw new RecordNotFoundException(messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null,
 						LocaleContextHolder.getLocale()), ErrorCode.NO_COMPANY_RECORD_FOUND);
@@ -313,6 +330,20 @@ public class CompanyService {
 				messageSource.getMessage(ErrorCode.OPARATION_SUCCESS, null, LocaleContextHolder.getLocale()));
 		logger.info("================== End Get Company By Id =================");
 		return getCompanyByIdResponse;
+	}
+
+	private void genarateCompanyBean(CompanyResponse companyBean, TempDto tempDto,
+			GetCompanyByIdResponse getCompanyByIdResponse) {
+		CompanyTempBean companyTempBean = commonConverter.mapToPojo(tempDto.getRequestPayload(), CompanyTempBean.class);
+		try {
+			BeanUtils.copyProperties(companyBean, companyTempBean);
+			companyBean.setStatus(RecordStatusEnum.CREATE_PENDING.name());
+			getCompanyByIdResponse.setCompanyBean(companyBean);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new SystemException(
+					messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), e,
+					ErrorCode.DATA_COPY_ERROR);
+		}
 	}
 
 	public CommonResponse deleteCompany(String companyId, String userId, String userGroup, String requestId) {
@@ -378,7 +409,12 @@ public class CompanyService {
 		bean.setUserId(userId);
 		bean.setRequestType(REQUEST_TYPE.name());
 
-		List<TempDto> tempList = companyTempComponent.getAuthPendingRecord(bean).getTempList();
+		List<TempDto> tempList = new ArrayList<>();
+		try {
+			tempList = companyTempComponent.getAuthPendingRecord(bean).getTempList();
+		} catch (Exception e) {
+			logger.info("No Temp record foud");
+		}
 		List<String> companyIdList = new ArrayList<>();
 		List<CompanyListResponseBean> companyListResponseBeans = new ArrayList<>();
 		for (TempDto tempDto : tempList) {

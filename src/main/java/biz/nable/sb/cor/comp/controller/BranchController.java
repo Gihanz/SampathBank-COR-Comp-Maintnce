@@ -30,7 +30,6 @@ import biz.nable.sb.cor.common.exception.RecordNotFoundException;
 import biz.nable.sb.cor.common.exception.SystemException;
 import biz.nable.sb.cor.common.response.CommonResponse;
 import biz.nable.sb.cor.common.utility.ErrorCode;
-import biz.nable.sb.cor.common.utility.StatusEnum;
 import biz.nable.sb.cor.comp.bean.AuthPendingBranchBean;
 import biz.nable.sb.cor.comp.bean.BranchDetailBean;
 import biz.nable.sb.cor.comp.request.CreateBranchRequest;
@@ -38,6 +37,7 @@ import biz.nable.sb.cor.comp.request.DeleteBranchRequest;
 import biz.nable.sb.cor.comp.request.UpdateBranchRequest;
 import biz.nable.sb.cor.comp.response.CommonGetListResponse;
 import biz.nable.sb.cor.comp.service.impl.BranchService;
+import biz.nable.sb.cor.comp.utility.RecordStatusEnum;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -116,7 +116,7 @@ public class BranchController {
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup,
-			@RequestParam(name = "status", required = true) StatusEnum status,
+			@RequestParam(name = "status", required = true) RecordStatusEnum status,
 			@PathVariable("companyId") String companyId) {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
@@ -208,12 +208,12 @@ public class BranchController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })
-	@DeleteMapping(value = "/v1/branch")
+	@DeleteMapping(value = "/v1/branch/{companyId}/{branchId}")
 	public ResponseEntity<CommonResponse> deletBranch(
 			@RequestHeader(name = REQUEST_ID_HEADER, required = true) String requestId,
 			@RequestHeader(name = "userId", required = true) String userId,
 			@RequestHeader(name = "userGroup", required = false) String userGroup,
-			@RequestBody DeleteBranchRequest deleteBranchRequest) {
+			@PathVariable("companyId") String companyId, @PathVariable("branchId") String branchId) {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
 
@@ -227,11 +227,11 @@ public class BranchController {
 					ErrorCode.INVALID_USER_ID);
 		} else {
 			try {
-				logger.debug("Delete Branch : {} of Company : {}", deleteBranchRequest.getBranchId(),
-						deleteBranchRequest.getCompanyId());
+				logger.debug("Delete Branch : {} of Company : {}", branchId, companyId);
 				if (StringUtils.isEmpty(userGroup)) {
 					userGroup = COMMON_USER_GROUP;
 				}
+				DeleteBranchRequest deleteBranchRequest = new DeleteBranchRequest(companyId, branchId);
 				commonResponse = branchService.deleteBranch(deleteBranchRequest, userId, userGroup, requestId);
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
