@@ -47,6 +47,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UserService {
+	private static final String COMMON_USER_GROUP = "SYSTEM";
 
 	@Autowired
 	CommonConverter commonConverter;
@@ -492,7 +493,7 @@ public class UserService {
 		Optional<UserMst> userMstOptional = userMstRepository.findByUserIdAndCompanyId(Long.parseLong(userId), companyId);
 		CommonRequestBean commonRequestBean = new CommonRequestBean();
 		CreateUserRequest createUserRequest ;
-		if (userMstOptional.get().getRecordStatus().equals(blockRequest.getBlockedStatus())){
+		if (userMstOptional.get().getStatus().equals(blockRequest.getBlockedStatus())){
 			logger.info(
 					messageSource.getMessage(ErrorCode.USER_ALREADY_SAME_STATUS, null, LocaleContextHolder.getLocale()));
 			commonResponse.setErrorCode(ErrorCode.USER_ALREADY_SAME_STATUS);
@@ -502,6 +503,7 @@ public class UserService {
 		}else {
             createUserRequest = setCreateUserRequest(userMstOptional);
             createUserRequest.setLastModifiedDate(new Date());
+
             createUserRequest.setLastModifiedBy(adminUserId);
             createUserRequest.setUserId(userMstOptional.get().getUserId());
             String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
@@ -515,7 +517,7 @@ public class UserService {
             commonRequestBean.setHashTags(hashTags);
             commonRequestBean.setReferenceNo(referenceNo);
             commonRequestBean.setRequestType(REQUEST_TYPE.name());
-            commonRequestBean.setUserGroup(userGroup);
+            commonRequestBean.setUserGroup(userGroup != null ? userGroup : COMMON_USER_GROUP);
             commonRequestBean.setUserId(userId);
             CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
             userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
@@ -527,44 +529,6 @@ public class UserService {
         }
 		logger.info("================== End change status request =================");
 		return commonResponse;
-	}
-
-	private CommonResponse setCommonResponse(String requestId, CommonResponse commonResponse, Optional<UserMst> userMstOptional,
-											 CommonRequestBean commonRequestBean) {
-		logger.info("================== Start set common response request =================");
-		CommonResponseBean commonResponseBean = userTempComponent.updateTempUser(commonRequestBean, requestId);
-		userMstOptional.get().setRecordStatus(RecordStatuUsersEnum.MODIFY_PENDING);
-		userMstRepository.save(userMstOptional.get());
-		commonResponse.setErrorCode(commonResponseBean.getErrorCode());
-		commonResponse.setReturnCode(commonResponseBean.getReturnCode());
-		commonResponse.setReturnMessage(commonResponseBean.getReturnMessage());
-		logger.info("================== End set common response request =================");
-		return commonResponseBean;
-	}
-
-	private void setModifyRequest(String userGroup, String requestId,String adminUserId, Optional<UserMst> userMstOptional,
-								  CommonRequestBean commonRequestBean, CreateUserRequest createUserRequest) {
-		logger.info("================== Start set modify request request =================");
-		try {
-			BeanUtils.copyProperties(createUserRequest, userMstOptional.get());
-		}catch (IllegalAccessException | InvocationTargetException exception){
-			throw new SystemException(
-					messageSource.getMessage(ErrorCode.DATA_COPY_ERROR, null, LocaleContextHolder.getLocale()), exception,
-					ErrorCode.DATA_COPY_ERROR);
-		}
-		setCreateUserRequest(userGroup, requestId, adminUserId, commonRequestBean, createUserRequest);
-		logger.info("================== End set modify request request =================");
-	}
-
-	private void setCreateUserRequest(String userGroup, String requestId, String adminUserId, CommonRequestBean commonRequestBean,
-									  CreateUserRequest createUserRequest) {
-		logger.info("================== Start set create user request =================");
-		createUserRequest.setLastModifiedDate(new Date());
-		createUserRequest.setLastModifiedBy(adminUserId);
-		createUserRequest.setUserGroup(userGroup);
-		setCommonRequestBean(userGroup, requestId, createUserRequest);
-		commonRequestBean.setCommonTempBean(createUserRequest);
-		logger.info("================== End set create user request =================");
 	}
 
 	private CommonRequestBean setCommonRequestBean(String userGroup, String requestId,CreateUserRequest createUserRequest) {

@@ -237,12 +237,12 @@ public class UserController {
 		return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(userListResponse.getReturnCode()))).body(userListResponse);
 	}
 
-	@ApiOperation(value = "Delete User API", nickname = "Delete User API", notes = "Delete User API", httpMethod = "DELETE")
+	@ApiOperation(value = "Delete User API", nickname = "Delete User API", notes = "Delete User API", httpMethod = "PUT")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully deleted", response = CommonResponse.class),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 400, message = "Input parameters are not valid"),
 			@ApiResponse(code = 500, message = "Internal server error") })
-	@DeleteMapping(value = "/v1/user")
+	@PutMapping(value = "/v1/user")
 	public ResponseEntity<CommonResponse> deletUser(
 			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
             @RequestHeader(name = USER_GROUP, required = false) String userGroup,
