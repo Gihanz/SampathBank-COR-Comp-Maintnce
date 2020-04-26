@@ -149,10 +149,10 @@ public class UserService {
 		return commonResponse;
 	}
 
-	public ApprovalPendingUserResponse getPendingAuthUseres(String userId, String userGroup, String approvalStatus) {
+	public ApprovalPendingUserResponse getPendingAuthUseres( String adminUserId, String userGroup, String approvalStatus) {
 		logger.info("================== Start auth pending user request=================");
 		ApprovalPendingUserResponse commonResponse = new ApprovalPendingUserResponse();
-		CommonSearchBean bean = setCommonSearchBean(userId, userGroup, approvalStatus);
+		CommonSearchBean bean = setCommonSearchBean(adminUserId,  userGroup, approvalStatus, REQUEST_TYPE);
 		List<TempDto> tempResponseList = new ArrayList<>();
 		try{
 			tempResponseList = userTempComponent.getAuthPendingRecord(bean).getTempList();
@@ -194,6 +194,10 @@ public class UserService {
 				Set<UserMst> userMstSet = userMstRepository.findByUserIdIn(userReferenceList);
 				userListResponseBean.setOriginalUserResponseSet(setAuthUserListResponse(userMstSet));
 			});
+            userListResponseBean.setCreatedBy(tempDto.getCreatedBy());
+            userListResponseBean.setCreatedDate(tempDto.getCreatedDate());
+            userListResponseBean.setLastUpdatedBy(tempDto.getLastUpdatedBy());
+            userListResponseBean.setLastUpdatedDate(tempDto.getLastUpdatedDate());
 			userListResponseBeanSet.add(userListResponseBean);
 		});
 
@@ -207,14 +211,14 @@ public class UserService {
 		return commonResponse;
 	}
 
-	public CommonSearchBean setCommonSearchBean(String userId, String userGroup, String approvalStatus){
-		logger.info("================== Start set common search bean=================");
-		CommonSearchBean bean = setCommonSearchBean(userGroup, userId, approvalStatus, REQUEST_TYPE);
-		logger.info("================== End set common search bean=================");
-		return bean;
-	}
+//	public CommonSearchBean setCommonSearchBean( String userGroup, String approvalStatus){
+//		logger.info("================== Start set common search bean=================");
+//		CommonSearchBean bean = setCommonSearchBean(userGroup , approvalStatus, REQUEST_TYPE);
+//		logger.info("================== End set common search bean=================");
+//		return bean;
+//	}
 
-	private CommonSearchBean setCommonSearchBean(String userGroup, String adminUserId, String approvalStatus, RequestTypeEnum requestType) {
+	private CommonSearchBean setCommonSearchBean(String adminUserId, String userGroup, String approvalStatus, RequestTypeEnum requestType) {
 		logger.info("================== Start set common search bean for user request =================");
 		CommonSearchBean bean = new CommonSearchBean();
 		bean.setRequestType(requestType.name());

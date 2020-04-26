@@ -166,16 +166,16 @@ public class UserController {
 	@GetMapping("/v1/user/requests")
 	public ResponseEntity<CommonResponse> getPendingAuthUsers(
 			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
-			@RequestHeader(name = USER_ID) String userId,
+			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
 			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
             @RequestParam(name = "approvalStatus", required = false) String approvalStatus) {
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
 		logger.info("Start execute method getPendingAuthUser's");
 		CommonResponse commonResponse;
-		if (StringUtils.isEmpty(userId)) {
+		if (StringUtils.isEmpty(adminUserId)) {
 			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
-					messageSource.getMessage(ErrorCode.INVALID_USER_ID, new Object[] { userId },
+					messageSource.getMessage(ErrorCode.INVALID_USER_ID, new Object[] { adminUserId },
 							LocaleContextHolder.getLocale()),
 					ErrorCode.INVALID_USER_ID);
 		} else {
@@ -184,7 +184,7 @@ public class UserController {
 				if (StringUtils.isEmpty(userGroup)) {
 					userGroup = COMMON_USER_GROUP;
 				}
-				commonResponse = userService.getPendingAuthUseres(userId, userGroup, approvalStatus);
+				commonResponse = userService.getPendingAuthUseres(adminUserId, userGroup, approvalStatus);
 				logger.info(commonResponse.getReturnMessage());
 			} catch (SystemException e) {
 				logger.error("Error occurred while getPendingAuthUser's for {}.", e.toString());
