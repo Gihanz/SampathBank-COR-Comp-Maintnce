@@ -135,6 +135,7 @@ public class CompanyController {
 
 		logger.info("Start exicute method updateCompany");
 		CommonResponse commonResponse;
+		
 		if (StringUtils.isEmpty(userId)) {
 			logger.error(invalidUserLoggingMsg, userId);
 			commonResponse = new CommonResponse(HttpStatus.BAD_REQUEST.value(),
