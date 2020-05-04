@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?><!--File IIBFinacleIntegration.wsdl, application MFP_CHANNEL_FINACLE_01--><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="IIBFinacleIntegration" targetNamespace="http://www.sampath.lk/SD/IIBFinacleIntegration/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.sampath.lk/SD/IIBFinacleIntegration/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="IIBFinacleIntegration_InlineSchema1.xsd"/>
+        <binding hasEncoding="false" imported="true" name="IIBFinacleIntegrationSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="http://www.sampath.lk/SD/IIBFinacleIntegration/" schemaLocation="IIBFinacleIntegration.xsd">
+			</xsd:import></xsd:schema><xsd:schema targetNamespace="http://www.sampath.lk/SD/IIBFinacleIntegration/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="GetFullstmtRequest">
+		<wsdl:part element="tns:GetFullstmtRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetFullstmtResponse">
+		<wsdl:part element="tns:GetFullstmtResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetBalanceInquiryRequest">
+		<wsdl:part element="tns:GetBalanceInquiryRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetBalanceInquiryResponse">
+		<wsdl:part element="tns:GetBalanceInquiryResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetMinistmtRequest">
+		<wsdl:part element="tns:GetMinistmtRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetMinistmtResponse">
+		<wsdl:part element="tns:GetMinistmtResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoChequeInquiryRequest">
+		<wsdl:part element="tns:DoChequeInquiryRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoChequeInquiryResponse">
+		<wsdl:part element="tns:DoChequeInquiryResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetCustomerInfoRequest">
+		<wsdl:part element="tns:GetCustomerInfoRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetCustomerInfoResponse">
+		<wsdl:part element="tns:GetCustomerInfoResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetGenInqRequest">
+		<wsdl:part element="tns:GetGenInqRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetGenInqResponse">
+		<wsdl:part element="tns:GetGenInqResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetDepositACInqRequest">
+		<wsdl:part element="tns:GetDepositACInqRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetDepositACInqResponse">
+		<wsdl:part element="tns:GetDepositACInqResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanInquiryRequest">
+		<wsdl:part element="tns:GetLoanInquiryRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanInquiryResponse">
+		<wsdl:part element="tns:GetLoanInquiryResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetCurrencyRateRequest">
+		<wsdl:part element="tns:GetCurrencyRateRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetCurrencyRateResponse">
+		<wsdl:part element="tns:GetCurrencyRateResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoTransferRequest">
+		<wsdl:part element="tns:DoTransferRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoTransferResponse">
+		<wsdl:part element="tns:DoTransferResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoSlipTransactionRequest">
+		<wsdl:part element="tns:DoSlipTransactionRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoSlipTransactionResponse">
+		<wsdl:part element="tns:DoSlipTransactionResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoBillPaymentRequest">
+		<wsdl:part element="tns:DoBillPaymentRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoBillPaymentResponse">
+		<wsdl:part element="tns:DoBillPaymentResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="StopChequeRequest">
+		<wsdl:part element="tns:StopChequeRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="StopChequeResponse">
+		<wsdl:part element="tns:StopChequeResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetChequeInquiryDataRequest">
+		<wsdl:part element="tns:GetChequeInquiryDataRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetChequeInquiryDataResponse">
+		<wsdl:part element="tns:GetChequeInquiryDataResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetDepositScheduleRequest">
+		<wsdl:part element="tns:GetDepositScheduleRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetDepositScheduleResponse">
+		<wsdl:part element="tns:GetDepositScheduleResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanscheduleDataRequest">
+		<wsdl:part element="tns:GetLoanscheduleDataRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanscheduleDataResponse">
+		<wsdl:part element="tns:GetLoanscheduleDataResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanStatementRequest">
+		<wsdl:part element="tns:GetLoanStatementRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanStatementResponse">
+		<wsdl:part element="tns:GetLoanStatementResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetOperativeAccountDataRequest">
+		<wsdl:part element="tns:GetOperativeAccountDataRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetOperativeAccountDataResponse">
+		<wsdl:part element="tns:GetOperativeAccountDataResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="InquiryDepositedChequeRequest">
+		<wsdl:part element="tns:InquiryDepositedChequeRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="InquiryDepositedChequeResponse">
+		<wsdl:part element="tns:InquiryDepositedChequeResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetBalanceInquiryFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetFullstmtFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetMinistmtFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoChequeInquiryFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetCustomerInfoFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetGenInqFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetDepositACInqFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanInquiryFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetCurrencyRateFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoTransferFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoSlipTransactionFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoBillPaymentFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="StopChequeFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetChequeInquiryDataFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetDepositScheduleFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanscheduleDataFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetLoanStatementFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="GetOperativeAccountDataFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="InquiryDepositedChequeFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoInterBankTransferRequest">
+		<wsdl:part element="tns:DoInterBankTransferRequest" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoInterBankTransferResponse">
+		<wsdl:part element="tns:DoInterBankTransferResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="DoInterBankTransferFault">
+		<wsdl:part element="tns:ExecutionException" name="parameters"/>
+	</wsdl:message>
+	<wsdl:portType name="IIBFinacleIntegration">
+		<wsdl:operation name="GetBalanceInquiry">
+			<wsdl:input message="tns:GetBalanceInquiryRequest"/>
+			<wsdl:output message="tns:GetBalanceInquiryResponse"/>
+            <wsdl:fault message="tns:GetBalanceInquiryFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetFullstmt">
+			<wsdl:input message="tns:GetFullstmtRequest"/>
+			<wsdl:output message="tns:GetFullstmtResponse"/>
+            <wsdl:fault message="tns:GetFullstmtFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetMinistmt">
+			<wsdl:input message="tns:GetMinistmtRequest"/>
+			<wsdl:output message="tns:GetMinistmtResponse"/>
+            <wsdl:fault message="tns:GetMinistmtFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="DoChequeInquiry">
+			<wsdl:input message="tns:DoChequeInquiryRequest"/>
+			<wsdl:output message="tns:DoChequeInquiryResponse"/>
+            <wsdl:fault message="tns:DoChequeInquiryFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetCustomerInfo">
+			<wsdl:input message="tns:GetCustomerInfoRequest"/>
+			<wsdl:output message="tns:GetCustomerInfoResponse"/>
+            <wsdl:fault message="tns:GetCustomerInfoFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetGenInq">
+			<wsdl:input message="tns:GetGenInqRequest"/>
+			<wsdl:output message="tns:GetGenInqResponse"/>
+            <wsdl:fault message="tns:GetGenInqFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetDepositACInq">
+			<wsdl:input message="tns:GetDepositACInqRequest"/>
+			<wsdl:output message="tns:GetDepositACInqResponse"/>
+            <wsdl:fault message="tns:GetDepositACInqFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetLoanInquiry">
+			<wsdl:input message="tns:GetLoanInquiryRequest"/>
+			<wsdl:output message="tns:GetLoanInquiryResponse"/>
+            <wsdl:fault message="tns:GetLoanInquiryFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetCurrencyRate">
+			<wsdl:input message="tns:GetCurrencyRateRequest"/>
+			<wsdl:output message="tns:GetCurrencyRateResponse"/>
+            <wsdl:fault message="tns:GetCurrencyRateFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="DoTransfer">
+			<wsdl:input message="tns:DoTransferRequest"/>
+			<wsdl:output message="tns:DoTransferResponse"/>
+            <wsdl:fault message="tns:DoTransferFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="DoSlipTransaction">
+			<wsdl:input message="tns:DoSlipTransactionRequest"/>
+			<wsdl:output message="tns:DoSlipTransactionResponse"/>
+            <wsdl:fault message="tns:DoSlipTransactionFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="DoBillPayment">
+			<wsdl:input message="tns:DoBillPaymentRequest"/>
+			<wsdl:output message="tns:DoBillPaymentResponse"/>
+            <wsdl:fault message="tns:DoBillPaymentFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="StopCheque">
+			<wsdl:input message="tns:StopChequeRequest"/>
+			<wsdl:output message="tns:StopChequeResponse"/>
+            <wsdl:fault message="tns:StopChequeFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetChequeInquiryData">
+			<wsdl:input message="tns:GetChequeInquiryDataRequest"/>
+			<wsdl:output message="tns:GetChequeInquiryDataResponse"/>
+            <wsdl:fault message="tns:GetChequeInquiryDataFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetDepositSchedule">
+			<wsdl:input message="tns:GetDepositScheduleRequest"/>
+			<wsdl:output message="tns:GetDepositScheduleResponse"/>
+            <wsdl:fault message="tns:GetDepositScheduleFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetLoanscheduleData">
+			<wsdl:input message="tns:GetLoanscheduleDataRequest"/>
+			<wsdl:output message="tns:GetLoanscheduleDataResponse"/>
+            <wsdl:fault message="tns:GetLoanscheduleDataFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetLoanStatement">
+			<wsdl:input message="tns:GetLoanStatementRequest"/>
+			<wsdl:output message="tns:GetLoanStatementResponse"/>
+            <wsdl:fault message="tns:GetLoanStatementFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="GetOperativeAccountData ">
+			<wsdl:input message="tns:GetOperativeAccountDataRequest"/>
+			<wsdl:output message="tns:GetOperativeAccountDataResponse"/>
+            <wsdl:fault message="tns:GetOperativeAccountDataFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="InquiryDepositedCheque">
+			<wsdl:input message="tns:InquiryDepositedChequeRequest"/>
+			<wsdl:output message="tns:InquiryDepositedChequeResponse"/>
+            <wsdl:fault message="tns:InquiryDepositedChequeFault" name="fault"/>
+        </wsdl:operation>
+		<wsdl:operation name="DoInterBankTransfer">
+			<wsdl:input message="tns:DoInterBankTransferRequest"/>
+			<wsdl:output message="tns:DoInterBankTransferResponse"/>
+            <wsdl:fault message="tns:DoInterBankTransferFault" name="fault"/>
+        </wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="IIBFinacleIntegrationSOAP" type="tns:IIBFinacleIntegration">
+
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetBalanceInquiry">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetBalanceInquiry"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetFullstmt">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetFullstmt"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetMinistmt">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetMinistmt"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="DoChequeInquiry">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/DoChequeInquiry"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetCustomerInfo">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetCustomerInfo"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetGenInq">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetGenInq"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetDepositACInq">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetDepositACInq"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetLoanInquiry">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetLoanInquiry"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetCurrencyRate">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetCurrencyRate"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="DoTransfer">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/DoTransfer"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="DoSlipTransaction">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/DoSlipTransaction"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="DoBillPayment">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/DoBillPayment"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="StopCheque">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/StopCheque"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetChequeInquiryData">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetChequeInquiryData"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetDepositSchedule">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetDepositSchedule"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetLoanscheduleData">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetLoanscheduleData"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetLoanStatement">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetLoanStatement"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetOperativeAccountData ">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/GetOperativeAccountData "/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="InquiryDepositedCheque">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/InquiryDepositedCheque"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="DoInterBankTransfer">
+
+			<soap:operation soapAction="http://www.sampath.lk/SD/IIBFinacleIntegration/DoInterBankTransfer"/>
+			<wsdl:input>
+
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="fault">
+				<soap:fault name="fault" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="IIBFinacleIntegration">
+		<wsdl:port binding="tns:IIBFinacleIntegrationSOAP" name="IIBFinacleIntegrationSOAP">
+			<soap:address location="http://192.168.125.96:7800/sd/iib/IIBFinacleIntegration"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="UTF-8"?><!--File IIBFinacleIntegration_InlineSchema1.xsd, application MFP_CHANNEL_FINACLE_01--><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.sampath.lk/SD/IIBFinacleIntegration/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.sampath.lk/SD/IIBFinacleIntegration/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+																																																																																																						
+																																																																																																												
+								
+            		
+            		
+                    
+                    
+                    
+                    
+                    
+                                                
+            		
+        
+            		
+                        
+            
+                        
+                        		<xsd:element ibmSchExtn:docRoot="true" name="GetFullstmtRequest" type="tns:GetFullstmtRequestType">
+			</xsd:element>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetFullstmtResponse" type="tns:GetFullstmtResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetMinistmtRequest" type="tns:GetMinistmtRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetMinistmtResponse" type="tns:GetMinistmtResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoChequeInquiryRequest" type="tns:DoChequeInquiryRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoChequeInquiryResponse" type="tns:DoChequeInquiryResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetCustomerInfoRequest" type="tns:GetCustomerInfoRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetCustomerInfoResponse" type="tns:GetCustomerInfoResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetGenInqRequest" type="tns:GetGenInqRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetGenInqResponse" type="tns:GetGenInqResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetDepositACInqRequest" type="tns:GetDepositACInqRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetDepositACInqResponse" type="tns:GetDepositACInqResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetLoanInquiryRequest" type="tns:GetLoanInquiryRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetLoanInquiryResponse" type="tns:GetLoanInquiryResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetCurrencyRateRequest" type="tns:GetCurrencyRateRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetCurrencyRateResponse" type="tns:GetCurrencyRateResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoTransferRequest" type="tns:DoTransferRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoTransferResponse" type="tns:DoTransferResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoSlipTransactionRequest" type="tns:DoSlipTransactionRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoSlipTransactionResponse" type="tns:DoSlipTransactionResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoBillPaymentRequest" type="tns:DoBillPaymentRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="DoBillPaymentResponse" type="tns:DoBillPaymentResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="StopChequeRequest" type="tns:StopChequeRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="StopChequeResponse" type="tns:StopChequeResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetChequeInquiryDataRequest" type="tns:GetChequeInquiryDataRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetChequeInquiryDataResponse" type="tns:GetChequeInquiryDataResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetDepositScheduleRequest" type="tns:GetDepositScheduleRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetDepositScheduleResponse" type="tns:GetDepositScheduleResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetLoanscheduleDataRequest" type="tns:GetLoanscheduleDataRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetLoanscheduleDataResponse" type="tns:GetLoanscheduleDataResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetLoanStatementRequest" type="tns:GetLoanStatementRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetLoanStatementResponse" type="tns:GetLoanStatementResponseType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetOperativeAccountDataRequest" type="tns:GetOperativeAccountDataRequestType"/>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetOperativeAccountDataResponse" type="tns:GetOperativeAccountDataResponseType"/>
+            <xsd:complexType name="GetBalanceInquiryRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="SolID" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetBalanceInquiryResponseType">
+				<xsd:sequence>
+				    <xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FfdBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="UserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CurrencyCode" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetFullstmtRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="TxnDateFrom" type="xsd:string"/>
+					<xsd:element name="TxnDateTo" type="xsd:string"/>
+					<xsd:element name="LowerAmt" type="xsd:double"/>
+					<xsd:element name="HigherAmt" type="xsd:double"/>
+					<xsd:element name="BeginChq" type="xsd:string"/>
+					<xsd:element name="EndChq" type="xsd:string"/>
+					<xsd:element name="NumRec" type="xsd:int"/>
+					<xsd:element name="SortOrder" type="xsd:string"/>
+					<xsd:element name="DebitCredit" type="xsd:string"/>
+					<xsd:element name="CurrencyCode" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="SolId" type="xsd:string"/>
+					<xsd:element name="CDCI043" type="xsd:string"/>
+				</xsd:sequence>
+
+			</xsd:complexType>
+            <xsd:complexType name="GetFullstmtResponseType">
+				<xsd:sequence>
+				    <xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="FullStmtRecord" type="tns:FullStmtRecord">
+					</xsd:element>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetMinistmtRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="SolID" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetMinistmtResponseType">
+				<xsd:sequence>
+				    <xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="MiniStmtRecord" type="tns:MiniStmtRecord"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoChequeInquiryRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="ChequeNo" type="xsd:string"/>
+					<xsd:element name="NoCheques" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoChequeInquiryResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="ChequeInquiryRecord" type="tns:ChequeInquiryRecord"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetCustomerInfoRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="CustId" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetCustomerInfoResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="CustomerInfoRecord" type="tns:CustomerInfoRecord"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetGenInqRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+
+					<xsd:element name="SolID" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetGenInqResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="TxnStatus" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FfdBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="UserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LienAmount" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CurrencyCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctNo" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CustID" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CustName" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctName" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctOpenDate" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SchemeCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctType" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctStatus" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctMsg" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ModeOfOperation" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="JointHolders" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SystemNickname" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetDepositACInqRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="CurrencyCode" type="xsd:string"/>
+					<xsd:element name="SolID" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetDepositACInqResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AccountNo" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CustomerID" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CustomerName" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctOpenDate" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="PeriodMonths" type="xsd:int"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="PeriodDays" type="xsd:int"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctMaturityDate" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctType" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctSchemeCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="JointHolderName1" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="JointHolderName2" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="JointHolderName3" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="InterestRate" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DepositAmount" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="MaturityAmount" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CurrencyCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SystemNickname" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetLoanInquiryRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+				</xsd:sequence>
+
+			</xsd:complexType>
+            <xsd:complexType name="GetLoanInquiryResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FfdBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="UserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CurrencyCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AccountNo" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CustID" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="NickName" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctOpenDate" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LoanPeriodMnth" type="xsd:int"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LoanPeriodDays" type="xsd:int"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LoanSchmCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="InterestRate" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LoanType" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="NextInstlDueDate" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="JointHldr1" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="JointHldr2" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="JointHldr3" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SanctionedAmt" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DisbursedAmt" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="InstAmt" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="OverDueAmt" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LoanExpDate" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SystemNickname" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetCurrencyRateRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="CurrencyCode" type="xsd:string">
+					</xsd:element>
+
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="CDCI043" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetCurrencyRateResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CurrencyRate" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoTransferRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="FromAccountNo" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="ToAccountNo" type="xsd:string"/>
+					<xsd:element name="DTxnAmount" type="xsd:double"/>
+					<xsd:element name="DCommAmount" type="xsd:double"/>
+					<xsd:element name="TransMemo" type="xsd:string"/>
+					<xsd:element name="ValueDate" type="xsd:string"/>
+					<xsd:element name="FromCurrCode" type="xsd:string">
+					</xsd:element>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoTransferResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrLedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrAvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrFloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrFFDBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrUserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrCurrencyCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CrLedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CrAvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CrFloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CrFFDBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CrUserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CrCurrencyCode" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoSlipTransactionRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="FromAccountNo" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="DTxnAmount" type="xsd:double"/>
+					<xsd:element name="DCommAmount" type="xsd:double"/>
+					<xsd:element name="RegBankCode" type="xsd:string"/>
+					<xsd:element name="RegBranchCode" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="RegAcctNo" type="xsd:string"/>
+					<xsd:element name="RegAcctName" type="xsd:string"/>
+					<xsd:element name="TranIndex" type="xsd:string"/>
+					<xsd:element name="ValueDate" type="xsd:string"/>
+					<xsd:element name="SlipsCode" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoSlipTransactionResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="TxnStatus" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrLedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrAvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrFloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrFFDBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrUserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrCurrencyCode" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoBillPaymentRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="FromAccountNo" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="ToAccountNo" type="xsd:string"/>
+					<xsd:element name="Amount" type="xsd:double"/>
+					<xsd:element name="CommAmount" type="xsd:double"/>
+					<xsd:element name="Opt125Data" type="xsd:string"/>
+					<xsd:element name="TranIndex" type="xsd:string"/>
+					<xsd:element name="ValueDate" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="DoBillPaymentResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="TxnStatus" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrLedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrAvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrFloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrFFDBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrUserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrCurrencyCode" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="StopChequeRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="ChequeNo" type="xsd:string"/>
+					<xsd:element name="NoCheques" type="xsd:string"/>
+					<xsd:element name="ReasonCode" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="StopChequeResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CDCIResponse" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetChequeInquiryDataRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="FromDate" type="xsd:string"/>
+					<xsd:element name="ToDate" type="xsd:string"/>
+					<xsd:element name="CDCI043" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetChequeInquiryDataResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="ChequeInquiryRecordDataRecord" type="tns:ChequeInquiryDataRecord"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetDepositScheduleRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="CurrCode" type="xsd:string"/>
+					<xsd:element name="SolId" type="xsd:string"/>
+					<xsd:element name="CDCI043" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetDepositScheduleResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="DepositScheduleRecord" type="tns:DepositScheduleRecord"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetLoanscheduleDataRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="CurrCode" type="xsd:string"/>
+					<xsd:element name="CDCI043" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetLoanscheduleDataResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LoanScheduleRecord" type="tns:LoanScheduleRecord"/>
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetLoanStatementRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="PrimaryAccountNo" type="xsd:string"/>
+					<xsd:element name="CurrencyCode" type="xsd:string"/>
+					<xsd:element name="CDCI043" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetLoanStatementResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="ProcessedDesc" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="LoanStmtRecord" type="tns:LoanStmtRecord"/>
+					
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetOperativeAccountDataRequestType">
+				<xsd:sequence>
+					<xsd:element name="APPCode" type="xsd:string"/>
+					<xsd:element name="Controller" type="xsd:string"/>
+					<xsd:element name="CDCICode" type="xsd:string"/>
+					<xsd:element name="AccountNo" type="xsd:string"/>
+					<xsd:element name="solId" type="xsd:string"/>
+					<xsd:element name="CDCI043" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:complexType name="GetOperativeAccountDataResponseType">
+				<xsd:sequence>
+					<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="TxnStatus" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LedgerBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AvailableBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FloatBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FfdBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="UserDefinedBalance" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SanctionLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="UtilisedAmount" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SecuredAdhocLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SecuredRunningLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SecuredSingleTrLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DACCLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="LienAmount" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="OverdueLiability" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SystemRsrvdAmount" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="FundsInClearing" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="DrawingPower" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CleanAdhocLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CleanRunningLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CleanSingleTrLimit" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AvailAmtInFFD" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="EffectiveAvailAmt" type="xsd:double"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="CurrencyCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctNo" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctName" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctOpenDate" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SchemeCode" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctType" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctStatus" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="AcctMsg" type="xsd:string"/>
+					<xsd:element maxOccurs="1" minOccurs="0" name="SystemNickname" type="xsd:string"/>
+
+				</xsd:sequence>
+			</xsd:complexType>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetBalanceInquiryRequest" type="tns:GetBalanceInquiryRequestType">
+			</xsd:element>
+            <xsd:element ibmSchExtn:docRoot="true" name="GetBalanceInquiryResponse" type="tns:GetBalanceInquiryResponseType">
+			</xsd:element>
+            <xsd:complexType name="FullStmtRecord">
+            	<xsd:sequence>
+            		<xsd:element name="TxnDate" type="xsd:string"/>
+            		<xsd:element name="TxnId" type="xsd:string"/>
+            		<xsd:element name="PartTxnSrl" type="xsd:string"/>
+            		<xsd:element name="TxnType" type="xsd:string"/>
+            		<xsd:element name="TxnSubType" type="xsd:string"/>
+            		<xsd:element name="DrCr" type="xsd:string"/>
+            		<xsd:element name="ValueDate" type="xsd:string"/>
+            		<xsd:element name="TxnAmt" type="xsd:double"/>
+            		<xsd:element name="TxnParticular" type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="TxnPostedDate" type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="InstNo" type="xsd:string"/>
+            		<xsd:element name="AcBalance" type="xsd:double"/>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="MiniStmtRecord">
+            	<xsd:sequence>
+            		<xsd:element name="SerialNo" type="xsd:string"/>
+            		<xsd:element name="TxnDate" type="xsd:string"/>
+            		<xsd:element name="TxnType" type="xsd:string"/>
+            		<xsd:element name="TxnAmount" type="xsd:double"/>
+            		<xsd:element name="TxnDesc" type="xsd:string"/>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="ChequeInquiryRecord">
+            <xsd:sequence>
+            <xsd:element name="AccountNo" type="xsd:string"/>
+<xsd:element name="ChequeNo" type="xsd:string"/>
+<xsd:element name="StatusCode" type="xsd:string"/>
+<xsd:element name="StatusDesc" type="xsd:string"/>
+</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="CustomerInfoRecord">
+             <xsd:sequence>
+            <xsd:element name="AcctNo" type="xsd:string"/>
+<xsd:element name="AcctType" type="xsd:string"/>
+<xsd:element name="AvailableBalance" type="xsd:double"/>
+<xsd:element name="CurrencyCode" type="xsd:string"/>
+<xsd:element name="JointSerial" type="xsd:string"/>
+<xsd:element name="JointRecType" type="xsd:string"/>
+           </xsd:sequence> 
+            </xsd:complexType>
+            <xsd:complexType name="ChequeInquiryDataRecord">
+            <xsd:sequence>
+            <xsd:element name="AcctNo" type="xsd:string"/>
+<xsd:element name="ChqAlpha" type="xsd:string"/>
+<xsd:element name="StartChequeNo" type="xsd:long"/>
+<xsd:element name="IssueDate" type="xsd:string"/>
+<xsd:element name="NoofLeaves" type="xsd:int"/>
+            
+            </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="DepositScheduleRecord">
+            <xsd:sequence>
+            <xsd:element name="AcctNo" type="xsd:string"/>
+<xsd:element name="FlowSerial" type="xsd:string"/>
+<xsd:element name="PaymentIndicator" type="xsd:string"/>
+<xsd:element name="PaymentType" type="xsd:string"/>
+<xsd:element name="DueOnDate" type="xsd:string"/>
+<xsd:element name="Amount" type="xsd:double"/>
+<xsd:element name="AcctBalance" type="xsd:double"/>
+<xsd:element name="PaidDate" type="xsd:string"/>
+<xsd:element name="AmountPaid" type="xsd:double"/>
+            </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="LoanScheduleRecord">
+            <xsd:sequence>
+            <xsd:element name="AcctNo" type="xsd:string"/>
+<xsd:element name="FlowID" type="xsd:string"/>
+<xsd:element name="FirstInstDate" type="xsd:string"/>
+<xsd:element name="InstAmount" type="xsd:double"/>
+<xsd:element name="NoOfInst" type="xsd:int"/>
+<xsd:element name="NextDemandDate" type="xsd:string"/>
+<xsd:element name="RepayCode" type="xsd:string"/>
+<xsd:element name="RepayFrequency" type="xsd:string"/>
+            </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="LoanStmtRecord">
+            	<xsd:sequence>
+            		<xsd:element name="DemandIndicator" type="xsd:string"/>
+					<xsd:element name="DemandType" type="xsd:string"/>
+					<xsd:element name="DemandEffDate" type="xsd:string">
+					</xsd:element>
+					<xsd:element name="DemandAmount" type="xsd:double">
+					</xsd:element>
+					<xsd:element name="CollectionAmount" type="xsd:double">
+					</xsd:element>
+					<xsd:element name="LastAdjustDate" type="xsd:string">
+					</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:element ibmSchExtn:docRoot="true" name="InquiryDepositedChequeResponse" type="tns:InquiryDepositedChequeResponseType">
+
+            </xsd:element>
+            <xsd:element ibmSchExtn:docRoot="true" name="InquiryDepositedChequeRequest" type="tns:InquiryDepositedChequeRequestType">
+            </xsd:element>
+            <xsd:complexType name="InquiryDepositedChequeRequestType">
+            	<xsd:sequence>
+            		<xsd:element name="APPCode" type="xsd:string"/>
+            		<xsd:element name="Controller" type="xsd:string"/>
+            		<xsd:element name="CDCICode" type="xsd:string"/>
+            		<xsd:element name="AccountNo" type="xsd:string"/>
+            		<xsd:element name="FromDate" type="xsd:string"/>
+            		<xsd:element name="ToDate" type="xsd:string"/>
+            		<xsd:element name="FilterCode" type="xsd:string"/>
+            		<xsd:element name="CDCI043" type="xsd:string"/>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="InquiryDepositedChequeResponseType">
+            	<xsd:sequence>
+            		<xsd:element name="ProcessedCode" type="xsd:string"/>
+					<xsd:element name="ProcessedDesc" type="xsd:string"/>
+					<xsd:element name="ActionCode" type="xsd:string"/>
+            		<xsd:element maxOccurs="unbounded" minOccurs="0" name="DepositedChequeRecord" type="tns:DepositedChequeRecord"/>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="DepositedChequeRecord">
+            <xsd:sequence>
+            		<xsd:element name="AccountNo" type="xsd:string"/>
+            		<xsd:element name="DepositBranch" type="xsd:string"/>
+            		<xsd:element name="DepositDate" type="xsd:string"/>
+            		<xsd:element name="ChequeNo" type="xsd:string"/>
+            		<xsd:element name="DepositAmount" type="xsd:double"/>
+            		<xsd:element name="CurrCode" type="xsd:string"/>
+            		<xsd:element name="TranDate" type="xsd:string"/>
+            		<xsd:element name="UserDefineAmount" type="xsd:double"/>
+            		<xsd:element name="BankCode" type="xsd:string"/>
+            		<xsd:element name="BankName" type="xsd:string"/>
+            		<xsd:element name="BranchCode" type="xsd:string"/>
+            		<xsd:element name="BranchName" type="xsd:string"/>
+            		<xsd:element name="UserDefineDate" type="xsd:string"/>
+            		<xsd:element name="StatusFlag" type="xsd:string"/>
+            	</xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:element name="DoInterBankTransferResponse" type="tns:DoInterBankTransferResponseType"> </xsd:element>
+            
+            <xsd:element name="DoInterBankTransferRequest" type="tns:DoInterBankTransferRequestType"> </xsd:element>
+            
+            <xsd:complexType name="DoInterBankTransferRequestType">
+		    	<xsd:sequence>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="APPCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="Controller" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="CDCICode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="TerminalID" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="CardNo" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="1" name="FromAccNo" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="FromAccType" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="FromAccBankCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="FromAccBranchCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="1" name="ToAccNo" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ToAccName" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ToAccType" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="1" name="ToAccBankCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ToAccBranchCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="1" name="TxnAmount" type="xsd:double">
+		    		</xsd:element>
+
+		    		<xsd:element maxOccurs="1" minOccurs="1" name="CommAmount" type="xsd:double">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="CommAccount" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="TranRemarks" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ValueDate" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="SlipsCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="DrCurrencyCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ChannelType" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="1" name="CEFTFlag" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="1" name="FromAccName" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="Reference" type="xsd:string"/>
+		    	</xsd:sequence>
+            </xsd:complexType>
+		    
+		    <xsd:complexType name="DoInterBankTransferResponseType">
+		    	<xsd:sequence>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ProcessedCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ProcessedDesc" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="ActionCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="TxnStatus" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="TxnStatusDesc" type="xsd:string"/>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="DrLedgerBalance" type="xsd:double">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="DrAvailableBalance" type="xsd:double">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="DrFloatBalance" type="xsd:double">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="DrFFDBalance" type="xsd:double">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="DrUserDefinedBalance" type="xsd:double">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="DrCurrencyCode" type="xsd:string">
+		    		</xsd:element>
+		    		<xsd:element maxOccurs="1" minOccurs="0" name="TraceNo" type="xsd:string">
+		    		</xsd:element>
+		    	</xsd:sequence>
+		    </xsd:complexType>
+            
+            <xsd:element ibmSchExtn:docRoot="true" name="ExecutionException" type="tns:ExecutionExceptionType">
+            </xsd:element>
+            <xsd:complexType name="ExecutionExceptionType">
+            	<xsd:sequence>
+            		<xsd:element name="ExceptionCode" type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="ExceptionDetails" type="xsd:string"/>
+            	</xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
