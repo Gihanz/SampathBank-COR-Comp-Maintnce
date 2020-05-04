@@ -18,7 +18,7 @@ public interface CompanyFeaturesRepository extends CrudRepository<CompanyFeature
 	@Query("delete from CompanyFeatures u where u.company = ?1")
 	void deleteFeaturesByCompany(CompanyMst companyMst);
 
-	Optional<CompanyFeatures> findByCompany(Long aLong);
+	Optional<CompanyFeatures> findByCompany(CompanyMst companyMst);
 
 	Set<CompanyFeatures> findByFeature(long feature);
 }

@@ -14,7 +14,7 @@ public class LinkedCompaniesBean {
     private String companyId;
     private String companyName;
     private String allAccountAccessFlag;
-    private Set<UserCompanyFeaturesBean> userCompanyFeaturesBean;
-    private Set<UserCompanyAccountsBean> userCompanyAccountsBean;
-    private Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroupsBean;
+    private Set<UserCompanyAccountsBean> userCompanyAccounts;
+    private Set<UserCompanyFeaturesBean> userCompanyFeatures;
+    private Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroups;
 }

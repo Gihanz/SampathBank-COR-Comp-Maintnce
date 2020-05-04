@@ -2,13 +2,11 @@ package biz.nable.sb.cor.comp.bean;
 
 import biz.nable.sb.cor.common.db.audit.Auditable;
 import biz.nable.sb.cor.common.utility.ActionTypeEnum;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.Date;
 
 
 @Data

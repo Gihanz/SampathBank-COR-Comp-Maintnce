@@ -21,9 +21,7 @@ import biz.nable.sb.cor.comp.response.UserListResponseByUserID;
 import biz.nable.sb.cor.comp.response.UserResponseList;
 import biz.nable.sb.cor.comp.thirdparty.GetUserDetailsResponse;
 import biz.nable.sb.cor.comp.thirdparty.GroupsDetails;
-import biz.nable.sb.cor.comp.utility.ErrorCode;
-import biz.nable.sb.cor.comp.utility.ErrorDescription;
-import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
+import biz.nable.sb.cor.comp.utility.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +40,6 @@ import biz.nable.sb.cor.common.service.impl.CommonConverter;
 import biz.nable.sb.cor.comp.component.BranchTempComponent;
 import biz.nable.sb.cor.comp.component.UserTempComponent;
 import biz.nable.sb.cor.comp.request.CreateUserRequest;
-import biz.nable.sb.cor.comp.utility.RequestTypeEnum;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -179,7 +176,6 @@ public class UserService {
 				userListResponseBean.setRequestType(tempDto.getRequestType());
 				userListResponseBean.setReferenceNo(String.valueOf(tempDto.getReferenceNo()));
 				userListResponseBean.setActionType(tempDto.getActionType());
-//				BeanUtils.copyProperties(userListResponseBean, tempDto);
 			}catch (Exception exception){
 				logger.error("Error in copying tempDTO to userListResponseBean.: {}", exception.toString());
 			}
@@ -211,12 +207,6 @@ public class UserService {
 		return commonResponse;
 	}
 
-//	public CommonSearchBean setCommonSearchBean( String userGroup, String approvalStatus){
-//		logger.info("================== Start set common search bean=================");
-//		CommonSearchBean bean = setCommonSearchBean(userGroup , approvalStatus, REQUEST_TYPE);
-//		logger.info("================== End set common search bean=================");
-//		return bean;
-//	}
 
 	private CommonSearchBean setCommonSearchBean(String adminUserId, String userGroup, String approvalStatus, RequestTypeEnum requestType) {
 		logger.info("================== Start set common search bean for user request =================");
@@ -240,6 +230,7 @@ public class UserService {
 		logger.info("================== End set common search bean request =================");
 		return bean;
 	}
+
 	private OriginalUserResponse setAuthUserListResponse(Set<UserMst> userMstSet){
 		logger.info("================== Start set auth user list request =================");
 		OriginalUserResponse originalUserResponse = new OriginalUserResponse();
@@ -374,8 +365,9 @@ public class UserService {
         });
        return userAccountsBeanSet;
     }
-	private Set<UserFeaturesBean> userFeatureBeanSet = new HashSet<>();
+
 	private Set<UserFeaturesBean> setUserFeatureBean(Set<UserPrimaryFeature> userPrimaryFeatures){
+	    Set<UserFeaturesBean> userFeatureBeanSet = new HashSet<>();
 		UserFeaturesBean userFeatureBean = new UserFeaturesBean();
 		userPrimaryFeatures.forEach(values -> {
 			userFeatureBean.setFeatureId(values.getFeature());
@@ -383,7 +375,8 @@ public class UserService {
 		});
 		return userFeatureBeanSet;
 	}
-	public UserListResponseByUserID getUserListByUserID(String userID) {
+
+	public UserListResponseByUserID getUserListByUserID(String userID, AccountTypeEnum accountType, String accountNumber, String accountName, Date acctOpenedDateFrom, Date acctOpenedDateTo, String currencyType) {
 		logger.info("================== Start get user list request =================");
 		UserListResponseByUserID userListResponseByUserID =  new UserListResponseByUserID();
 		Optional<UserMst> optionalUserMst = userMstRepository.findByUserId(Long.parseLong(userID));
@@ -439,7 +432,7 @@ public class UserService {
 		return userListResponseByUserID;
 	}
 
-    public GetUserDetailsResponse callGetUsers(long userID){
+    GetUserDetailsResponse callGetUsers(long userID){
         HttpHeaders headers = new HttpHeaders();
         RestTemplate restTemplate = new RestTemplate();
         String URL = getUserDetailsURL;
@@ -467,7 +460,7 @@ public class UserService {
 					userCompanyFeaturesBean.setFeatureName(featuresList.getFeatureDescription());
                     userCompanyFeaturesBeanSet.add(userCompanyFeaturesBean);
 				});
-                linkedCompaniesBean.get().setUserCompanyFeaturesBean(userCompanyFeaturesBeanSet);
+                linkedCompaniesBean.get().setUserCompanyFeatures(userCompanyFeaturesBeanSet);
 			});
 			Set<UserCompanyAccount> userCompanyAccounts = values.getUserCompanyAccounts();
             Set<UserCompanyAccountsBean> userCompanyAccountsBeanHashSet = new HashSet<>();
@@ -476,7 +469,7 @@ public class UserService {
 				userCompanyAccountsBean.setAccountNumber(userCompanyAccount.getAccountNo());
 				userCompanyAccountsBeanHashSet.add(userCompanyAccountsBean);
 			});
-            linkedCompaniesBean.get().setUserCompanyAccountsBean(userCompanyAccountsBeanHashSet);
+            linkedCompaniesBean.get().setUserCompanyAccounts(userCompanyAccountsBeanHashSet);
             GetUserDetailsResponse getUserDetailsResponse = callGetUsers(values.getUserMst().getUserId());
             Set<GroupsDetails> groupsDetails = getUserDetailsResponse.groups;
             Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroupsBeanHashSet = new HashSet<>();
@@ -485,7 +478,7 @@ public class UserService {
                 userCompanyWorkflowGroupsBean.setUserGroupId(getValues.getGroupId());
                 userCompanyWorkflowGroupsBeanHashSet.add(userCompanyWorkflowGroupsBean);
             });
-			linkedCompaniesBean.get().setUserCompanyWorkflowGroupsBean(userCompanyWorkflowGroupsBeanHashSet);
+			linkedCompaniesBean.get().setUserCompanyWorkflowGroups(userCompanyWorkflowGroupsBeanHashSet);
 		});
 		logger.info("================== end set linked companies bean request =================");
 		return linkedCompaniesBean.get();
@@ -539,12 +532,8 @@ public class UserService {
 		logger.info("================== Start set common request bean=================");
         CommonRequestBean commonRequestBean = new CommonRequestBean();
 		String hashTags = USER_HASH_TAG.concat(String.valueOf(createUserRequest.getPrimaryCompanyId()));
-        String referenceNo = null;
-		if (createUserRequest.getPrimaryCompanyId() != null){
-             referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
-        }else{
-            referenceNo = requestId;
-        }
+        String referenceNo;
+        referenceNo = requestId.concat("-").concat(createUserRequest.getPrimaryCompanyId());
         commonRequestBean.setCommonTempBean(createUserRequest);
 		commonRequestBean.setHashTags(hashTags);
 		commonRequestBean.setReferenceNo(referenceNo);

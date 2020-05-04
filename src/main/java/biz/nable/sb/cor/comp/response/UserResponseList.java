@@ -15,6 +15,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseList extends CommonResponse {
+
+    public UserResponseList(int returnCode, String returnMessage, String errorCode) {
+        super(returnCode, returnMessage, errorCode);
+    }
+
     Set<UserListResponse> userListResponses;
 }
 

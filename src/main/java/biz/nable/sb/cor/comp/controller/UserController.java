@@ -9,6 +9,7 @@ import biz.nable.sb.cor.common.exception.RecordNotFoundException;
 import biz.nable.sb.cor.comp.request.BlockRequest;
 import biz.nable.sb.cor.comp.request.DeleteUserRequest;
 import biz.nable.sb.cor.comp.response.*;
+import biz.nable.sb.cor.comp.utility.AccountTypeEnum;
 import biz.nable.sb.cor.comp.utility.ErrorDescription;
 import biz.nable.sb.cor.comp.utility.RecordStatuUsersEnum;
 import biz.nable.sb.cor.comp.validator.Validator;
@@ -34,6 +35,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.Date;
 import java.util.Objects;
 
 
@@ -45,15 +47,17 @@ import java.util.Objects;
 @RestController
 public class UserController {
 
-	Logger logger = LoggerFactory.getLogger(UserController.class);
+	private Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    private static final String COMMON_USER_GROUP = "SYSTEM";
+    private static final String REQUEST_ID_HEADER = "request-id";
+    private static final String ADMIN_USER_ID = "adminUserId";
+    private static final String USER_ID = "userId";
+    private static final String USER_GROUP = "userGroup";
+
 	@Autowired
 	private UserService userService;
-	private static final String COMMON_USER_GROUP = "SYSTEM";
 
-	private static final String REQUEST_ID_HEADER = "request-id";
-	private static final String ADMIN_USER_ID = "adminUserId";
-	private static final String USER_ID = "userId";
-	private static final String USER_GROUP = "userGroup";
 	@Autowired
 	ObjectMapper objectMapper;
 
@@ -79,12 +83,12 @@ public class UserController {
 		logger.info("Start execute method createUser: CreateUserRequest: {} RequestId: {} AdminUserID: {} UserGroup: {}",
 				createUserRequest ,requestId ,adminUserId ,userGroup);
 		CommonResponse commonResponse;
-//		commonResponse =  inputValidator.validateRequest(createUserRequest, userId);
-//		if(commonResponse != null){
-//			logger.info("CreateUser method validation response: {}",
-//					ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
-//			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
-//		}else {
+		commonResponse =  inputValidator.validateRequest(createUserRequest);
+		if(commonResponse != null){
+			logger.info("CreateUser method validation response: {}",
+					ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
+			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+		}else {
 			try {
 				if (StringUtils.isEmpty(userGroup)) {
 					userGroup = COMMON_USER_GROUP;
@@ -106,8 +110,7 @@ public class UserController {
 			MDC.clear();
 			logger.info("createUser method Response: {}", ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
 			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
-//			return ResponseEntity.status(HttpStatus.resolve(commonResponse.getReturnCode())).body(commonResponse);
-//		}
+		}
 	}
 
 	@ApiOperation(value = "Update User request", nickname = "Update User", notes = "Update user request.", httpMethod = "PUT")
@@ -126,13 +129,13 @@ public class UserController {
 		long startTime = System.currentTimeMillis();
 		logger.info("Start execute method updateUser: CreateUserRequest: {} RequestId: {} AdminUserID: {} UserID: {} UserGroup: {}",
 				createUserRequest ,requestId ,adminUserId ,userId ,userGroup);
-		CommonResponse commonResponse = new CommonResponse();
-//		commonResponse =  inputValidator.validateRequest(createUserRequest, userId);
-//		if(commonResponse != null){
-//			logger.info("CreateUser method validation response: {}",
-//					ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
-//			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
-//		}else {
+		CommonResponse commonResponse;
+		commonResponse =  inputValidator.validateRequest(createUserRequest);
+		if(commonResponse != null){
+			logger.info("CreateUser method validation response: {}",
+					ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse));
+			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
+		}else {
 			try {
 				if (StringUtils.isEmpty(userGroup)) {
 					userGroup = COMMON_USER_GROUP;
@@ -155,7 +158,7 @@ public class UserController {
 			logger.info("updateCompany rate: avg_resp={}", (endTime - startTime));
 			MDC.clear();
 			return ResponseEntity.status(Objects.requireNonNull(HttpStatus.resolve(commonResponse.getReturnCode()))).body(commonResponse);
-//		}
+		}
 	}
 
 	@ApiOperation(value = "Get Auth pending User List", nickname = "Get Auth pending User List", notes = "Get Auth pending User List.", httpMethod = "GET")
@@ -215,20 +218,21 @@ public class UserController {
 			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
 			@RequestParam(name = "companyId", required = false) String companyId,
 			@RequestParam(name = "recordStatus", required = false) RecordStatuUsersEnum recordStatus){
+
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
-        UserResponseList userListResponse = new UserResponseList();
-		CommonResponse commonResponse = new CommonResponse();
+        UserResponseList userListResponse;
+
 		try {
 			userListResponse = userService.getUserList(companyId, recordStatus);
 			logger.info(userListResponse.getReturnMessage());
 		} catch (SystemException e) {
 			logger.error("Error occurred while getUserById for {}.", e.toString());
-			commonResponse = new CommonResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
+            userListResponse = new UserResponseList(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage(),
 					e.getErrorCode());
 		} catch (Exception e) {
 			logger.error("Error occurred while getUserById for {}.", e.toString());
-			commonResponse = new CommonResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
+            userListResponse = new UserResponseList(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 					ErrorCode.UNKNOWN_ERROR);
 		}
 		long endTime = System.currentTimeMillis();
@@ -292,13 +296,19 @@ public class UserController {
 			@RequestHeader(name = REQUEST_ID_HEADER) String requestId,
 			@RequestHeader(name = ADMIN_USER_ID) String adminUserId,
 			@RequestHeader(name = USER_GROUP, required = false) String userGroup,
-			@PathVariable(name = USER_ID, required = false) String userId){
+			@PathVariable(name = USER_ID, required = false) String userId,
+            @RequestParam(name = "accountType", required = false) AccountTypeEnum accountType,
+            @RequestParam(name = "accountNumber", required = false) String accountNumber,
+            @RequestParam(name = "accountName", required = false) String accountName,
+            @RequestParam(name = "acctOpenedDateFrom", required = false) Date acctOpenedDateFrom,
+            @RequestParam(name = "acctOpenedDateTo", required = false) Date acctOpenedDateTo,
+            @RequestParam(name = "currencyType", required = false) String currencyType){
 
 		MDC.put(REQUEST_ID_HEADER, requestId);
 		long startTime = System.currentTimeMillis();
 		UserListResponseByUserID userListResponse = new UserListResponseByUserID();
 		try {
-			userListResponse = userService.getUserListByUserID(userId);
+			userListResponse = userService.getUserListByUserID(userId, accountType, accountNumber, accountName, acctOpenedDateFrom, acctOpenedDateTo, currencyType);
 			logger.info(userListResponse.getReturnMessage());
 		} catch (SystemException e) {
 			logger.error("Error occurred while getUserById for {}.", e.toString());

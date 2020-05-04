@@ -2,9 +2,7 @@ package biz.nable.sb.cor.comp.request;
 
 import biz.nable.sb.cor.common.bean.CommonTempBean;
 import biz.nable.sb.cor.common.db.audit.Auditable;
-import biz.nable.sb.cor.comp.bean.UserAccountsBean;
-import biz.nable.sb.cor.comp.bean.UserFeaturesBean;
-import biz.nable.sb.cor.comp.bean.UserWorkFlowGroupsBean;
+import biz.nable.sb.cor.comp.bean.*;
 import lombok.*;
 import java.util.Set;
 
@@ -15,9 +13,10 @@ import java.util.Set;
 @Builder
 public class UserLinkRequest extends Auditable implements CommonTempBean {
 
+    private Long userLinkId;
     private String companyId;
     private String allAccountAccessFlag;
-    private Set<UserAccountsBean> userAccountBeans;
-    private Set<UserFeaturesBean> userFeatureBeans;
-    private Set<UserWorkFlowGroupsBean> userWorkFlowGroupBeans;
+    private Set<UserCompanyAccountsBean> userCompanyAccounts;
+    private Set<UserCompanyFeaturesBean> userCompanyFeatures;
+    private Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroups;
 }

@@ -187,12 +187,17 @@ public class UserLinkCompanyService {
                 userId[0] = responseArray[0];
                 userLinkListResponse.setUserId(userId[0]);
                 userLinkListResponse.setApprovalId(tempResponse.getApprovalId());
-                userLinkListResponse.setApprovalStatus(approvalStatus);
+                if (tempResponse.getActionType().equals(ActionTypeEnum.CREATE)){
+                    userLinkListResponse.setApprovalStatus(RecordStatuUsersEnum.NEW_PENDING);
+                }else if (tempResponse.getActionType().equals(ActionTypeEnum.UPDATE)){
+                    userLinkListResponse.setApprovalStatus(RecordStatuUsersEnum.MODIFY_PENDING);
+                }else if (tempResponse.getActionType().equals(ActionTypeEnum.DELETE)){
+                    userLinkListResponse.setApprovalStatus(RecordStatuUsersEnum.DELETE_PENDING);
+                }else {
+                    userLinkListResponse.setApprovalStatus(null);
+                }
                 userLinkListResponse.setSignature(tempResponse.getSignature());
                 LinkedCompaniesBean linkedCompaniesBean = commonConverter.mapToPojo(tempResponse.getRequestPayload(), LinkedCompaniesBean.class);
-//                linkedCompaniesBean.setUserCompanyFeaturesBean(linkedCompaniesBean.getUserCompanyFeaturesBean());
-//                linkedCompaniesBean.setUserCompanyAccountsBean(linkedCompaniesBean.getUserCompanyAccountsBean());
-//                linkedCompaniesBean.setUserCompanyWorkflowGroupsBean(linkedCompaniesBean.getUserCompanyWorkflowGroupsBean());
                 userLinkListResponse.setLinkedCompaniesBean(linkedCompaniesBean);
                 userLinkListResponseSet.add(userLinkListResponse);
             });
@@ -236,7 +241,6 @@ public class UserLinkCompanyService {
         UserLinkListByApprovalIDResponse userLinkListByApprovalIDResponse = new UserLinkListByApprovalIDResponse();
         CommonSearchBean bean =  setCommonSearchBean(userGroup, adminUserId, null, REQUEST_TYPE);
         List<TempDto> tempResponseList;
-        List<TempDto> tempDtoList;
         tempResponseList = userLinkCompanyTempComponent.getAuthPendingRecord(bean).getTempList();
 
         if (tempResponseList == null){
@@ -265,7 +269,6 @@ public class UserLinkCompanyService {
                     userMstId.setUserId(Long.parseLong(userId[0]));
                     Optional<UserLinkedCompany> userLinkedCompany = userLinkCompanyRepository.findByCompanyMstAndUserMst(companyMstId,userMstId);
                     OriginalUserLinkBean originalUserLinkBean = new OriginalUserLinkBean();
-//                    Optional.ofNullable(userLinkedCompany).ifPresent( values -> {
                         if (userLinkedCompany.isPresent()){
                             linkedCompaniesBean.set(new LinkedCompaniesBean());
                             linkedCompaniesBean.get().setCompanyId(userLinkedCompany.get().getCompanyMst().getCompanyId());
@@ -278,7 +281,7 @@ public class UserLinkCompanyService {
                                 userCompanyFeaturesBean.setFeatureId(userCompanyFeature.getFeature());
                                 userCompanyFeaturesBeanSet.add(userCompanyFeaturesBean);
                             });
-                            linkedCompaniesBean.get().setUserCompanyFeaturesBean(userCompanyFeaturesBeanSet);
+                            linkedCompaniesBean.get().setUserCompanyFeatures(userCompanyFeaturesBeanSet);
                             Set<UserCompanyAccount> userCompanyAccounts = userLinkedCompany.get().getUserCompanyAccounts();
                             Set<UserCompanyAccountsBean> userCompanyAccountsBeanHashSet = new HashSet<>();
                             userCompanyAccounts.forEach(userCompanyAccount -> {
@@ -286,7 +289,7 @@ public class UserLinkCompanyService {
                                 userCompanyAccountsBean.setAccountNumber(userCompanyAccount.getAccountNo());
                                 userCompanyAccountsBeanHashSet.add(userCompanyAccountsBean);
                             });
-                            linkedCompaniesBean.get().setUserCompanyAccountsBean(userCompanyAccountsBeanHashSet);
+                            linkedCompaniesBean.get().setUserCompanyAccounts(userCompanyAccountsBeanHashSet);
                             GetUserDetailsResponse getUserDetailsResponse = userService.callGetUsers(Long.parseLong(userId[0]));
                             Set<GroupsDetails> groupsDetails = getUserDetailsResponse.groups;
                             Set<UserCompanyWorkflowGroupsBean> userCompanyWorkflowGroupsBeanHashSet = new HashSet<>();
@@ -295,10 +298,9 @@ public class UserLinkCompanyService {
                                 userCompanyWorkflowGroupsBean.setUserGroupId(getValues.getGroupId());
                                 userCompanyWorkflowGroupsBeanHashSet.add(userCompanyWorkflowGroupsBean);
                             });
-                            linkedCompaniesBean.get().setUserCompanyWorkflowGroupsBean(userCompanyWorkflowGroupsBeanHashSet);
+                            linkedCompaniesBean.get().setUserCompanyWorkflowGroups(userCompanyWorkflowGroupsBeanHashSet);
                             originalUserLinkBean.setLinkedCompaniesBean(linkedCompaniesBean.get());
                         }
-//                    });
                     userLinkListByApprovalIDResponse.setOriginalUserLinkBean(originalUserLinkBean);
                 }
             });

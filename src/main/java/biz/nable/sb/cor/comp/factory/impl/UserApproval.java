@@ -76,7 +76,7 @@ public class UserApproval implements CommonApprovalTemplate {
                 deleteFromUserMst(approvalBean, commonTemp);
             }
         }else {
-            changeMstUserStatus(approvalBean);
+            changeMstUserStatus(approvalBean,commonTemp);
         }
         commonResponse.setReturnCode(HttpStatus.ACCEPTED.value());
         commonResponse.setErrorCode(ErrorCode.OPARATION_SUCCESS);
@@ -87,15 +87,17 @@ public class UserApproval implements CommonApprovalTemplate {
         return commonResponse;
     }
 
-    private void changeMstUserStatus(ApprovalBean approvalBean) {
+    private void changeMstUserStatus(ApprovalBean approvalBean, TempDto tempDto) {
         logger.info("================== Start change master user status request =================");
         if (!ActionTypeEnum.CREATE.name().equals(approvalBean.getActionType())) {
-            Optional<UserMst> userMstOptional = userMstRepository.findByUserId(Long.parseLong(approvalBean.getReferenceId()));
+            CreateUserRequest createUserRequest = commonConverter.mapToPojo(tempDto.getRequestPayload(),CreateUserRequest.class);
+            Optional<UserMst> userMstOptional = userMstRepository.findByUserId(createUserRequest.getUserId());
             if (!userMstOptional.isPresent()) {
                 throw new SystemException(messageSource.getMessage(ErrorCode.NO_COMPANY_RECORD_FOUND, null,
                         LocaleContextHolder.getLocale()), ErrorCode.NO_COMPANY_RECORD_FOUND);
             }
             UserMst userMst = userMstOptional.get();
+            userMst.setRecordStatus(RecordStatuUsersEnum.VERIFIED);
             userMstRepository.save(userMst);
             logger.info("================== End change master user status request =================");
         }
@@ -103,17 +105,9 @@ public class UserApproval implements CommonApprovalTemplate {
     private void addToUserMaster(ApprovalBean approvalBean, TempDto tempDto) {
         logger.info("================== Start user addToUserMaster process =================");
         CreateUserRequest createUserRequest = commonConverter.mapToPojo(tempDto.getRequestPayload(),CreateUserRequest.class);
-//        String userId = tempDto.getRequestPayload().get("userId").toString();
-//        Optional<UserMst> UserMasterResponse = userMstRepository.findByUserId(Long.parseLong(userId));
-        UserMst userMst;
-//        if (UserMasterResponse.isPresent()) {
-//            logger.info("User record already exist: ErrorCode: {} ErrorDescription: {}",
-//                    ErrorCode.USER_RECORD_ALREADY_EXISTS, ErrorDescription.USER_RECORD_ALREADY_EXISTS);
-//            throw new SystemException(messageSource.getMessage(ErrorCode.USER_RECORD_ALREADY_EXISTS, null,
-//                    LocaleContextHolder.getLocale()), ErrorCode.USER_RECORD_ALREADY_EXISTS);
-//        }
+        UserMst userMst = new UserMst();
         logger.info("Start Inserting a new user");
-        userMst = new UserMst();
+//        userMst = new UserMst();
         userMst = setUserMasterTable(approvalBean, createUserRequest, userMst);
         userMst.setCreatedBy(approvalBean.getEnteredBy());
         userMst.setCreatedDate(approvalBean.getEnteredDate());
@@ -173,7 +167,6 @@ public class UserApproval implements CommonApprovalTemplate {
         userMst.setUserPrimaryFeatures(createUserRequest.getUserFeatureBeans() != null ? setUserPrimaryFeature(createUserRequest, userMst) : null);
         userMst.setApprovalId(Long.parseLong(approvalBean.getApprovalId()));
         userMst.setRecordStatus(RecordStatuUsersEnum.VERIFIED);
-//        userMst.setStatus(StatusUserEnum.ACTIVE);
         return userMst;
     }
 
@@ -225,7 +218,6 @@ public class UserApproval implements CommonApprovalTemplate {
             userMst.setLastVerifiedDate(new Date());
             logger.info("================== End user updateUserMaster process =================");
             userMstRepository.save(userMst);
-//        Optional<UserMst> userMstOptional = userMstRepository.findByApprovalId(Long.parseLong(approvalBean.getApprovalId()));
             Optional<UserMst> userMstOptional = userMstRepository.findByUserId(userMst.getUserId());
             callUserCreation(userMstOptional, createUserRequest);
         }

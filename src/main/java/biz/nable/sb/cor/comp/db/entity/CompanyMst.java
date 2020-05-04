@@ -1,7 +1,6 @@
 package biz.nable.sb.cor.comp.db.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Set;
 
 import javax.persistence.*;
