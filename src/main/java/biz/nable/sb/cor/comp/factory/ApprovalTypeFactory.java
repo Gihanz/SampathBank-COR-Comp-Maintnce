@@ -1,12 +1,10 @@
 package biz.nable.sb.cor.comp.factory;
 
+import biz.nable.sb.cor.comp.factory.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import biz.nable.sb.cor.common.template.CommonApprovalTemplate;
-import biz.nable.sb.cor.comp.factory.impl.BranchApproval;
-import biz.nable.sb.cor.comp.factory.impl.CompanyApproval;
-import biz.nable.sb.cor.comp.factory.impl.LinkCompanyApproval;
 import biz.nable.sb.cor.comp.utility.RequestTypeEnum;
 
 @Component
@@ -17,8 +15,15 @@ public class ApprovalTypeFactory {
 
 	@Autowired
 	LinkCompanyApproval linkCompanyApproval;
+
 	@Autowired
 	BranchApproval branchApproval;
+
+	@Autowired
+	UserApproval userApproval;
+
+	@Autowired
+	UserLinkCompanyApproval userLinkCompanyApproval;
 
 	public CommonApprovalTemplate getApproval(String type) {
 		if (null == type) {
@@ -29,7 +34,11 @@ public class ApprovalTypeFactory {
 			return linkCompanyApproval;
 		} else if (RequestTypeEnum.BRANCH.name().equalsIgnoreCase(type)) {
 			return branchApproval;
-		} else {
+		} else if (RequestTypeEnum.USER.name().equalsIgnoreCase(type)){
+			return userApproval;
+		}else if (RequestTypeEnum.LINK_USER.name().equalsIgnoreCase(type)){
+			return userLinkCompanyApproval;
+		}else {
 			return null;
 		}
 	}

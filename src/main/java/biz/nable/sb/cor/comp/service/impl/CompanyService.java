@@ -192,9 +192,9 @@ public class CompanyService {
 				BeanUtils.copyProperties(companyResponse, companyMst);
 				companyResponse.setStatus(companyMst.getRecordStatus().name());
 			} catch (IllegalAccessException e) {
-				logger.error("Propperty copping error: IllegalAccessException");
+				logger.error("Property copping error: IllegalAccessException");
 			} catch (InvocationTargetException e) {
-				logger.info("Propperty copping error: InvocationTargetException");
+				logger.info("Property copping error: InvocationTargetException");
 			}
 			List<Long> list = new ArrayList<>();
 			for (CompanyFeatures features : companyMst.getCompanyFeatures()) {
@@ -436,7 +436,6 @@ public class CompanyService {
 		if (!companyIdList.isEmpty()) {
 			List<CompanyMst> companyMsts = companyMstRepository.findByCompanyIdIn(companyIdList);
 			logger.info("Start get Company temp List");
-
 			buildAuthCompanyListResponse(companyMsts, companyListResponseBeans);
 		}
 

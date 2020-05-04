@@ -2,6 +2,7 @@ package biz.nable.sb.cor.comp.db.entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -43,5 +44,5 @@ public class CompanyFeatures implements Serializable {
 
 	@OneToMany(mappedBy = "companyFeatures")
 	@JsonManagedReference
-	private List<UserFeatures> userFeatures;
+	private Set<UserFeatures> userFeatures;
 }

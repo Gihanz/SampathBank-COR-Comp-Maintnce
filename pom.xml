@@ -69,6 +69,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		 <dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-devtools</artifactId>
+    	 </dependency>
+		
+		<dependency>
+ 			 <groupId>com.sun.xml.bind</groupId>
+  			<artifactId>jaxb-impl</artifactId>
+ 			 <version>2.2.2</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
@@ -176,26 +188,26 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-			<!-- <plugin> -->
-			<!-- <groupId>org.jvnet.jaxb2.maven2</groupId> -->
-			<!-- <artifactId>maven-jaxb2-plugin</artifactId> -->
-			<!-- <version>0.13.2</version> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <goals> -->
-			<!-- <goal>generate</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- <configuration> -->
-			<!-- <generatePackage>biz.nable.sb.cor.comp.soap.schemas.iib</generatePackage> -->
-			<!-- <generateDirectory>${project.basedir}/src/main/java</generateDirectory> -->
-			<!-- <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory> -->
-			<!-- <schemaIncludes> -->
-			<!-- <include>*.wsdl</include> -->
-			<!-- </schemaIncludes> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
+			 <plugin>
+			 <groupId>org.jvnet.jaxb2.maven2</groupId>
+			 <artifactId>maven-jaxb2-plugin</artifactId>
+			 <version>0.14.0</version>
+			 <executions>
+			 	<execution>
+			 		<goals>
+			 			<goal>generate</goal>
+			 		</goals>
+			 	</execution>
+			 </executions>
+			 <configuration>
+			 	<generatePackage>biz.nable.sb.cor.comp.soap.schemas.iib</generatePackage>
+				 <generateDirectory>${project.basedir}/src/main/java</generateDirectory>
+				 <schemaDirectory>${project.basedir}/src/main/resources/wsdl</schemaDirectory>
+				 	<schemaIncludes>
+						<include>*.wsdl</include>
+					</schemaIncludes>
+			 </configuration>
+			 </plugin>
 		</plugins>
 	</build>
 

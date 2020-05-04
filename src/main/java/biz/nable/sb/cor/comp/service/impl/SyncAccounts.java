@@ -1,8 +1,6 @@
 package biz.nable.sb.cor.comp.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +49,10 @@ public class SyncAccounts {
 		if ("Y".equalsIgnoreCase(isSyncEnable)) {
 			logger.info("start Account sync CustId : {}", request.getCustId());
 			Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(request.getCustId());
-			List<CompanyAccountMst> entities;
+
+			Set<CompanyAccountMst> entities;
 			if (!optional.isPresent()) {
-				entities = new ArrayList<>();
+				entities = new HashSet<>();
 			} else {
 				entities = optional.get().getCompanyAccounts();
 			}
@@ -92,7 +91,7 @@ public class SyncAccounts {
 	}
 
 	private CommonResponse syncAccont(CompanyAccountMst debitAccountEntity, CustomerInfoRecord finacleModle,
-			GetGenInqResponseType genInqResponseType) {
+									  GetGenInqResponseType genInqResponseType) {
 		logger.info("Start sync acconut accNo: {}", genInqResponseType.getAcctNo());
 		if (null == debitAccountEntity) {
 			debitAccountEntity = new CompanyAccountMst();

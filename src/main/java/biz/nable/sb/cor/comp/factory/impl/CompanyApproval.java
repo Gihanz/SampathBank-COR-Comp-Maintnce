@@ -1,10 +1,7 @@
 package biz.nable.sb.cor.comp.factory.impl;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
@@ -266,9 +263,12 @@ public class CompanyApproval implements CommonApprovalTemplate {
 	}
 
 	private void addFeatureList(CompanyMst companyMst, List<Long> requestedFeatures) {
-		Iterable<Features> features = featuresRepository.findAll();
+//		List<Features> features = (List<Features>) featuresRepository.findAll();
+//		List<CompanyFeatures> companyFeatures = new ArrayList<>();
 
-		List<CompanyFeatures> companyFeatures = new ArrayList<>();
+		Iterable<Features> features = featuresRepository.findAll();
+		Set<CompanyFeatures> companyFeatures = new HashSet<>();
+
 		for (Features feature : features) {
 			if (requestedFeatures.stream().anyMatch(x -> x.equals(feature.getId()))) {
 				CompanyFeatures companyFeature = new CompanyFeatures();

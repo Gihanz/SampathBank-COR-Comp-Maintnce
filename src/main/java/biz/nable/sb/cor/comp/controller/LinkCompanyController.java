@@ -146,7 +146,6 @@ public class LinkCompanyController {
 				commonResponse = new GetCustomerIdsResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(),
 						ErrorCode.UNKNOWN_ERROR);
 			}
-
 		}
 		long endTime = System.currentTimeMillis();
 		logger.info("getCustomerids rate: avg_resp={}", (endTime - startTime));
