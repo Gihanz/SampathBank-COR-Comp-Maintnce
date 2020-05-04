@@ -24,7 +24,11 @@ public class CompanyBean {
 	private String companyName;
 	private String contactNo;
 	private String emailAddr;
+	
+	@NotEmpty(message = "contactPerson should not be empty")
+	@NotNull(message = "contactPerson should not be null")
 	private String contactPerson;
+	
 	@JsonIgnore
 	private String createBy;
 	@JsonIgnore
@@ -38,8 +42,13 @@ public class CompanyBean {
 	private String epfAreaCode;
 	private String commTemplateId;
 	private YnFlagEnum mcAuthFlg;
+	
+	@NotEmpty(message = "canvassedBranch should not be empty")
+	@NotNull(message = "canvassedBranch should not be null")
 	private String canvassedBranch;
+	
 	private Long canvassedUser;
+	
 	private String treasureCustRef;
 	private String mobileCashAuthorization;
 	private String webServiceActivationFlag;
@@ -50,8 +59,13 @@ public class CompanyBean {
 	private String requestId;
 	@JsonIgnore
 	private String userGroup;
+	
 	private Long corporatePaymentsLimit;
+	
+	@NotEmpty(message = "deviceLocation should not be empty")
+	@NotNull(message = "deviceLocation should not be null")
 	private String deviceLocation;
+	
 	@NotEmpty(message = "companyFeatures cannot be empty")
 	private List<Long> companyFeatures = new ArrayList<>();
 }
