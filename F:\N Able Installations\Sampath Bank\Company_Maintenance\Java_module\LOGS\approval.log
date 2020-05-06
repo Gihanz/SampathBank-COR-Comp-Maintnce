@@ -1062,3 +1062,533 @@ Caused by: com.ibm.db2.jcc.am.SqlSyntaxErrorException: DB2 SQL Error: SQLCODE=-5
 					HikariPool-1 - Shutdown initiated...
 [2020-05-06T13:52:50.050Z] [com.zaxxer.hikari.HikariDataSource] [Thread-45] [352] [INFO ]
 					HikariPool-1 - Shutdown completed.
+[2020-05-06T19:45:45.045Z] [org.springframework.boot.logging.DeferredLog] [restartedMain] [225] [INFO ]
+					Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+[2020-05-06T19:45:45.045Z] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker] [restartedMain] [330] [INFO ]
+					Bean 'org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration' of type [org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration$$EnhancerBySpringCGLIB$$fad2fd3e] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2020-05-06T19:45:45.045Z] [org.springframework.cloud.config.client.ConfigServicePropertySourceLocator] [restartedMain] [207] [INFO ]
+					Fetching config from server at : http://localhost:8888
+[2020-05-06T19:45:45.045Z] [org.springframework.cloud.config.client.ConfigServicePropertySourceLocator] [restartedMain] [230] [INFO ]
+					Connect Timeout Exception on Url - http://localhost:8888. Will be trying the next url if available
+[2020-05-06T19:45:45.045Z] [org.springframework.cloud.config.client.ConfigServicePropertySourceLocator] [restartedMain] [143] [WARN ]
+					Could not locate PropertySource: I/O error on GET request for "http://localhost:8888/maintenance-microservice/local": Connection refused (Connection refused); nested exception is java.net.ConnectException: Connection refused (Connection refused)
+[2020-05-06T19:45:45.045Z] [org.springframework.boot.SpringApplication] [restartedMain] [651] [INFO ]
+					The following profiles are active: local
+[2020-05-06T19:45:46.046Z] [org.springframework.data.repository.config.RepositoryConfigurationDelegate] [restartedMain] [126] [INFO ]
+					Bootstrapping Spring Data repositories in DEFAULT mode.
+[2020-05-06T19:45:46.046Z] [org.springframework.data.repository.config.RepositoryConfigurationDelegate] [restartedMain] [182] [INFO ]
+					Finished Spring Data repository scanning in 108ms. Found 18 repository interfaces.
+[2020-05-06T19:45:47.047Z] [org.springframework.cloud.context.scope.GenericScope] [restartedMain] [295] [INFO ]
+					BeanFactory id=ab3e5794-f0a4-36f6-9061-afb03e9d4021
+[2020-05-06T19:45:47.047Z] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker] [restartedMain] [330] [INFO ]
+					Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$EnhancerBySpringCGLIB$$8350bf40] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2020-05-06T19:45:47.047Z] [org.springframework.ws.soap.addressing.server.AbstractAddressingEndpointMapping] [restartedMain] [236] [INFO ]
+					Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+[2020-05-06T19:45:47.047Z] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker] [restartedMain] [330] [INFO ]
+					Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$deb8fa41] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2020-05-06T19:45:47.047Z] [org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker] [restartedMain] [330] [INFO ]
+					Bean 'org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration' of type [org.springframework.cloud.autoconfigure.ConfigurationPropertiesRebinderAutoConfiguration$$EnhancerBySpringCGLIB$$fad2fd3e] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+[2020-05-06T19:45:48.048Z] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer] [restartedMain] [90] [INFO ]
+					Tomcat initialized with port(s): 8082 (http)
+[2020-05-06T19:45:48.048Z] [org.apache.juli.logging.DirectJDKLog] [restartedMain] [173] [INFO ]
+					Initializing ProtocolHandler ["http-nio-8082"]
+[2020-05-06T19:45:48.048Z] [org.apache.juli.logging.DirectJDKLog] [restartedMain] [173] [INFO ]
+					Starting service [Tomcat]
+[2020-05-06T19:45:48.048Z] [org.apache.juli.logging.DirectJDKLog] [restartedMain] [173] [INFO ]
+					Starting Servlet engine: [Apache Tomcat/9.0.22]
+[2020-05-06T19:45:48.048Z] [org.apache.juli.logging.DirectJDKLog] [restartedMain] [173] [INFO ]
+					Initializing Spring embedded WebApplicationContext
+[2020-05-06T19:45:48.048Z] [org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext] [restartedMain] [284] [INFO ]
+					Root WebApplicationContext: initialization completed in 2483 ms
+[2020-05-06T19:45:49.049Z] [com.zaxxer.hikari.HikariDataSource] [restartedMain] [110] [INFO ]
+					HikariPool-1 - Starting...
+[2020-05-06T19:45:51.051Z] [com.zaxxer.hikari.HikariDataSource] [restartedMain] [123] [INFO ]
+					HikariPool-1 - Start completed.
+[2020-05-06T19:45:51.051Z] [org.hibernate.jpa.internal.util.LogHelper] [restartedMain] [31] [INFO ]
+					HHH000204: Processing PersistenceUnitInfo [
+	name: default
+	...]
+[2020-05-06T19:45:51.051Z] [org.hibernate.Version] [restartedMain] [46] [INFO ]
+					HHH000412: Hibernate Core {5.3.10.Final}
+[2020-05-06T19:45:51.051Z] [org.hibernate.cfg.Environment] [restartedMain] [213] [INFO ]
+					HHH000206: hibernate.properties not found
+[2020-05-06T19:45:51.051Z] [org.hibernate.annotations.common.reflection.java.JavaReflectionManager] [restartedMain] [49] [INFO ]
+					HCANN000001: Hibernate Commons Annotations {5.0.4.Final}
+[2020-05-06T19:45:51.051Z] [org.hibernate.dialect.Dialect] [restartedMain] [157] [INFO ]
+					HHH000400: Using dialect: org.hibernate.dialect.DB2Dialect
+[2020-05-06T19:45:57.057Z] [org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl] [restartedMain] [27] [WARN ]
+					GenerationTarget encountered exception accepting command : Error executing DDL "alter table sb_oc_cor_company.company_user add constraint FKd61neen40k4qu7smukj00w3s2 foreign key (company) references sb_oc_cor_company.sb_cor_company_mst" via JDBC Statement
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table sb_oc_cor_company.company_user add constraint FKd61neen40k4qu7smukj00w3s2 foreign key (company) references sb_oc_cor_company.sb_cor_company_mst" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:559)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:504)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:433)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:249)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:114)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:183)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:72)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:310)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:467)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:939)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:57)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:377)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1837)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1774)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:593)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:515)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:320)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:318)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1105)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:549)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:743)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:390)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at biz.nable.sb.cor.comp.ApplicationStarter.main(ApplicationStarter.java:34)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: com.ibm.db2.jcc.am.SqlIntegrityConstraintViolationException: DB2 SQL Error: SQLCODE=-667, SQLSTATE=23520, SQLERRMC=FKD61NEEN40K4QU7SMUKJ00W3S2, DRIVER=4.25.13
+	at com.ibm.db2.jcc.am.b6.a(b6.java:806)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:66)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:140)
+	at com.ibm.db2.jcc.am.k3.c(k3.java:2824)
+	at com.ibm.db2.jcc.am.k3.d(k3.java:2808)
+	at com.ibm.db2.jcc.am.k3.b(k3.java:2168)
+	at com.ibm.db2.jcc.t4.ab.k(ab.java:446)
+	at com.ibm.db2.jcc.t4.ab.c(ab.java:104)
+	at com.ibm.db2.jcc.t4.p.b(p.java:38)
+	at com.ibm.db2.jcc.t4.av.h(av.java:124)
+	at com.ibm.db2.jcc.am.k3.ak(k3.java:2163)
+	at com.ibm.db2.jcc.am.k3.a(k3.java:3366)
+	at com.ibm.db2.jcc.am.k3.e(k3.java:1131)
+	at com.ibm.db2.jcc.am.k3.execute(k3.java:1110)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
+	... 37 common frames omitted
+[2020-05-06T19:45:57.057Z] [org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl] [restartedMain] [27] [WARN ]
+					GenerationTarget encountered exception accepting command : Error executing DDL "alter table sb_oc_cor_company.company_user add constraint FK2210o1bkq7yhn6nb3r8q52epq foreign key (user) references sb_oc_cor_company.user_mst" via JDBC Statement
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table sb_oc_cor_company.company_user add constraint FK2210o1bkq7yhn6nb3r8q52epq foreign key (user) references sb_oc_cor_company.user_mst" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:559)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:504)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:433)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:249)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:114)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:183)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:72)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:310)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:467)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:939)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:57)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:377)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1837)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1774)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:593)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:515)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:320)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:318)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1105)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:549)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:743)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:390)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at biz.nable.sb.cor.comp.ApplicationStarter.main(ApplicationStarter.java:34)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: com.ibm.db2.jcc.am.SqlIntegrityConstraintViolationException: DB2 SQL Error: SQLCODE=-667, SQLSTATE=23520, SQLERRMC=FK2210O1BKQ7YHN6NB3R8Q52EPQ, DRIVER=4.25.13
+	at com.ibm.db2.jcc.am.b6.a(b6.java:806)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:66)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:140)
+	at com.ibm.db2.jcc.am.k3.c(k3.java:2824)
+	at com.ibm.db2.jcc.am.k3.d(k3.java:2808)
+	at com.ibm.db2.jcc.am.k3.b(k3.java:2168)
+	at com.ibm.db2.jcc.t4.ab.k(ab.java:446)
+	at com.ibm.db2.jcc.t4.ab.c(ab.java:104)
+	at com.ibm.db2.jcc.t4.p.b(p.java:38)
+	at com.ibm.db2.jcc.t4.av.h(av.java:124)
+	at com.ibm.db2.jcc.am.k3.ak(k3.java:2163)
+	at com.ibm.db2.jcc.am.k3.a(k3.java:3366)
+	at com.ibm.db2.jcc.am.k3.e(k3.java:1131)
+	at com.ibm.db2.jcc.am.k3.execute(k3.java:1110)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
+	... 37 common frames omitted
+[2020-05-06T19:46:01.001Z] [org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl] [restartedMain] [27] [WARN ]
+					GenerationTarget encountered exception accepting command : Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_features add constraint FKg4ggsiee61624qwyb6pms14q8 foreign key (company_user) references sb_oc_cor_company.company_user" via JDBC Statement
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_features add constraint FKg4ggsiee61624qwyb6pms14q8 foreign key (company_user) references sb_oc_cor_company.company_user" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:559)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:504)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:433)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:249)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:114)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:183)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:72)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:310)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:467)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:939)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:57)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:377)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1837)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1774)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:593)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:515)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:320)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:318)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1105)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:549)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:743)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:390)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at biz.nable.sb.cor.comp.ApplicationStarter.main(ApplicationStarter.java:34)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: com.ibm.db2.jcc.am.SqlSyntaxErrorException: DB2 SQL Error: SQLCODE=-539, SQLSTATE=42888, SQLERRMC=SB_OC_COR_COMPANY.COMPANY_USER;PRIMARY, DRIVER=4.25.13
+	at com.ibm.db2.jcc.am.b6.a(b6.java:810)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:66)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:140)
+	at com.ibm.db2.jcc.am.k3.c(k3.java:2824)
+	at com.ibm.db2.jcc.am.k3.d(k3.java:2808)
+	at com.ibm.db2.jcc.am.k3.b(k3.java:2168)
+	at com.ibm.db2.jcc.t4.ab.k(ab.java:446)
+	at com.ibm.db2.jcc.t4.ab.c(ab.java:104)
+	at com.ibm.db2.jcc.t4.p.b(p.java:38)
+	at com.ibm.db2.jcc.t4.av.h(av.java:124)
+	at com.ibm.db2.jcc.am.k3.ak(k3.java:2163)
+	at com.ibm.db2.jcc.am.k3.a(k3.java:3366)
+	at com.ibm.db2.jcc.am.k3.e(k3.java:1131)
+	at com.ibm.db2.jcc.am.k3.execute(k3.java:1110)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
+	... 37 common frames omitted
+[2020-05-06T19:46:02.002Z] [org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl] [restartedMain] [27] [WARN ]
+					GenerationTarget encountered exception accepting command : Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_linked_company add constraint FK1pag54qvqx82duougxbggp9wv foreign key (company_id) references sb_oc_cor_company.sb_cor_company_mst" via JDBC Statement
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_linked_company add constraint FK1pag54qvqx82duougxbggp9wv foreign key (company_id) references sb_oc_cor_company.sb_cor_company_mst" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:559)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:504)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:433)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:249)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:114)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:183)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:72)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:310)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:467)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:939)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:57)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:377)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1837)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1774)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:593)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:515)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:320)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:318)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1105)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:549)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:743)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:390)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at biz.nable.sb.cor.comp.ApplicationStarter.main(ApplicationStarter.java:34)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: com.ibm.db2.jcc.am.SqlSyntaxErrorException: DB2 SQL Error: SQLCODE=-538, SQLSTATE=42830, SQLERRMC=FK1PAG54QVQX82DUOUGXBGGP9WV;SB_OC_COR_COMPANY.SB_COR_COMPANY_MST, DRIVER=4.25.13
+	at com.ibm.db2.jcc.am.b6.a(b6.java:810)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:66)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:140)
+	at com.ibm.db2.jcc.am.k3.c(k3.java:2824)
+	at com.ibm.db2.jcc.am.k3.d(k3.java:2808)
+	at com.ibm.db2.jcc.am.k3.b(k3.java:2168)
+	at com.ibm.db2.jcc.t4.ab.k(ab.java:446)
+	at com.ibm.db2.jcc.t4.ab.c(ab.java:104)
+	at com.ibm.db2.jcc.t4.p.b(p.java:38)
+	at com.ibm.db2.jcc.t4.av.h(av.java:124)
+	at com.ibm.db2.jcc.am.k3.ak(k3.java:2163)
+	at com.ibm.db2.jcc.am.k3.a(k3.java:3366)
+	at com.ibm.db2.jcc.am.k3.e(k3.java:1131)
+	at com.ibm.db2.jcc.am.k3.execute(k3.java:1110)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
+	... 37 common frames omitted
+[2020-05-06T19:46:02.002Z] [org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl] [restartedMain] [27] [WARN ]
+					GenerationTarget encountered exception accepting command : Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_linked_company add constraint FKqa52iw0w53oisiyt7pvoh2cck foreign key (user_id) references sb_oc_cor_company.user_mst" via JDBC Statement
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_linked_company add constraint FKqa52iw0w53oisiyt7pvoh2cck foreign key (user_id) references sb_oc_cor_company.user_mst" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:559)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:504)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:433)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:249)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:114)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:183)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:72)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:310)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:467)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:939)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:57)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:377)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1837)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1774)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:593)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:515)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:320)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:318)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1105)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:549)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:743)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:390)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at biz.nable.sb.cor.comp.ApplicationStarter.main(ApplicationStarter.java:34)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: com.ibm.db2.jcc.am.SqlIntegrityConstraintViolationException: DB2 SQL Error: SQLCODE=-667, SQLSTATE=23520, SQLERRMC=FKQA52IW0W53OISIYT7PVOH2CCK, DRIVER=4.25.13
+	at com.ibm.db2.jcc.am.b6.a(b6.java:806)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:66)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:140)
+	at com.ibm.db2.jcc.am.k3.c(k3.java:2824)
+	at com.ibm.db2.jcc.am.k3.d(k3.java:2808)
+	at com.ibm.db2.jcc.am.k3.b(k3.java:2168)
+	at com.ibm.db2.jcc.t4.ab.k(ab.java:446)
+	at com.ibm.db2.jcc.t4.ab.c(ab.java:104)
+	at com.ibm.db2.jcc.t4.p.b(p.java:38)
+	at com.ibm.db2.jcc.t4.av.h(av.java:124)
+	at com.ibm.db2.jcc.am.k3.ak(k3.java:2163)
+	at com.ibm.db2.jcc.am.k3.a(k3.java:3366)
+	at com.ibm.db2.jcc.am.k3.e(k3.java:1131)
+	at com.ibm.db2.jcc.am.k3.execute(k3.java:1110)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
+	... 37 common frames omitted
+[2020-05-06T19:46:02.002Z] [org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl] [restartedMain] [27] [WARN ]
+					GenerationTarget encountered exception accepting command : Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_linked_company add constraint FK2et5v3gaxdp9boocrlxuhcpjc foreign key (link_id) references sb_oc_cor_company.user_mst" via JDBC Statement
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table sb_oc_cor_company.sb_cor_user_linked_company add constraint FK2et5v3gaxdp9boocrlxuhcpjc foreign key (link_id) references sb_oc_cor_company.user_mst" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:559)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:504)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:433)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:249)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:114)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:183)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:72)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:310)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:467)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:939)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:57)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:377)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1837)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1774)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:593)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:515)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:320)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:318)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1105)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:549)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:743)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:390)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at biz.nable.sb.cor.comp.ApplicationStarter.main(ApplicationStarter.java:34)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: com.ibm.db2.jcc.am.SqlIntegrityConstraintViolationException: DB2 SQL Error: SQLCODE=-667, SQLSTATE=23520, SQLERRMC=FK2ET5V3GAXDP9BOOCRLXUHCPJC, DRIVER=4.25.13
+	at com.ibm.db2.jcc.am.b6.a(b6.java:806)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:66)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:140)
+	at com.ibm.db2.jcc.am.k3.c(k3.java:2824)
+	at com.ibm.db2.jcc.am.k3.d(k3.java:2808)
+	at com.ibm.db2.jcc.am.k3.b(k3.java:2168)
+	at com.ibm.db2.jcc.t4.ab.k(ab.java:446)
+	at com.ibm.db2.jcc.t4.ab.c(ab.java:104)
+	at com.ibm.db2.jcc.t4.p.b(p.java:38)
+	at com.ibm.db2.jcc.t4.av.h(av.java:124)
+	at com.ibm.db2.jcc.am.k3.ak(k3.java:2163)
+	at com.ibm.db2.jcc.am.k3.a(k3.java:3366)
+	at com.ibm.db2.jcc.am.k3.e(k3.java:1131)
+	at com.ibm.db2.jcc.am.k3.execute(k3.java:1110)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
+	... 37 common frames omitted
+[2020-05-06T19:46:07.007Z] [org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl] [restartedMain] [27] [WARN ]
+					GenerationTarget encountered exception accepting command : Error executing DDL "alter table sb_oc_cor_company.user_account add constraint FK9ohsx6vo2h533be03k570ebvy foreign key (company_user) references sb_oc_cor_company.company_user" via JDBC Statement
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table sb_oc_cor_company.user_account add constraint FK9ohsx6vo2h533be03k570ebvy foreign key (company_user) references sb_oc_cor_company.company_user" via JDBC Statement
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:67)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:559)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:504)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:433)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:249)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:114)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:183)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:72)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:310)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:467)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:939)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:57)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:377)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1837)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1774)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:593)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:515)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:320)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:222)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:318)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1105)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:867)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:549)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:141)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:743)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:390)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:312)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:140)
+	at biz.nable.sb.cor.comp.ApplicationStarter.main(ApplicationStarter.java:34)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: com.ibm.db2.jcc.am.SqlSyntaxErrorException: DB2 SQL Error: SQLCODE=-539, SQLSTATE=42888, SQLERRMC=SB_OC_COR_COMPANY.COMPANY_USER;PRIMARY, DRIVER=4.25.13
+	at com.ibm.db2.jcc.am.b6.a(b6.java:810)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:66)
+	at com.ibm.db2.jcc.am.b6.a(b6.java:140)
+	at com.ibm.db2.jcc.am.k3.c(k3.java:2824)
+	at com.ibm.db2.jcc.am.k3.d(k3.java:2808)
+	at com.ibm.db2.jcc.am.k3.b(k3.java:2168)
+	at com.ibm.db2.jcc.t4.ab.k(ab.java:446)
+	at com.ibm.db2.jcc.t4.ab.c(ab.java:104)
+	at com.ibm.db2.jcc.t4.p.b(p.java:38)
+	at com.ibm.db2.jcc.t4.av.h(av.java:124)
+	at com.ibm.db2.jcc.am.k3.ak(k3.java:2163)
+	at com.ibm.db2.jcc.am.k3.a(k3.java:3366)
+	at com.ibm.db2.jcc.am.k3.e(k3.java:1131)
+	at com.ibm.db2.jcc.am.k3.execute(k3.java:1110)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
+	... 37 common frames omitted
+[2020-05-06T19:46:07.007Z] [org.springframework.orm.jpa.AbstractEntityManagerFactoryBean] [restartedMain] [415] [INFO ]
+					Initialized JPA EntityManagerFactory for persistence unit 'default'
+[2020-05-06T19:46:07.007Z] [org.springframework.boot.devtools.autoconfigure.OptionalLiveReloadServer] [restartedMain] [60] [WARN ]
+					Unable to start LiveReload server
+[2020-05-06T19:46:07.007Z] [org.springframework.ws.soap.saaj.SaajSoapMessageFactory] [restartedMain] [141] [INFO ]
+					Creating SAAJ 1.3 MessageFactory with SOAP 1.1 Protocol
+[2020-05-06T19:46:08.008Z] [org.hibernate.hql.internal.QueryTranslatorFactoryInitiator] [restartedMain] [47] [INFO ]
+					HHH000397: Using ASTQueryTranslatorFactory
+[2020-05-06T19:46:09.009Z] [org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration$JpaWebMvcConfiguration] [restartedMain] [226] [WARN ]
+					spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+[2020-05-06T19:46:09.009Z] [org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver] [restartedMain] [58] [INFO ]
+					Exposing 2 endpoint(s) beneath base path '/actuator'
+[2020-05-06T19:46:09.009Z] [org.springframework.ws.soap.saaj.SaajSoapMessageFactory] [restartedMain] [141] [INFO ]
+					Creating SAAJ 1.3 MessageFactory with SOAP 1.1 Protocol
+[2020-05-06T19:46:09.009Z] [org.springframework.scheduling.concurrent.ExecutorConfigurationSupport] [restartedMain] [171] [INFO ]
+					Initializing ExecutorService
+[2020-05-06T19:46:09.009Z] [org.springframework.scheduling.concurrent.ExecutorConfigurationSupport] [restartedMain] [171] [INFO ]
+					Initializing ExecutorService 'asyncAccountSyncExecutor'
+[2020-05-06T19:46:10.010Z] [springfox.documentation.spring.web.PropertySourcedRequestMappingHandlerMapping] [restartedMain] [69] [INFO ]
+					Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+[2020-05-06T19:46:11.011Z] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper] [restartedMain] [160] [INFO ]
+					Context refreshed
+[2020-05-06T19:46:11.011Z] [springfox.documentation.spring.web.plugins.DocumentationPluginsBootstrapper] [restartedMain] [163] [INFO ]
+					Found 1 custom documentation plugin(s)
+[2020-05-06T19:46:11.011Z] [springfox.documentation.spring.web.scanners.ApiListingReferenceScanner] [restartedMain] [41] [INFO ]
+					Scanning for api listing references
+[2020-05-06T19:46:11.011Z] [org.apache.juli.logging.DirectJDKLog] [restartedMain] [173] [INFO ]
+					Starting ProtocolHandler ["http-nio-8082"]
+[2020-05-06T19:46:11.011Z] [org.springframework.boot.web.embedded.tomcat.TomcatWebServer] [restartedMain] [202] [INFO ]
+					Tomcat started on port(s): 8082 (http) with context path ''
+[2020-05-06T19:46:11.011Z] [org.springframework.boot.StartupInfoLogger] [restartedMain] [59] [INFO ]
+					Started ApplicationStarter in 27.375 seconds (JVM running for 27.929)
+[2020-05-06T19:46:12.012Z] [org.apache.juli.logging.DirectJDKLog] [RMI TCP Connection(5)-127.0.0.1] [173] [INFO ]
+					Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2020-05-06T19:46:12.012Z] [org.springframework.web.servlet.FrameworkServlet] [RMI TCP Connection(5)-127.0.0.1] [524] [INFO ]
+					Initializing Servlet 'dispatcherServlet'
+[2020-05-06T19:46:12.012Z] [org.springframework.web.servlet.FrameworkServlet] [RMI TCP Connection(5)-127.0.0.1] [546] [INFO ]
+					Completed initialization in 20 ms
+[2020-05-06T19:46:12.012Z] [org.springframework.cloud.config.client.ConfigServicePropertySourceLocator] [RMI TCP Connection(4)-127.0.0.1] [207] [INFO ]
+					Fetching config from server at : http://localhost:8888
+[2020-05-06T19:46:12.012Z] [org.springframework.cloud.config.client.ConfigServicePropertySourceLocator] [RMI TCP Connection(4)-127.0.0.1] [230] [INFO ]
+					Connect Timeout Exception on Url - http://localhost:8888. Will be trying the next url if available
+[2020-05-06T19:46:12.012Z] [org.springframework.cloud.config.client.ConfigServicePropertySourceLocator] [RMI TCP Connection(4)-127.0.0.1] [143] [WARN ]
+					Could not locate PropertySource: I/O error on GET request for "http://localhost:8888/maintenance-microservice/local": Connection refused (Connection refused); nested exception is java.net.ConnectException: Connection refused (Connection refused)
+[2020-05-06T19:49:07.007Z] [org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver] [http-nio-8082-exec-9] [198] [WARN ]
+					Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<biz.nable.sb.cor.common.response.CommonResponse> biz.nable.sb.cor.comp.controller.CompanyController.createCompany(biz.nable.sb.cor.comp.request.CreateCompanyRequest,java.lang.String,java.lang.String,java.lang.String): [Field error in object 'createCompanyRequest' on field 'companyId': rejected value [null]; codes [NotBlank.createCompanyRequest.companyId,NotBlank.companyId,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [createCompanyRequest.companyId,companyId]; arguments []; default message [companyId]]; default message [companyId should not be empty]] ]
+[2020-05-06T19:49:18.018Z] [org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver] [http-nio-8082-exec-2] [198] [WARN ]
+					Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<biz.nable.sb.cor.common.response.CommonResponse> biz.nable.sb.cor.comp.controller.CompanyController.createCompany(biz.nable.sb.cor.comp.request.CreateCompanyRequest,java.lang.String,java.lang.String,java.lang.String): [Field error in object 'createCompanyRequest' on field 'companyId': rejected value []; codes [NotBlank.createCompanyRequest.companyId,NotBlank.companyId,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [createCompanyRequest.companyId,companyId]; arguments []; default message [companyId]]; default message [companyId should not be empty]] ]
+[2020-05-06T19:49:42.042Z] [org.springframework.scheduling.concurrent.ExecutorConfigurationSupport] [Thread-66] [208] [INFO ]
+					Shutting down ExecutorService 'asyncAccountSyncExecutor'
+[2020-05-06T19:49:42.042Z] [org.springframework.orm.jpa.AbstractEntityManagerFactoryBean] [Thread-66] [597] [INFO ]
+					Closing JPA EntityManagerFactory for persistence unit 'default'
+[2020-05-06T19:49:42.042Z] [com.zaxxer.hikari.HikariDataSource] [Thread-66] [350] [INFO ]
+					HikariPool-1 - Shutdown initiated...
+[2020-05-06T19:49:42.042Z] [com.zaxxer.hikari.HikariDataSource] [Thread-66] [352] [INFO ]
+					HikariPool-1 - Shutdown completed.

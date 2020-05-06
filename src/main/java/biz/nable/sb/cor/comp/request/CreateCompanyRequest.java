@@ -15,6 +15,6 @@ import org.hibernate.validator.constraints.NotBlank;
 @ToString
 public class CreateCompanyRequest extends CompanyBean implements CommonTempBean {
 	@NotBlank(message = "companyId should not be empty")
-	@NotNull(message = "companyId should not be null")
+//	@NotNull(message = "companyId should not be null")
 	private String companyId;
 }
