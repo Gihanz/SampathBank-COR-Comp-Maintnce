@@ -54,11 +54,13 @@ import io.swagger.annotations.ApiResponses;
 public class CompanyController {
 
 	Logger logger = LoggerFactory.getLogger(CompanyController.class);
+
 	@Autowired
 	private CompanyService companyService;
 	private static final String COMMON_USER_GROUP = "SYSTEM";
 	private String invalidUserLoggingMsg = "User Id is invalid: {}";
 	private static final String REQUEST_ID_HEADER = "request-id";
+
 	@Autowired
 	ObjectMapper objectMapper;
 

@@ -8,12 +8,13 @@ import biz.nable.sb.cor.comp.bean.CompanyBean;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Getter
 @Setter
 @ToString
 public class CreateCompanyRequest extends CompanyBean implements CommonTempBean {
-	@NotEmpty(message = "companyId should not be empty")
+	@NotBlank(message = "companyId should not be empty")
 	@NotNull(message = "companyId should not be null")
 	private String companyId;
 }
