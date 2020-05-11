@@ -50,9 +50,9 @@ public class SyncAccounts {
 			logger.info("start Account sync CustId : {}", request.getCustId());
 			Optional<CompanyMst> optional = companyMstRepository.findByCompanyId(request.getCustId());
 
-			Set<CompanyAccountMst> entities;
+			List<CompanyAccountMst> entities;
 			if (!optional.isPresent()) {
-				entities = new HashSet<>();
+				entities = new ArrayList<>();
 			} else {
 				entities = optional.get().getCompanyAccounts();
 			}

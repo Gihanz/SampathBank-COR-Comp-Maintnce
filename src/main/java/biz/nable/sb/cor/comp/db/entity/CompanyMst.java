@@ -1,6 +1,9 @@
 package biz.nable.sb.cor.comp.db.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -76,11 +79,11 @@ public class CompanyMst extends Auditable implements Serializable {
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
 	@JsonManagedReference
-	private Set<CompanyFeatures> companyFeatures;
+	private List<CompanyFeatures> companyFeatures = new ArrayList<>();
 
 	@OneToMany(mappedBy = "companyId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference
-	private Set<CompanyAccountMst> companyAccounts;
+	private List<CompanyAccountMst> companyAccounts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "companyMst", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JsonManagedReference
