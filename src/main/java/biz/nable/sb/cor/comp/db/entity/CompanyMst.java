@@ -27,10 +27,10 @@ public class CompanyMst extends Auditable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COMPANY_MST_SEQ")
 	@SequenceGenerator(name = "COMPANY_MST_SEQ", sequenceName = "SB_COR_COMPANY_MST_SEQ", allocationSize = 1)
 	private Long id;
-	@Id
 	@Column(length = 9)
 	private String companyId;
 	@Column(length = 9)
@@ -71,11 +71,11 @@ public class CompanyMst extends Auditable implements Serializable {
 
 	@OneToMany(mappedBy = "company")
 	@JsonManagedReference
-	private Set<BranchMst> branchMsts;
+	private List<BranchMst> branchMsts;
 
 	@OneToMany(mappedBy = "company")
 	@JsonManagedReference
-	private Set<CompanyUser> companyUsers;
+	private List<CompanyUser> companyUsers;
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
 	@JsonManagedReference
