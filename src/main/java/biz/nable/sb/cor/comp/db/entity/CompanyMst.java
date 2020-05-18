@@ -53,7 +53,7 @@ public class CompanyMst extends Auditable implements Serializable {
 	private YnFlagEnum mcAuthFlg;
 	@Column(length = 3)
 	private String canvassedBranch;
-	private Long canvassedUser;
+	private String canvassedUser;
 	@Column(length = 15)
 	private String treasureCustRef;
 	private String mobileCashAuthorization;
