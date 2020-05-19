@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -19,6 +21,9 @@ import lombok.ToString;
 public class UpdateCompanyRequest implements CommonTempBean {
 
 	private String companyId;
+	
+	@Size(min = 1 , message = "companyName should not be empty")
+	@NotNull(message = "companyName should not be null")
 	private String companyName;
 	private String contactNo;
 	private String emailAddr;
@@ -30,9 +35,25 @@ public class UpdateCompanyRequest implements CommonTempBean {
 	private String mobileCashAuthorization;
 	private String webServiceActivationFlag;
 	private String bulkDirectDebitFlg;
+	
+	@NotNull(message = "corporatePaymentsLimit can not be null")
+	private Long corporatePaymentsLimit;
+	
+	@Size(min = 1 , message = "deviceLocation should not be empty")
+	@NotNull(message = "deviceLocation should not be null")
+	private String deviceLocation;
+	
+	@Size(min = 1 , message = "contactPerson should not be empty")
+	@NotNull(message = "contactPerson should not be null")
 	private String contactPerson;
+	
+	@Size(min = 1 , message = "canvassedBranch should not be empty")
+	@NotNull(message = "canvassedBranch should not be null")
 	private String canvassedBranch;
-	private Long canvassedUser;
+	
+	@Size(min = 1 , message = "canvassedUser should not be empty")
+	@NotNull(message = "canvassedUser can not be null")
+	private String canvassedUser;
 	private Double bulkPaymentLimit;
 	private String wsIp;
 
@@ -40,6 +61,7 @@ public class UpdateCompanyRequest implements CommonTempBean {
 	protected String lastUpdatedBy;
 	@JsonIgnore
 	protected Date lastUpdatedDate;
-	@NotEmpty(message = "companyFeatures cannot be empty")
+	
+
 	private List<Long> companyFeatures = new ArrayList<>();
 }

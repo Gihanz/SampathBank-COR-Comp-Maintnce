@@ -267,7 +267,8 @@ public class CompanyApproval implements CommonApprovalTemplate {
 //		List<CompanyFeatures> companyFeatures = new ArrayList<>();
 
 		Iterable<Features> features = featuresRepository.findAll();
-		Set<CompanyFeatures> companyFeatures = new HashSet<>();
+//		Set<CompanyFeatures> companyFeatures = new HashSet<>();
+		List<CompanyFeatures> companyFeatures = new ArrayList<>();
 
 		for (Features feature : features) {
 			if (requestedFeatures.stream().anyMatch(x -> x.equals(feature.getId()))) {
