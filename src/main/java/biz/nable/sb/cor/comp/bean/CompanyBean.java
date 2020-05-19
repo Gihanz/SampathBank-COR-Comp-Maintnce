@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -19,13 +20,14 @@ import lombok.ToString;
 @ToString
 public class CompanyBean {
 	private Long parentCompanyId;
-	@NotEmpty(message = "companyName should not be empty")
+	
+	@Size(min = 1 , message = "companyName should not be empty")
 	@NotNull(message = "companyName should not be null")
 	private String companyName;
 	private String contactNo;
 	private String emailAddr;
 	
-	@NotEmpty(message = "contactPerson should not be empty")
+	@Size(min = 1 , message = "contactPerson should not be empty")
 	@NotNull(message = "contactPerson should not be null")
 	private String contactPerson;
 	
@@ -43,11 +45,13 @@ public class CompanyBean {
 	private String commTemplateId;
 	private YnFlagEnum mcAuthFlg;
 	
-	@NotEmpty(message = "canvassedBranch should not be empty")
+	@Size(min = 1 , message = "canvassedBranch should not be empty")
 	@NotNull(message = "canvassedBranch should not be null")
 	private String canvassedBranch;
 	
-	private Long canvassedUser;
+	@Size(min = 1 , message = "canvassedUser should not be empty")
+	@NotNull(message = "canvassedUser can not be null")
+	private String canvassedUser;
 	
 	private String treasureCustRef;
 	private String mobileCashAuthorization;
@@ -60,12 +64,13 @@ public class CompanyBean {
 	@JsonIgnore
 	private String userGroup;
 	
+	@NotNull(message = "corporatePaymentsLimit can not be null")
 	private Long corporatePaymentsLimit;
 	
-	@NotEmpty(message = "deviceLocation should not be empty")
+	@Size(min = 1 , message = "deviceLocation should not be empty")
 	@NotNull(message = "deviceLocation should not be null")
 	private String deviceLocation;
 	
-	@NotEmpty(message = "companyFeatures cannot be empty")
+	
 	private List<Long> companyFeatures = new ArrayList<>();
 }
