@@ -210,5 +210,11 @@
 			 </plugin>
 		</plugins>
 	</build>
-
+    <distributionManagement>
+       <repository>
+             <id>github</id>
+             <name>SB_JAVA_COR_COMP_MAINTNCE</name>
+             <url>https://maven.pkg.github.com/n-ableprivatelimitedcolombosrilanka/SB_JAVA_COR_COMP_MAINTNCE</url>
+       </repository>
+    </distributionManagement>
 </project>
